@@ -20,7 +20,7 @@ inputPaths.countries = sys.argv[2]
 inputPaths.croplandLayerList = sys.argv[3].split(";")
 
 for i in range(len(inputPaths.croplandLayerList)):
-    inputPaths.croplandLayerList[i] = inputPaths.croplandLayerList[i][1:-1]
+    inputPaths.croplandLayerList[i] = inputPaths.croplandLayerList[i]
 
 # Parse priorities
 if sys.argv[4] == '#':
