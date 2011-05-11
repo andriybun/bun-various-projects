@@ -10,7 +10,7 @@ from rasterAgreementTable import rasterAgreementTable
 #print findFirst(cls, 2)
 #print findFirst(cls, 3)
 #print findFirst(cls, 4)
-tb = rasterAgreementTable([1, 1, 1], [2, 1, 1])
+tb = rasterAgreementTable([1, 1, 1, 1, 1], [1, 1, 1, 1, 1])
 print 'Weights 1st type: ' + str(tb.weights)
 print 'Weights 2nd type: ' + str(tb.priorityValues2)
 tb.Print()

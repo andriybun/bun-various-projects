@@ -116,6 +116,7 @@ class config():
             clippedName = self.paths.TMPDIR + rName
             self.gp.clip_management(RasterName, coords, clippedName)
             self.paths.inputs.cellAreas = clippedName
+        
         clippedLayerList = []
         
         for RasterName in self.paths.inputs.LayerList:
@@ -125,7 +126,9 @@ class config():
                 self.gp.copy_management(RasterName, clippedName)
             else:
                 self.gp.clip_management(RasterName, coords, clippedName)
+            
             clippedLayerList.append(clippedName)
+        
         self.paths.inputs.LayerList = clippedLayerList
                 
     # Verify if rasters exist

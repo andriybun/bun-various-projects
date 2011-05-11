@@ -18,7 +18,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     interface.PrintTextTime("Started")
 
     runConfig = config(interface, inputPaths, coords)
-    
+ 
     gp = arcgisscripting.create()
     gp.CheckOutExtension("Spatial")
     gp.OverWriteOutput = 1
@@ -38,14 +38,6 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
 
     weights = agreementTable.weights
     
-#    interface.PrintText(str(priorityValues))
-#    interface.PrintText(str(weights))
-
-    # Land classes:
-#    landClasses = agreementTable.classes1
-   
-#    interface.PrintText(str(landClasses))
-
     # Calculations:
     list_of_rasters = ""
     list_of_rasters_weights = ""
@@ -70,17 +62,13 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         list_of_rasters_weights += "\'" + TmpName + "\';"
         list_of_rasters_one += "\'" + TmpName + "one\';"
         list_of_rasters_two += "\'" + TmpName + "two\';"
-#        interface.PrintText(str(i))
-#        interface.PrintText(runConfig.paths.inputs.LayerList[i])
-#        interface.PrintText(runConfig.paths.tmp.LayerList[i])
-#        interface.PrintText(str(list_of_rasters_weights))
 
     # Computing per cell sums of these rasters:
     gp.CellStatistics_sa(list_of_rasters, temp3, "SUM")
     gp.CellStatistics_sa(list_of_rasters_weights, temp1, "SUM")
     gp.CellStatistics_sa(list_of_rasters_one, temp2, "SUM")
     gp.CellStatistics_sa(list_of_rasters_two, temp4, "SUM")
-    
+
     # Computing the average:
     gp.Divide_sa(temp3, temp2, runConfig.paths.resultAvg)
     # Formatting the output:
@@ -129,7 +117,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     row.setValue("LAND_CLASS", agreementTable.FindFirst(currRastAgree, currRastAgree2))
     rows.UpdateRow(row)
     x = x + 1;
-#    interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
+    #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
     # Processing rows:
     while x < num:
         row = rows.next()
@@ -146,7 +134,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         prevCountry = currCountry
         prevRastAgree = currRastAgree
         prevRastAgree2 = currRastAgree2
-#        interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
+        #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
 
     #===============================================================================
     # Writing results to the output raster
@@ -158,7 +146,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     del rows
 
     # Deleting temporary rasters:
-    runConfig.DeleteDir(runConfig.paths.TMPDIR)
+    #runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')
     
