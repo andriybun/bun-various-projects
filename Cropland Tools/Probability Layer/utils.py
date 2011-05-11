@@ -14,12 +14,18 @@ import math
 #  with 0
 #===============================================================================
 def MakeRasterOfValues( gp, rast, order, weight, weight2, out ):
-    gp.Con_sa(rast, order, out, "0", "VALUE > 0")
-    gp.BuildRasterAttributeTable_management(out,"OVERWRITE")
-    gp.Con_sa(rast, weight, out + "one", "0", "VALUE > 0")
-    gp.BuildRasterAttributeTable_management(out + "one","OVERWRITE")
-    gp.Con_sa(rast, weight2, out + "two", "0", "VALUE > 0")
-    gp.BuildRasterAttributeTable_management(out + "two","OVERWRITE")
+    onesRast = out + "bin"
+    gp.Con_sa(rast, 1, onesRast, 0, "VALUE > 0")
+    gp.BuildRasterAttributeTable_management(onesRast, "OVERWRITE")
+    gp.Times_sa(onesRast, order, out)
+    gp.Times_sa(onesRast, weight, out + "one")
+    gp.Times_sa(onesRast, weight2, out + "two")
+    #gp.Con_sa(rast, order, out, 0, "VALUE > 0")
+    #gp.BuildRasterAttributeTable_management(out, "OVERWRITE")
+    #gp.Con_sa(rast, weight, out + "one", 0, "VALUE > 0")
+    #gp.BuildRasterAttributeTable_management(out + "one", "OVERWRITE")
+    #gp.Con_sa(rast, weight2, out + "two", 0, "VALUE > 0")
+    #gp.BuildRasterAttributeTable_management(out + "two", "OVERWRITE")
 
 #===============================================================================
 # Validation function
