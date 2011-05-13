@@ -29,8 +29,6 @@ def ReplaceNodata(inRaster, outRaster):
 
 
 if __name__ == '__main__':
-#    inRaster = sys.argv[1]
-#    outRaster = sys.argv[2]
-    inRaster = 'd:\path'
-    outRaster = 'd:\result'
+    inRaster = sys.argv[1]
+    outRaster = sys.argv[2]
     ReplaceNodata(inRaster, outRaster)

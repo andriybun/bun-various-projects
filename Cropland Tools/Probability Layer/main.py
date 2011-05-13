@@ -2,10 +2,12 @@
 # Author: Andriy Bun
 # Name:   ...
 
+import sys
+sys.path.append('..\\Common')
+
 from RunAll import RunAll
 from iterableStruct import iterableStruct
 from GeoprocessingInfo import GeoprocessingInfo, GeoprocessingInfo_debug
-import sys
 
 #===============================================================================
 # ArcGIS GUI version
@@ -20,7 +22,7 @@ inputPaths.countries = sys.argv[2]
 inputPaths.croplandLayerList = sys.argv[3].split(";")
 
 for i in range(len(inputPaths.croplandLayerList)):
-    inputPaths.croplandLayerList[i] = inputPaths.croplandLayerList[i]
+    inputPaths.croplandLayerList[i] = inputPaths.croplandLayerList[i][1:-1]
 
 # Parse priorities
 if sys.argv[4] == '#':

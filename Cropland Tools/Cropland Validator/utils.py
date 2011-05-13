@@ -158,6 +158,7 @@ class utils:
         else:
             self.gp.clip_management(inputRaster, coords, OutRaster1)
         self.gp.Int_sa(OutRaster1, outputRaster)
+        self.gp.BuildRasterAttributeTable_management(outputRaster, "OVERWRITE")
 
     # clip an area from input raster    
     def clipRaster(self, inputRaster, outputRaster, coords):
@@ -165,6 +166,7 @@ class utils:
             self.gp.copy_management(inputRaster, outputRaster)
         else:
             self.gp.clip_management(inputRaster, coords, outputRaster)
+        #self.gp.BuildRasterAttributeTable_management(outputRaster, "OVERWRITE")
 
     # converting inputs to proper units
     def prepareRasters(self):
