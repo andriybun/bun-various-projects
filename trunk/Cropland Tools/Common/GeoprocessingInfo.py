@@ -14,7 +14,6 @@ import arcgisscripting
 class GeoprocessingInfo():
     def __init__(self):
         self.gp = arcgisscripting.create()
-        self.InitialiseDefaultProgressor('Cropland validator working...')
     
     # print status with time
     def PrintTextTime(self, textToAppend):
@@ -46,7 +45,6 @@ class GeoprocessingInfo():
 class GeoprocessingInfo_debug():
     def __init__(self):
         self.gp = arcgisscripting.create()
-        self.InitialiseDefaultProgressor('Cropland validator working...')
     
     # print status with time
     def PrintTextTime(self, textToAppend):
