@@ -5,9 +5,14 @@
 # Modified: 
 '''
 
+import sys
+import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
+
 from iterableStruct import iterableStruct
 from runAll import runAll
-import sys, time
+import time
 import arcgisscripting
 from GeoprocessingInfo import GeoprocessingInfo, GeoprocessingInfo_debug
 

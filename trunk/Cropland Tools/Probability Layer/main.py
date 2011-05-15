@@ -3,7 +3,9 @@
 # Name:   ...
 
 import sys
-sys.path.append('..\\Common')
+import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
 
 from RunAll import RunAll
 from iterableStruct import iterableStruct
@@ -22,7 +24,8 @@ inputPaths.countries = sys.argv[2]
 inputPaths.croplandLayerList = sys.argv[3].split(";")
 
 for i in range(len(inputPaths.croplandLayerList)):
-    inputPaths.croplandLayerList[i] = inputPaths.croplandLayerList[i][1:-1]
+    if (inputPaths.croplandLayerList[i][0] == '\''):
+        inputPaths.croplandLayerList[i] = inputPaths.croplandLayerList[i][1:-1]
 
 # Parse priorities
 if sys.argv[4] == '#':
