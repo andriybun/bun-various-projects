@@ -75,8 +75,8 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
         # Adding a new field for the result:
         gp.addfield (combined,"CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
         # Creating cursor:
-        rowsClasses = gp.SearchCursor(OutRaster,"","","",unitsName)
-        rowsCombined = gp.UpdateCursor(combined,"","","","VALUE")
+        rowsClasses = gp.SearchCursor(OutRaster, "", "", "", unitsName)
+        rowsCombined = gp.UpdateCursor(combined, "", "", "", "VALUE")
         # Iterating through the table
         rowClasses = rowsClasses.next()
         rowCombined = rowsCombined.next()
