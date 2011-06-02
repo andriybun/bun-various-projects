@@ -6,7 +6,9 @@ Created on Fri May 13 13:39:39 2011
 """
 
 import sys
-sys.path.append('..\\Common')
+import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
 
 from iterableStruct import iterableStruct
 from GeoprocessingInfo import GeoprocessingInfo, GeoprocessingInfo_debug

@@ -33,7 +33,10 @@ class config():
 
     def __InitPaths__(self, inputPaths = None):
         # Main directories
-        self.paths.HOMEDIR = os.getcwd() + "\\"
+        if inputPaths is None:
+            self.paths.HOMEDIR = os.getcwd() + "\\"
+        else:
+            self.paths.HOMEDIR = os.path.dirname(inputPaths.result) + "\\"
 #        self.paths.INPUTDIR = self.paths.HOMEDIR + "input_5\\"
         self.paths.INPUTDIR = self.paths.HOMEDIR + "input\\"
         self.paths.RESULTDIR = self.paths.HOMEDIR + "results\\"
@@ -61,7 +64,9 @@ class config():
                 os.mkdir(self.paths.RESULTDIR)
 
             self.paths.result = self.paths.RESULTDIR + "mark_high"
-            self.paths.resultAvg = self.paths.RESULTDIR + "mark_high_a"
+            self.paths.resultAvg = self.paths.RESULTDIR + "mark_high_avg.img"
+            self.paths.resultMin = self.paths.RESULTDIR + "mark_high_min.img"
+            self.paths.resultMax = self.paths.RESULTDIR + "mark_high_max.img"
         else:
             # Input rasters:
             self.paths.inputs = iterableStruct()
@@ -72,7 +77,10 @@ class config():
             
             # Result:
             self.paths.result = inputPaths.result
-            self.paths.resultAvg = inputPaths.resultAvg
+            result_name_tuple = os.path.splitext(self.paths.result)
+            self.paths.resultAvg = result_name_tuple[0] + "_avg" + result_name_tuple[1]
+            self.paths.resultMin = result_name_tuple[0] + "_min" + result_name_tuple[1]
+            self.paths.resultMax = result_name_tuple[0] + "_max" + result_name_tuple[1]
         
         # Temporary rasters:
         self.paths.tmp = iterableStruct()

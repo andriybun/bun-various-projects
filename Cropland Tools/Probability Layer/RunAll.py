@@ -19,6 +19,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
 
     runConfig = config(interface, inputPaths, coords)
  
+    interface.PrintText(str(runConfig.paths.resultAvg))
     gp = arcgisscripting.create()
     gp.CheckOutExtension("Spatial")
     gp.OverWriteOutput = 1
@@ -49,6 +50,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     temp2 = runConfig.paths.tmp.temp2
     temp3 = runConfig.paths.tmp.temp3
     temp4 = runConfig.paths.tmp.temp4
+    temp5 = runConfig.paths.tmp.temp4 + "stat"
 
     #===============================================================================
     # Creating table:
@@ -69,8 +71,12 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     gp.CellStatistics_sa(list_of_rasters_one, temp2, "SUM")
     gp.CellStatistics_sa(list_of_rasters_two, temp4, "SUM")
 
-    # Computing the average:
+    # Computing statistics:
     gp.Divide_sa(temp3, temp2, runConfig.paths.resultAvg)
+    gp.CellStatistics_sa(list_of_rasters, temp5, "MINIMUM")
+    gp.Con_sa(temp5, temp5, runConfig.paths.resultMin, "#", "VALUE > 0")
+    gp.CellStatistics_sa(list_of_rasters, temp5, "MAXIMUM")
+    gp.Con_sa(temp5, temp5, runConfig.paths.resultMax, "#", "VALUE > 0")
     # Formatting the output:
     gp.Int_sa(temp1, runConfig.paths.tmp.sumRast)
     gp.BuildRasterAttributeTable_management(runConfig.paths.tmp.sumRast,"OVERWRITE")
@@ -146,7 +152,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     del rows
 
     # Deleting temporary rasters:
-    #runConfig.DeleteDir(runConfig.paths.TMPDIR)
+    runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')
     
