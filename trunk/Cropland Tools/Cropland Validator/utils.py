@@ -128,7 +128,7 @@ class utils:
         tmp.OutRaster1    = paramsStruct.tmpDir + "tmp1"
         tmp.OutRaster2    = paramsStruct.tmpDir + "tmp2"
         tmp.OutRaster3     = paramsStruct.tmpDir + "tmp3"
-        tmp.OutClass       = paramsStruct.tmpDir + "class"
+        tmp.OutClass       = paramsStruct.tmpDir + "class_%d"
         tmp.differName = "differ"
         tmp.differ = paramsStruct.tmpDir + tmp.differName
         tmp.zones = paramsStruct.tmpDir + "zones"
