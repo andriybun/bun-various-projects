@@ -55,7 +55,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     # loop by all the indeces within the range (minClass, maxClass) in reverse order
     for i in range(maxClass, minClass - 1, -1):
         # raster containing the result of calculations for current index
-        OutRaster = OutClass + str(i)
+        OutRaster = OutClass % i
         # selecting only cells with the values that correspond to current index
         gp.Con_sa(mark_high32, cell_area_min, OutRaster1, 0, "VALUE = " + str(i))
         # zonal sum => calculating total area by countries
@@ -71,7 +71,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gui.PrintText('Stage 2. Creating combined raster')
     gui.InitialiseStepProgressor('Creating combined raster')
     for i in range(maxClass, minClass - 1, -1):
-        OutRaster = OutClass + str(i)
+        OutRaster = OutClass % i
         # Adding a new field for the result:
         gp.addfield (combined,"CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
         # Creating cursor:
