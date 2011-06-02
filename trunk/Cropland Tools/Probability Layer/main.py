@@ -46,8 +46,8 @@ else:
 
 coords = sys.argv[6]
 
-inputPaths.result = sys.argv[num_args-2]
-inputPaths.resultAvg = sys.argv[num_args-1]
+inputPaths.result = sys.argv[num_args-1]
+#inputPaths.resultAvg = sys.argv[num_args-1]
 
 interface = GeoprocessingInfo()
 RunAll(interface, inputPaths = inputPaths, coords = coords, priorityValues = priorityValues, priorityValues2 = priorityValues2)

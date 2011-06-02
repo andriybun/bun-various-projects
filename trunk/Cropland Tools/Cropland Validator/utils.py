@@ -19,7 +19,8 @@ class utils:
         self.gp.CheckOutExtension("Spatial")
         self.gp.OverWriteOutput = 1 # allow overwriting rasters:
         # initialize roots and parameters
-        self.paramsStruct = self.initParams()
+        self.paramsStruct = self.initParams(output)
+        gui.PrintText("Homedir: " + str(self.paramsStruct.homeDir))
         # initialize paths to all the rasters
         rasterNames = self.defineRasterPaths()
         if inputsNotClipped is None:
@@ -33,10 +34,12 @@ class utils:
         self.tmp = rasterNames.tmp
 
     # define roots, parameters
-    def initParams(self):
+    def initParams(self, output = None):
         paramsStruct = iterableStruct()
-        
-        paramsStruct.homeDir = os.getcwd() + "\\"   # current directory where the script is located
+        if output is None:
+            paramsStruct.homeDir = os.getcwd() + "\\"
+        else:
+            paramsStruct.homeDir = os.path.dirname(output) + "\\"
         paramsStruct.inputDir = "..\\input_new\\"   # move all the rasters and all data to this directory:
         paramsStruct.resultDir = "test_results_to_be_deleted\\" # result will be saved to this directory:
         paramsStruct.tmpDir = paramsStruct.homeDir + "tmp\\"
