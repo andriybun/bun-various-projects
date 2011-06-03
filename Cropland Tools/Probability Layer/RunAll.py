@@ -56,6 +56,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     # Creating table:
     #===============================================================================
     interface.PrintTextTime("Computations started...")
+    interface.PrintTextTime("Processing input cropland rasters...")
     for i in range(0, runConfig.num_rasters):
         InputName = runConfig.paths.inputs.LayerList[i]
         TmpName = runConfig.paths.tmp.LayerList[i]
@@ -64,7 +65,9 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         list_of_rasters_weights += "\'" + TmpName + "\';"
         list_of_rasters_one += "\'" + AddSuffixToName(TmpName, "_one") + "\';"
         list_of_rasters_two += "\'" + AddSuffixToName(TmpName, "_two") + "\';"
+        gp.Delete_management(InputName)
 
+    interface.PrintTextTime("Computing statistics...")
     # Computing per cell sums of these rasters:
     gp.CellStatistics_sa(list_of_rasters, temp3, "SUM")
     gp.CellStatistics_sa(list_of_rasters_weights, temp1, "SUM")
@@ -76,6 +79,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     gp.Con_sa(temp5, temp5, runConfig.paths.resultMin, "#", "VALUE > 0")
     gp.CellStatistics_sa(list_of_rasters, temp5, "MAXIMUM")
     gp.Con_sa(temp5, temp5, runConfig.paths.resultMax, "#", "VALUE > 0")
+    interface.PrintTextTime("Statistics computed.")
     # Formatting the output:
     gp.Int_sa(temp1, runConfig.paths.tmp.sumRast)
     gp.BuildRasterAttributeTable_management(runConfig.paths.tmp.sumRast,"OVERWRITE")
@@ -124,7 +128,6 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     x = x + 1;
     #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
     # Processing rows:
-    interface.PrintText("b4 while")
     while x < num:
         row = rows.next()
         currCountry = row.getValue(unitsFieldName)

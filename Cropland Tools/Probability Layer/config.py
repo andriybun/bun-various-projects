@@ -36,7 +36,8 @@ class config():
         if inputPaths is None:
             self.paths.HOMEDIR = os.getcwd() + "\\"
         else:
-            self.paths.HOMEDIR = os.path.dirname(inputPaths.result) + "\\"
+            self.paths.HOMEDIR = os.getcwd() + "\\"
+#            self.paths.HOMEDIR = os.path.dirname(inputPaths.result) + "\\"
         self.paths.INPUTDIR = self.paths.HOMEDIR + "input\\"
         self.paths.RESULTDIR = self.paths.HOMEDIR + "results\\"
         self.paths.TMPDIR = self.paths.HOMEDIR + "tmp\\"
