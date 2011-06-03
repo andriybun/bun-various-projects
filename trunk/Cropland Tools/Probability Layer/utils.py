@@ -8,18 +8,22 @@ Created on Mon Nov 29 15:36:20 2010
 """
 
 import math
+import os
+
+def AddSuffixToName( name, suffix ):
+    return os.path.splitext(name)[0] + suffix + os.path.splitext(name)[1]
 
 #===============================================================================
 #  Method to replace all values in a raster with 'weight', and zeros or noData
 #  with 0
 #===============================================================================
 def MakeRasterOfValues( gp, rast, order, weight, weight2, out ):
-    onesRast = out + "bin"
+    onesRast = AddSuffixToName(out, "_bin")
     gp.Con_sa(rast, 1, onesRast, 0, "VALUE > 0")
     gp.BuildRasterAttributeTable_management(onesRast, "OVERWRITE")
     gp.Times_sa(onesRast, order, out)
-    gp.Times_sa(onesRast, weight, out + "one")
-    gp.Times_sa(onesRast, weight2, out + "two")
+    gp.Times_sa(onesRast, weight, AddSuffixToName(out, "_one"))
+    gp.Times_sa(onesRast, weight2, AddSuffixToName(out, "_two"))
     #gp.Con_sa(rast, order, out, 0, "VALUE > 0")
     #gp.BuildRasterAttributeTable_management(out, "OVERWRITE")
     #gp.Con_sa(rast, weight, out + "one", 0, "VALUE > 0")

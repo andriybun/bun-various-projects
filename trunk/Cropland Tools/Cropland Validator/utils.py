@@ -40,6 +40,9 @@ class utils:
             paramsStruct.homeDir = os.getcwd() + "\\"
         else:
             paramsStruct.homeDir = os.path.dirname(output) + "\\"
+            #paramsStruct.homeDir = "C:\\ProgramFiles\\TmpRasters\\"
+            #if not os.path.exists(paramsStruct.homeDir):
+            #    os.mkdir(paramsStruct.homeDir)
         paramsStruct.inputDir = "..\\input_new\\"   # move all the rasters and all data to this directory:
         paramsStruct.resultDir = "test_results_to_be_deleted\\" # result will be saved to this directory:
         paramsStruct.tmpDir = paramsStruct.homeDir + "tmp\\"

@@ -16,10 +16,12 @@ def ValidateRaster(rasterToValidate, areaGrid, nationalStatistics):
     gp.CheckOutExtension("Spatial")
     gp.OverWriteOutput = 1
 
-    TMPDIR = os.getcwd() + "\\"
-    tmpRaster = TMPDIR + "tmpRaster"
-    tmpCombined = TMPDIR + "tmpCombined"
-    nationalStatisticsInt = TMPDIR + "natStatInt"
+    TMPDIR = os.path.dirname(rasterToValidate) + "\\validation_tmp\\"
+    if not os.path.isdir(TMPDIR):
+        os.mkdir(TMPDIR)
+    tmpRaster = TMPDIR + "tmpRaster.img"
+    tmpCombined = TMPDIR + "tmpCombined.img"
+    nationalStatisticsInt = TMPDIR + "natStatInt.img"
 
     gp.Times_sa(rasterToValidate, areaGrid, tmpRaster)
     gp.Divide_sa(tmpRaster, 1000, tmpCombined)
@@ -27,8 +29,8 @@ def ValidateRaster(rasterToValidate, areaGrid, nationalStatistics):
     gp.ZonalStatistics_sa(nationalStatisticsInt, "Value", tmpCombined, tmpRaster, "SUM", "DATA")
     gp.Combine_sa("'" + nationalStatisticsInt + "';'" + tmpRaster + "'", tmpCombined)
 
-    nationalStatisticsName = os.path.basename(nationalStatisticsInt)
-    tmpRasterName = os.path.basename(tmpRaster)
+    nationalStatisticsName = os.path.splitext(os.path.basename(nationalStatisticsInt))[0]
+    tmpRasterName = os.path.splitext(os.path.basename(tmpRaster))[0]
 
     gp.AddMessage("\nnat. stat.\t|  computed\t|  error")
     gp.AddMessage("---------------------------------------")
@@ -43,9 +45,10 @@ def ValidateRaster(rasterToValidate, areaGrid, nationalStatistics):
         gp.AddMessage(outString)
         row = rows.next()
 
-    gp.delete_management(tmpRaster)
-    gp.delete_management(tmpCombined)
-    gp.delete_management(nationalStatisticsInt)
+#    gp.delete_management(tmpRaster)
+#    gp.delete_management(tmpCombined)
+#    gp.delete_management(nationalStatisticsInt)
+    os.removedirs(TMPDIR)
 
 if __name__ == '__main__':
     rasterToValidate = sys.argv[1]
