@@ -50,7 +50,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     temp2 = runConfig.paths.tmp.temp2
     temp3 = runConfig.paths.tmp.temp3
     temp4 = runConfig.paths.tmp.temp4
-    temp5 = runConfig.paths.tmp.temp4 + "stat"
+    temp5 = runConfig.paths.tmp.temp5
 
     #===============================================================================
     # Creating table:
@@ -62,15 +62,14 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         MakeRasterOfValues(gp, InputName, 2**i, weights[i], priorityValues2[i], TmpName)
         list_of_rasters += "\'" + InputName + "\';"
         list_of_rasters_weights += "\'" + TmpName + "\';"
-        list_of_rasters_one += "\'" + TmpName + "one\';"
-        list_of_rasters_two += "\'" + TmpName + "two\';"
+        list_of_rasters_one += "\'" + AddSuffixToName(TmpName, "_one") + "\';"
+        list_of_rasters_two += "\'" + AddSuffixToName(TmpName, "_two") + "\';"
 
     # Computing per cell sums of these rasters:
     gp.CellStatistics_sa(list_of_rasters, temp3, "SUM")
     gp.CellStatistics_sa(list_of_rasters_weights, temp1, "SUM")
     gp.CellStatistics_sa(list_of_rasters_one, temp2, "SUM")
     gp.CellStatistics_sa(list_of_rasters_two, temp4, "SUM")
-
     # Computing statistics:
     gp.Divide_sa(temp3, temp2, runConfig.paths.resultAvg)
     gp.CellStatistics_sa(list_of_rasters, temp5, "MINIMUM")
@@ -95,17 +94,17 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     # "countries", "sum of input rasters", "area by country":
     # 'temp3' field refers to total area of land class by country
     gp.Combine_sa("\'" + runConfig.paths.tmp.sumRast + "\';\'" + runConfig.paths.tmp.sumRastOne + "\';\'" + runConfig.paths.tmp.sumRastTwo + "\';\'" + runConfig.paths.inputs.units + "\';\'" + temp3 + "\'", temp1)
-
     #===============================================================================
     # Processing table data:
     #===============================================================================
     # field names:
-    unitsFieldName = os.path.basename(runConfig.paths.inputs.units)
-    sumRastFieldName = os.path.basename(runConfig.paths.tmp.sumRast)
-    sumRastOneFieldName = os.path.basename(runConfig.paths.tmp.sumRastOne)
-    sumRastTwoFieldName = os.path.basename(runConfig.paths.tmp.sumRastTwo)
-    areaByUnitsFieldName = os.path.basename(temp3)
+    unitsFieldName = os.path.splitext(os.path.basename(runConfig.paths.inputs.units))[0]
+    sumRastFieldName = os.path.splitext(os.path.basename(runConfig.paths.tmp.sumRast))[0]
+    sumRastOneFieldName = os.path.splitext(os.path.basename(runConfig.paths.tmp.sumRastOne))[0]
+    sumRastTwoFieldName = os.path.splitext(os.path.basename(runConfig.paths.tmp.sumRastTwo))[0]
+    areaByUnitsFieldName = os.path.splitext(os.path.basename(temp3))[0]
     # Adding a new field for the result:
+    interface.PrintText("started processing table")
     gp.addfield (temp1, "LAND_CLASS","LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
     # Creating cursor:
     rows = gp.UpdateCursor(temp1, "", "", "", unitsFieldName + "; " + sumRastOneFieldName + "; "  + sumRastTwoFieldName + "; " + areaByUnitsFieldName + " DESC")
@@ -125,6 +124,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     x = x + 1;
     #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
     # Processing rows:
+    interface.PrintText("b4 while")
     while x < num:
         row = rows.next()
         currCountry = row.getValue(unitsFieldName)
@@ -145,13 +145,14 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     #===============================================================================
     # Writing results to the output raster
     #===============================================================================
-    interface.PrintTextTime('Writing result')
+    interface.PrintTextTime('Writing result...')
     gp.ExtractByAttributes_sa(temp1 + ".LAND_CLASS", "LAND_CLASS > 0", runConfig.paths.result)
 
     del row
     del rows
 
     # Deleting temporary rasters:
+    interface.PrintTextTime('Done! Deleting temporary rasters')
     runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')

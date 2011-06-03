@@ -37,7 +37,6 @@ class config():
             self.paths.HOMEDIR = os.getcwd() + "\\"
         else:
             self.paths.HOMEDIR = os.path.dirname(inputPaths.result) + "\\"
-#        self.paths.INPUTDIR = self.paths.HOMEDIR + "input_5\\"
         self.paths.INPUTDIR = self.paths.HOMEDIR + "input\\"
         self.paths.RESULTDIR = self.paths.HOMEDIR + "results\\"
         self.paths.TMPDIR = self.paths.HOMEDIR + "tmp\\"
@@ -63,7 +62,7 @@ class config():
             if not os.path.isdir(self.paths.RESULTDIR):
                 os.mkdir(self.paths.RESULTDIR)
 
-            self.paths.result = self.paths.RESULTDIR + "mark_high"
+            self.paths.result = self.paths.RESULTDIR + "mark_high.img"
             self.paths.resultAvg = self.paths.RESULTDIR + "mark_high_avg.img"
             self.paths.resultMin = self.paths.RESULTDIR + "mark_high_min.img"
             self.paths.resultMax = self.paths.RESULTDIR + "mark_high_max.img"
@@ -78,6 +77,13 @@ class config():
             # Result:
             self.paths.result = inputPaths.result
             result_name_tuple = os.path.splitext(self.paths.result)
+            if result_name_tuple[1] != ".img":
+                self.gui.Warning("Warning: '" + os.path.basename(self.paths.result) + \
+                "' is not a valid img rater name! Changed to '" + \
+                os.path.basename(result_name_tuple[0]) + ".img'")
+                self.paths.result = result_name_tuple[0] + ".img"
+                result_name_tuple = os.path.splitext(self.paths.result)
+
             self.paths.resultAvg = result_name_tuple[0] + "_avg" + result_name_tuple[1]
             self.paths.resultMin = result_name_tuple[0] + "_min" + result_name_tuple[1]
             self.paths.resultMax = result_name_tuple[0] + "_max" + result_name_tuple[1]
@@ -85,43 +91,44 @@ class config():
         # Temporary rasters:
         self.paths.tmp = iterableStruct()
 
-        tmpPrefix = self.paths.TMPDIR + "tmp"
+        tmpPrefix = self.paths.TMPDIR + "tmp_%d.img"
         
         self.paths.tmp.LayerList = []
         
         for i in range(1, len(self.paths.inputs.LayerList) + 1):
-            self.paths.tmp.LayerList.append(tmpPrefix + str(i))
+            self.paths.tmp.LayerList.append(tmpPrefix % i)
 
-        self.paths.tmp.temp1      = self.paths.TMPDIR + "temp1"
-        self.paths.tmp.temp2      = self.paths.TMPDIR + "temp2"
-        self.paths.tmp.temp3      = self.paths.TMPDIR + "temp3"
-        self.paths.tmp.temp4      = self.paths.TMPDIR + "temp4"
-        self.paths.tmp.sumRast    = self.paths.TMPDIR + "sumRast"
-        self.paths.tmp.sumRastOne = self.paths.TMPDIR + "sumRastOne"
-        self.paths.tmp.sumRastTwo = self.paths.TMPDIR + "sumRastTwo"
+        self.paths.tmp.temp1      = self.paths.TMPDIR + "temp1.img"
+        self.paths.tmp.temp2      = self.paths.TMPDIR + "temp2.img"
+        self.paths.tmp.temp3      = self.paths.TMPDIR + "temp3.img"
+        self.paths.tmp.temp4      = self.paths.TMPDIR + "temp4.img"
+        self.paths.tmp.temp5      = self.paths.TMPDIR + "temp5.img"
+        self.paths.tmp.sumRast    = self.paths.TMPDIR + "sumRast.img"
+        self.paths.tmp.sumRastOne = self.paths.TMPDIR + "sumRastOne.img"
+        self.paths.tmp.sumRastTwo = self.paths.TMPDIR + "sumRastTwo.img"
 
     # clip an area from input raster    
     def ClipRasters(self, coords):
         if coords is None or coords == '#':
             RasterName = self.paths.inputs.units
-            rName = os.path.basename(RasterName)
-            clippedName = self.paths.TMPDIR + rName
+            rName = os.path.splitext(os.path.basename(RasterName))
+            clippedName = self.paths.TMPDIR + rName[0][0:9] + rName[1]
             self.gp.copy_management(RasterName, clippedName)
             self.paths.inputs.units = clippedName
             RasterName = self.paths.inputs.cellAreas
-            rName = os.path.basename(RasterName)
-            clippedName = self.paths.TMPDIR + rName
+            rName = os.path.splitext(os.path.basename(RasterName))
+            clippedName = self.paths.TMPDIR + rName[0][0:9] + rName[1]
             self.gp.copy_management(RasterName, clippedName)
             self.paths.inputs.cellAreas = clippedName
         else:
             RasterName = self.paths.inputs.units
-            rName = os.path.basename(RasterName)
-            clippedName = self.paths.TMPDIR + rName
+            rName = os.path.splitext(os.path.basename(RasterName))
+            clippedName = self.paths.TMPDIR + rName[0][0:9] + rName[1]
             self.gp.clip_management(RasterName, coords, clippedName)
             self.paths.inputs.units = clippedName
             RasterName = self.paths.inputs.cellAreas
-            rName = os.path.basename(RasterName)
-            clippedName = self.paths.TMPDIR + rName
+            rName = os.path.splitext(os.path.basename(RasterName))
+            clippedName = self.paths.TMPDIR + rName[0][0:9] + rName[1]
             self.gp.clip_management(RasterName, coords, clippedName)
             self.paths.inputs.cellAreas = clippedName
         
