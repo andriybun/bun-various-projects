@@ -16,12 +16,12 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     tmpDir = paramsStruct.tmpDir
     outputs = pathsAndUtilities.outputs
 
-    statisticsLevel1 = tmpDir + inputsClipped.levelStatisticsName[level-1]
-    statisticsLevel2 = tmpDir + inputsClipped.levelStatisticsName[level]
+    statisticsLevel1 = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[level-1]
+    statisticsLevel2 = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[level]
 
     # temporary rasters
     differName = tmp.differName
-    differ = tmpDir + differName
+    differ = tmp.differ
     zones = tmp.zones
     areaUnits = tmp.areaUnits
     sumLevel1 = tmp.sumLevel1
@@ -54,7 +54,7 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     # -1 - sum on national level is higher; we run the algorithm again for calibrated numbers
     # calculating national totals for zones with difference >= 0
     gp.Con_sa(zones, outputs.resultLevel[level-1], OutRaster1, "#", "VALUE = 1")
-    gp.Con_sa(OutRaster1, tmp.cell_area_min, OutRaster2, "#", "VALUE > 0")
+    gp.Con_sa(OutRaster1, inputsClipped.cell_area_min, OutRaster2, "#", "VALUE > 0")
     gp.ZonalStatistics_sa(statisticsLevel1, "Value", OutRaster2, sumLevel1, "SUM", "DATA")
     # replacing 'NoData' values with zeros
     gp.IsNull_sa(sumLevel1, OutRaster2)
@@ -62,7 +62,7 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     gp.Con_sa(statisticsLevel1, OutRaster1, sumLevel1, "#", "VALUE >= 0")
     # calculating subnational totals for zones with difference >= 0
     gp.Con_sa(zones, outputs.resultLevel[level], OutRaster1, "#", "VALUE = 1")
-    gp.Con_sa(OutRaster1, tmp.cell_area_min, OutRaster2, "#", "VALUE > 0")
+    gp.Con_sa(OutRaster1, inputsClipped.cell_area_min, OutRaster2, "#", "VALUE > 0")
     gp.ZonalStatistics_sa(statisticsLevel1, "Value", OutRaster2, sumLevel2, "SUM", "DATA")
     # replacing 'NoData' values with zeros
     gp.IsNull_sa(sumLevel2, OutRaster2)
@@ -72,13 +72,13 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     gp.Minus_sa(sumLevel2,sumLevel1,differ)
     # calculating national totals for zones with difference < 0
     gp.Con_sa(zones, outputs.resultLevel[level-1], OutRaster1, "#", "VALUE = -1")
-    gp.Con_sa(OutRaster1, tmp.cell_area_min, OutRaster2, "#", "VALUE > 0")
+    gp.Con_sa(OutRaster1, inputsClipped.cell_area_min, OutRaster2, "#", "VALUE > 0")
     gp.ZonalStatistics_sa(statisticsLevel1, "Value", OutRaster2, OutRaster3, "SUM", "DATA")
     # calculating calibrated values for areas where difference was < 0
     gp.Minus_sa(OutRaster3,differ,OutRaster1)
     # selecting only those areas, where difference was < 0# selecting only those areas, where difference was < 0
     gp.Con_sa(zones, OutRaster1, OutRaster2, "#", "VALUE = -1")
-    gp.Int_sa(OutRaster2,differ)
+    gp.Int_sa(OutRaster2, differ)
     gp.BuildRasterAttributeTable_management(differ,"OVERWRITE")
     cursor=gp.SearchCursor(differ)
     if cursor:
@@ -92,7 +92,7 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     gp.Con_sa(zones, outputs.resultLevel[level-1], OutRaster1, "#", "VALUE = 0")
     gp.Con_sa(zones, outputs.resultLevel[level], OutRaster2, OutRaster1, "VALUE = 1")
     gp.Con_sa(zones, outputs.resultForCalibratedLevel[level], outputs.combinedResult[level], OutRaster2, "VALUE = -1")
-    
-    pathsAndUtilities.cleanUp(tmp)
-    
+    gui.PrintText('Cleanup temporary rasters')
+    #pathsAndUtilities.cleanUp(tmp)
+    pathsAndUtilities.DeleteDir(tmpDir)
 

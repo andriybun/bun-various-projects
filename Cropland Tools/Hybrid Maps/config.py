@@ -19,9 +19,11 @@ class config():
     def __InitPaths__(self, paths):
         self.paths = paths
         self.paths.tmp = iterableStruct()
-        self.paths.tmp.dir = os.getcwd() + '\\tmp\\'
-        if not os.path.isdir(self.paths.tmp.dir):
-            os.mkdir(self.paths.tmp.dir)
+        self.paths.tmp.DIR = os.getcwd() + '\\tmp\\'
+        if os.path.isdir(self.paths.tmp.DIR):
+            self.DeleteDir(self.paths.tmp.DIR)
+        os.mkdir(self.paths.tmp.DIR)
+        self.paths.tmp.combinedRaster = self.paths.tmp.DIR + 'combined'
 
     # Verify if rasters exist
     def VerifyRasters(self, ListOfRasters, gui):
@@ -44,3 +46,39 @@ class config():
             else:
                 self.gp.delete_management(RasterName)
 
+    # Delete all files from a directory
+    def DeleteDir(self, dir):
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
+
+    def ClipSingleRaster(self, inRaster, outRaster, coords = None):
+        if coords is None or coords == '#':
+            self.gp.copy_management(inRaster, outRaster)
+        else:
+            self.gp.clip_management(inRaster, coords, outRaster)
+        
+
+    def ClipRasters(self, inRasters, destinationFolder, clippedNameTemplate = None, coords = None):
+        clippedLayerList = []
+        rasterNum = 1
+        if type(inRasters) == list:
+            for raster in inRasters:
+                if type(raster) == list:
+                    if clippedNameTemplate is not None:
+                        self.gui.Error('List of rasters contains inner lists - name template cannot be applied')
+                    else:
+                        self.ClipRasters(raster, destinationFolder, coords = coords)
+                if clippedNameTemplate is None:
+                    rasterName = os.path.basename(raster)
+                    clippedName = destinationFolder + rasterName
+                else:
+                    clippedName = destinationFolder + clippedNameTemplate % rasterNum
+                clippedLayerList.append(clippedName)
+                self.ClipSingleRaster(raster, clippedName, coords)
+                rasterNum = rasterNum + 1
+        else:
+            rasterName = os.path.basename(raster)
+            clippedName = destinationFolder + rasterName
+            self.ClipSingleRaster(inRasters, clippedName, coords)
+            
+        return clippedLayerList

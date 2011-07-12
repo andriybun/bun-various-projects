@@ -1,6 +1,7 @@
 # Some classes and functions used in script
 from iterableStruct import iterableStruct
 import os, arcgisscripting
+import shutil
 
 #-------------------------------------------------------------------------
 # utils class definition
@@ -40,12 +41,13 @@ class utils:
             paramsStruct.homeDir = os.getcwd() + "\\"
         else:
             paramsStruct.homeDir = os.path.dirname(output) + "\\"
-            #paramsStruct.homeDir = "C:\\ProgramFiles\\TmpRasters\\"
-            #if not os.path.exists(paramsStruct.homeDir):
-            #    os.mkdir(paramsStruct.homeDir)
+#            paramsStruct.homeDir = "C:\\ProgramFiles\\Cropland Validation\\TmpRasters\\"
+            if not os.path.exists(paramsStruct.homeDir):
+                os.mkdir(paramsStruct.homeDir)
         paramsStruct.inputDir = "..\\input_new\\"   # move all the rasters and all data to this directory:
         paramsStruct.resultDir = "test_results_to_be_deleted\\" # result will be saved to this directory:
         paramsStruct.tmpDir = paramsStruct.homeDir + "tmp\\"
+        paramsStruct.clippedInputs = paramsStruct.homeDir + "clipped\\"
     
         # Reading configuration file
         if os.path.exists("settings.txt"):
@@ -69,8 +71,11 @@ class utils:
         if not os.path.exists(paramsStruct.homeDir + paramsStruct.resultDir):
             os.mkdir(paramsStruct.homeDir + paramsStruct.resultDir)
         
-        if not os.path.exists(paramsStruct.homeDir + "tmp\\"):
-            os.mkdir(paramsStruct.homeDir + "tmp\\")
+        if not os.path.exists(paramsStruct.tmpDir):
+            os.mkdir(paramsStruct.tmpDir)
+            
+        if not os.path.exists(paramsStruct.clippedInputs):
+            os.mkdir(paramsStruct.clippedInputs)
         
         return paramsStruct        
 
@@ -97,12 +102,13 @@ class utils:
         inputsClipped.levelStatisticsName.append("cl_level1") # subnational units - regions
         inputsClipped.levelStatisticsName.append("cl_level2") # subregional units
         inputsClipped.mark_high_32name = "cl_mark_h32n"
-        inputsClipped.mark_high_32     = paramsStruct.tmpDir + inputsClipped.mark_high_32name
-        inputsClipped.countries        = paramsStruct.tmpDir + inputsClipped.levelStatisticsName[0]
-        inputsClipped.subnationalUnits = paramsStruct.tmpDir + inputsClipped.levelStatisticsName[1]
-        inputsClipped.subregionalUnits = paramsStruct.tmpDir + inputsClipped.levelStatisticsName[2]
-        inputsClipped.cell_area        = paramsStruct.tmpDir + "cl_a_0083"
-        inputsClipped.statLayer        = paramsStruct.tmpDir + "cl_mean"
+        inputsClipped.mark_high_32     = paramsStruct.clippedInputs + inputsClipped.mark_high_32name + ".img"
+        inputsClipped.countries        = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[0]
+        inputsClipped.subnationalUnits = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[1]
+        inputsClipped.subregionalUnits = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[2]
+        inputsClipped.cell_area        = paramsStruct.clippedInputs + "cl_a_0083"
+        inputsClipped.statLayer        = paramsStruct.clippedInputs + "cl_mean.img"
+        inputsClipped.cell_area_min    = paramsStruct.clippedInputs + "cl_a_min"
     
         #-------------------------------------------------------------------------------
         # Resulting rasters:
@@ -127,13 +133,12 @@ class utils:
         #-------------------------------------------------------------------------------
         tmp.closest       = paramsStruct.tmpDir + "cl_close"
         tmp.combined      = paramsStruct.tmpDir + "combine"
-        tmp.cell_area_min = paramsStruct.tmpDir + "cl_a_min"
         tmp.OutRaster1    = paramsStruct.tmpDir + "tmp1"
         tmp.OutRaster2    = paramsStruct.tmpDir + "tmp2"
         tmp.OutRaster3     = paramsStruct.tmpDir + "tmp3"
         tmp.OutClass       = paramsStruct.tmpDir + "class_%d"
         tmp.differName = "differ"
-        tmp.differ = paramsStruct.tmpDir + tmp.differName
+        tmp.differ = paramsStruct.clippedInputs + tmp.differName
         tmp.zones = paramsStruct.tmpDir + "zones"
         tmp.areaUnits = paramsStruct.tmpDir + "unit"
         tmp.sumLevel1 = paramsStruct.tmpDir + "sum_l1"
@@ -182,7 +187,7 @@ class utils:
         self.gp.Divide_sa(tmp.OutRaster2, 10, inputsClipped.cell_area)
         self.gp.Float_sa(inputsClipped.statLayer, tmp.OutRaster2)
         self.gp.Divide_sa(tmp.OutRaster2, 100, tmp.OutRaster1)
-        self.gp.Times_sa(tmp.OutRaster1, inputsClipped.cell_area, tmp.cell_area_min)
+        self.gp.Times_sa(tmp.OutRaster1, inputsClipped.cell_area, inputsClipped.cell_area_min)
         
     # processing results
     def processResults(self):
@@ -194,3 +199,8 @@ class utils:
         for rasterName in list:
             if (self.gp.Exists(rasterName)):
                 self.gp.delete_management(rasterName)
+                
+    # Delete all files from a directory
+    def DeleteDir(self, dir):
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
