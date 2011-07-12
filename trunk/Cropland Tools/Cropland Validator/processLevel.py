@@ -12,13 +12,14 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gp.OverWriteOutput = 1 # allow overwriting rasters:
 
     tmp = pathsAndUtilities.tmp
+    inputsClipped = pathsAndUtilities.inputsClipped
 
-    cell_area = pathsAndUtilities.inputsClipped.cell_area
-    statLayer = pathsAndUtilities.inputsClipped.statLayer
-    mark_high32name = pathsAndUtilities.inputsClipped.mark_high_32name
-    mark_high32 = pathsAndUtilities.inputsClipped.mark_high_32
+    cell_area = inputsClipped.cell_area
+    statLayer = inputsClipped.statLayer
+    mark_high32name = inputsClipped.mark_high_32name
+    mark_high32 = inputsClipped.mark_high_32
     
-    units = paramsStruct.tmpDir + unitsName
+    units = paramsStruct.clippedInputs + unitsName
     
     minClass = minMaxClass.minClass
     maxClass = minMaxClass.maxClass
@@ -33,7 +34,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     pathsAndUtilities.verifyRasters(inputs, gui)
 
     # some temporary rasters, used for calculations
-    cell_area_min = tmp.cell_area_min
+    cell_area_min = inputsClipped.cell_area_min
     OutClass      = tmp.OutClass
     OutRaster1    = tmp.OutRaster1
     OutRaster2    = tmp.OutRaster2
@@ -177,4 +178,8 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
 
     gp.Con_sa(OutRaster1, cell_area_min, result, "#", mark_high32name + " > 0 AND " + mark_high32name + " >= TMP2")
 
+    gui.PrintText('Cleanup temporary rasters')
+    #pathsAndUtilities.DeleteDir(paramsStruct.tmpDir)
+    
     gui.PrintTextTime('Done')
+

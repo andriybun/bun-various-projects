@@ -7,6 +7,7 @@ Created on Mon Nov 29 15:23:01 2010
 @name:   
 """
 
+from common import MakeListString
 from config import config
 from utils import *
 from rasterAgreementTable import rasterAgreementTable
@@ -19,7 +20,6 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
 
     runConfig = config(interface, inputPaths, coords)
  
-    interface.PrintText(str(runConfig.paths.resultAvg))
     gp = arcgisscripting.create()
     gp.CheckOutExtension("Spatial")
     gp.OverWriteOutput = 1
@@ -38,12 +38,12 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     agreementTable.Print(interface, runConfig.paths.inputs.LayerList)
 
     weights = agreementTable.weights
-    
+
     # Calculations:
-    list_of_rasters = ""
-    list_of_rasters_weights = ""
-    list_of_rasters_one = ""
-    list_of_rasters_two = ""
+    list_of_rasters = []
+    list_of_rasters_weights = []
+    list_of_rasters_one = []
+    list_of_rasters_two = []
     
     # Temporary raster names:
     temp1 = runConfig.paths.tmp.temp1
@@ -61,24 +61,29 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         InputName = runConfig.paths.inputs.LayerList[i]
         TmpName = runConfig.paths.tmp.LayerList[i]
         MakeRasterOfValues(gp, InputName, 2**i, weights[i], priorityValues2[i], TmpName)
-        list_of_rasters += "\'" + InputName + "\';"
-        list_of_rasters_weights += "\'" + TmpName + "\';"
-        list_of_rasters_one += "\'" + AddSuffixToName(TmpName, "_one") + "\';"
-        list_of_rasters_two += "\'" + AddSuffixToName(TmpName, "_two") + "\';"
-        gp.Delete_management(InputName)
+        list_of_rasters.append(InputName)
+        list_of_rasters_weights.append(TmpName)
+        list_of_rasters_one.append(AddSuffixToName(TmpName, "_one"))
+        list_of_rasters_two.append(AddSuffixToName(TmpName, "_two"))
 
     interface.PrintTextTime("Computing statistics...")
     # Computing per cell sums of these rasters:
-    gp.CellStatistics_sa(list_of_rasters, temp3, "SUM")
-    gp.CellStatistics_sa(list_of_rasters_weights, temp1, "SUM")
-    gp.CellStatistics_sa(list_of_rasters_one, temp2, "SUM")
-    gp.CellStatistics_sa(list_of_rasters_two, temp4, "SUM")
+    gp.CellStatistics_sa(MakeListString(list_of_rasters), temp3, "SUM")
+    gp.CellStatistics_sa(MakeListString(list_of_rasters_weights), temp1, "SUM")
+    runConfig.DeleteRasters(list_of_rasters_weights)
+    gp.CellStatistics_sa(MakeListString(list_of_rasters_one), temp2, "SUM")
+    runConfig.DeleteRasters(list_of_rasters_one)
+    gp.CellStatistics_sa(MakeListString(list_of_rasters_two), temp4, "SUM")
+    runConfig.DeleteRasters(list_of_rasters_two)
     # Computing statistics:
-    gp.Divide_sa(temp3, temp2, runConfig.paths.resultAvg)
-    gp.CellStatistics_sa(list_of_rasters, temp5, "MINIMUM")
-    gp.Con_sa(temp5, temp5, runConfig.paths.resultMin, "#", "VALUE > 0")
-    gp.CellStatistics_sa(list_of_rasters, temp5, "MAXIMUM")
+    # TODO: Turn off minimum / make separate scripts for statistics
+#    gp.CellStatistics_sa(MakeListString(list_of_rasters), temp5, "MINIMUM")
+#    gp.Con_sa(temp5, temp5, runConfig.paths.resultMin, "#", "VALUE > 0")
+    gp.CellStatistics_sa(MakeListString(list_of_rasters), temp5, "MAXIMUM")
     gp.Con_sa(temp5, temp5, runConfig.paths.resultMax, "#", "VALUE > 0")
+    gp.Divide_sa(temp3, temp2, runConfig.paths.resultAvg)
+    # Cleanup temporary rasters:
+    runConfig.DeleteRasters(list_of_rasters)
     interface.PrintTextTime("Statistics computed.")
     # Formatting the output:
     gp.Int_sa(temp1, runConfig.paths.tmp.sumRast)
@@ -159,7 +164,6 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')
-    
 #===============================================================================
 # TODO: fix no clip
 #===============================================================================
