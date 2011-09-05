@@ -74,7 +74,9 @@ class config():
             # Result:
             self.paths.result = inputPaths.result
             self.paths.resultAvg = inputPaths.resultAvg
-        
+
+        extension = ".img"
+
         # Temporary rasters:
         self.paths.tmp = iterableStruct()
 
@@ -83,15 +85,15 @@ class config():
         self.paths.tmp.LayerList = []
         
         for i in range(1, len(self.paths.inputs.LayerList) + 1):
-            self.paths.tmp.LayerList.append(tmpPrefix + str(i))
+            self.paths.tmp.LayerList.append(tmpPrefix + str(i) + extension)
 
-        self.paths.tmp.temp1      = self.paths.TMPDIR + "temp1"
-        self.paths.tmp.temp2      = self.paths.TMPDIR + "temp2"
-        self.paths.tmp.temp3      = self.paths.TMPDIR + "temp3"
-        self.paths.tmp.temp4      = self.paths.TMPDIR + "temp4"
-        self.paths.tmp.sumRast    = self.paths.TMPDIR + "sumRast"
-        self.paths.tmp.sumRastOne = self.paths.TMPDIR + "sumRastOne"
-        self.paths.tmp.sumRastTwo = self.paths.TMPDIR + "sumRastTwo"
+        self.paths.tmp.temp1      = self.paths.TMPDIR + "temp1" + extension
+        self.paths.tmp.temp2      = self.paths.TMPDIR + "temp2" + extension
+        self.paths.tmp.temp3      = self.paths.TMPDIR + "temp3" + extension
+        self.paths.tmp.temp4      = self.paths.TMPDIR + "temp4" + extension
+        self.paths.tmp.sumRast    = self.paths.TMPDIR + "sumRast" + extension
+        self.paths.tmp.sumRastOne = self.paths.TMPDIR + "sumRastOne" + extension
+        self.paths.tmp.sumRastTwo = self.paths.TMPDIR + "sumRastTwo" + extension
 
     # clip an area from input raster    
     def ClipRasters(self, coords):

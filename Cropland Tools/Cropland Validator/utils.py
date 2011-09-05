@@ -45,9 +45,12 @@ class utils:
             if not os.path.exists(paramsStruct.homeDir):
                 os.mkdir(paramsStruct.homeDir)
         paramsStruct.inputDir = "..\\input_new\\"   # move all the rasters and all data to this directory:
-        paramsStruct.resultDir = "test_results_to_be_deleted\\" # result will be saved to this directory:
-        paramsStruct.tmpDir = paramsStruct.homeDir + "tmp\\"
-        paramsStruct.clippedInputs = paramsStruct.homeDir + "clipped\\"
+        paramsStruct.resultDir = "test_results_to_be_deleted_" + os.getenv('COMPUTERNAME') + "\\" # result will be saved to this directory:
+        paramsStruct.tmpDir = paramsStruct.homeDir + "tmp_" + os.getenv('COMPUTERNAME') + "\\"
+        paramsStruct.clippedInputs = paramsStruct.homeDir + "clipped_" + os.getenv('COMPUTERNAME') + "\\"
+#        paramsStruct.resultDir = "test_results_to_be_deleted\\" # result will be saved to this directory:
+#        paramsStruct.tmpDir = paramsStruct.homeDir + "tmp\\"
+#        paramsStruct.clippedInputs = paramsStruct.homeDir + "clipped\\"
     
         # Reading configuration file
         if os.path.exists("settings.txt"):
@@ -87,6 +90,8 @@ class utils:
         outputs = iterableStruct()
         tmp = iterableStruct()            
         
+        extension = ".img"
+        
         #-------------------------------------------------------------------------------
         # Input rasters:
         #-------------------------------------------------------------------------------
@@ -98,17 +103,17 @@ class utils:
         inputsNotClipped.statLayer        = paramsStruct.homeDir + paramsStruct.inputDir + "max_5maps-20n"
     
         inputsClipped.levelStatisticsName = []
-        inputsClipped.levelStatisticsName.append("cl_level0") # countries
-        inputsClipped.levelStatisticsName.append("cl_level1") # subnational units - regions
-        inputsClipped.levelStatisticsName.append("cl_level2") # subregional units
-        inputsClipped.mark_high_32name = "cl_mark_h32n"
-        inputsClipped.mark_high_32     = paramsStruct.clippedInputs + inputsClipped.mark_high_32name + ".img"
+        inputsClipped.levelStatisticsName.append("cl_level0" + extension) # countries
+        inputsClipped.levelStatisticsName.append("cl_level1" + extension) # subnational units - regions
+        inputsClipped.levelStatisticsName.append("cl_level2" + extension) # subregional units
+        inputsClipped.mark_high_32name = "cl_prob"
+        inputsClipped.mark_high_32     = paramsStruct.clippedInputs + inputsClipped.mark_high_32name + extension
         inputsClipped.countries        = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[0]
         inputsClipped.subnationalUnits = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[1]
         inputsClipped.subregionalUnits = paramsStruct.clippedInputs + inputsClipped.levelStatisticsName[2]
-        inputsClipped.cell_area        = paramsStruct.clippedInputs + "cl_a_0083"
-        inputsClipped.statLayer        = paramsStruct.clippedInputs + "cl_mean.img"
-        inputsClipped.cell_area_min    = paramsStruct.clippedInputs + "cl_a_min"
+        inputsClipped.cell_area        = paramsStruct.clippedInputs + "cl_a_0083" + extension
+        inputsClipped.statLayer        = paramsStruct.clippedInputs + "cl_mean" + extension
+        inputsClipped.cell_area_min    = paramsStruct.clippedInputs + "cl_a_min" + extension
     
         #-------------------------------------------------------------------------------
         # Resulting rasters:
@@ -117,32 +122,32 @@ class utils:
         outputs.resultLevel = []
         outputs.resultForCalibratedLevel = ['dummy']
         outputs.combinedResult = ['dummy']
-        outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_0")
-        outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_1")
-        outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_2")
-        outputs.resultForCalibratedLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCalibr_1")
-        outputs.resultForCalibratedLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCalibr_2")
-        outputs.combinedResult.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCombi_1")
-        outputs.combinedResult.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCombi_2")
-        outputs.resultStat = outputs.combinedResult[2] + "st"
-        outputs.result_area = paramsStruct.homeDir + paramsStruct.resultDir + "result_ar"
-        outputs.result_sum = paramsStruct.homeDir + paramsStruct.resultDir + "result_sm"
+        outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_0" + extension)
+        outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_1" + extension)
+        outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_2" + extension)
+        outputs.resultForCalibratedLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCalibr_1" + extension)
+        outputs.resultForCalibratedLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCalibr_2" + extension)
+        outputs.combinedResult.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCombi_1" + extension)
+        outputs.combinedResult.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCombi_2" + extension)
+        outputs.resultStat = outputs.combinedResult[2] + "st" + extension
+        outputs.result_area = paramsStruct.homeDir + paramsStruct.resultDir + "result_ar" + extension
+        outputs.result_sum = paramsStruct.homeDir + paramsStruct.resultDir + "result_sm" + extension
     
         #-------------------------------------------------------------------------------
         # Temporary rasters:
         #-------------------------------------------------------------------------------
-        tmp.closest       = paramsStruct.tmpDir + "cl_close"
-        tmp.combined      = paramsStruct.tmpDir + "combine"
-        tmp.OutRaster1    = paramsStruct.tmpDir + "tmp1"
-        tmp.OutRaster2    = paramsStruct.tmpDir + "tmp2"
-        tmp.OutRaster3     = paramsStruct.tmpDir + "tmp3"
-        tmp.OutClass       = paramsStruct.tmpDir + "class_%d"
-        tmp.differName = "differ"
+        tmp.closest       = paramsStruct.tmpDir + "cl_close" + extension
+        tmp.combined      = paramsStruct.tmpDir + "combine" + extension
+        tmp.OutRaster1    = paramsStruct.tmpDir + "tmp1" + extension
+        tmp.OutRaster2    = paramsStruct.tmpDir + "tmp2" + extension
+        tmp.OutRaster3     = paramsStruct.tmpDir + "tmp3" + extension
+        tmp.OutClass       = paramsStruct.tmpDir + "class_%d" + extension
+        tmp.differName = "differ" + extension
         tmp.differ = paramsStruct.clippedInputs + tmp.differName
-        tmp.zones = paramsStruct.tmpDir + "zones"
-        tmp.areaUnits = paramsStruct.tmpDir + "unit"
-        tmp.sumLevel1 = paramsStruct.tmpDir + "sum_l1"
-        tmp.sumLevel2 = paramsStruct.tmpDir + "sum_l2"
+        tmp.zones = paramsStruct.tmpDir + "zones" + extension
+        tmp.areaUnits = paramsStruct.tmpDir + "unit" + extension
+        tmp.sumLevel1 = paramsStruct.tmpDir + "sum_l1" + extension
+        tmp.sumLevel2 = paramsStruct.tmpDir + "sum_l2" + extension
 
     
         output = iterableStruct()

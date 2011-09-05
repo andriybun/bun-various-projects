@@ -15,14 +15,11 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
 #    if coords is None:
 #        coords = "-18 4 0 17"
 #        #coords = "-18 -35 52 38"
-
-    # minimum and maximum classes of territory in "mark high"
-    minMaxClass = iterableStruct()
-    minMaxClass.minClass = 1
-    minMaxClass.maxClass = 31
+#        coords = "2 49 8 54" # Benelux
 
     # initialize paths
     pathsAndUtilities = utils(gui, inputsNotClipped, output);
+
     if pathsAndUtilities.verifyRasters(pathsAndUtilities.inputsNotClipped, gui) == 1:
         return 1
     paramsStruct = pathsAndUtilities.paramsStruct
@@ -41,6 +38,13 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
     pathsAndUtilities.clipRaster(inputsNotClipped.cell_area, inputsClipped.cell_area, coords)
     pathsAndUtilities.clipRaster(inputsNotClipped.statLayer, inputsClipped.statLayer, coords)
 
+    # minimum and maximum classes of territory in "mark high"
+    minMaxClass = iterableStruct()
+    minMaxClass.minClass = pathsAndUtilities.gp.GetRasterProperties_management(inputsClipped.mark_high_32, "MINIMUM")
+    minMaxClass.maxClass = pathsAndUtilities.gp.GetRasterProperties_management(inputsClipped.mark_high_32, "MAXIMUM")
+    gui.PrintText('Min class = %d' % (minMaxClass.minClass))
+    gui.PrintText('Max class = %d' % (minMaxClass.maxClass))
+    
     # convert rasters to proper measurement units
     pathsAndUtilities.prepareRasters()
     
@@ -79,5 +83,5 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
     gui.PrintTextTime('-- Cleanup temporary files --')
     pathsAndUtilities.cleanUp(inputsClipped)
     pathsAndUtilities.cleanUp(tmp)
-    
+
     gui.PrintTextTime('Finished')

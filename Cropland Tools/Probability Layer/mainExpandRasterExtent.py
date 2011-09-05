@@ -15,10 +15,10 @@ import arcgisscripting
 
 def GetRasterExtent(raster):
     gp = arcgisscripting.create()
-    extent = str(gp.GetRasterProperties(extentRaster, 'LEFT')) + ' ' + \
-        str(gp.GetRasterProperties(extentRaster, 'BOTTOM')) + ' ' + \
-        str(gp.GetRasterProperties(extentRaster, 'RIGHT')) + ' ' + \
-        str(gp.GetRasterProperties(extentRaster, 'TOP'))
+    extent = str(gp.GetRasterProperties(raster, 'LEFT')) + ' ' + \
+        str(gp.GetRasterProperties(raster, 'BOTTOM')) + ' ' + \
+        str(gp.GetRasterProperties(raster, 'RIGHT')) + ' ' + \
+        str(gp.GetRasterProperties(raster, 'TOP'))
     return extent
 
 def ExpandRasterExtent(inRaster, extentRaster, outRaster):
@@ -36,10 +36,8 @@ def ExpandRasterExtent(inRaster, extentRaster, outRaster):
     dataType = typesList[int(gp.GetRasterProperties(extentRaster, 'VALUETYPE'))]
     #gui.PrintText(GetRasterExtent(extentRaster))
     gp.CreateConstantRaster_sa(tmpRaster, 0, dataType, inRaster, GetRasterExtent(extentRaster))
-    
     gp.Extent = "MAXOF"
     gp.Plus_sa(inRaster, tmpRaster, outRaster)
-    
     gp.delete_management(tmpRaster)
 
 
