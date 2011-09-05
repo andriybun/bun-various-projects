@@ -14,6 +14,7 @@ from config import config
 from landCoverClassMap import landCoverClassMap
 from DissimilarityMatrix import ReadDissimilarityMatrix
 from common import MakeListString
+from utils import computeBestClass
 
 def ProduceHybridMap(gui, paths):
 
@@ -21,7 +22,8 @@ def ProduceHybridMap(gui, paths):
     runConfig = config(gui, paths)
     input = paths.input
     tmp = runConfig.paths.tmp
-    singleMapNameTemplate = 'map_%d'
+    aggregatedFieldName = "CR_CLASS"
+    singleMapNameTemplate = paths.tmp.singleMapNameTemplate
     numMaps = len(input.landMaps)
     
     # Dissimilarity matrix
@@ -34,26 +36,52 @@ def ProduceHybridMap(gui, paths):
         mapping.append(landCoverClassMap(fileName))
     
     # Clip input maps
+    gui.PrintTextTime('Clipping input maps')
     clippedLandMaps = runConfig.ClipRasters(input.landMaps, \
-        tmp.DIR, \
-        clippedNameTemplate = singleMapNameTemplate + '.img')
+        tmp.dir, \
+        clippedNameTemplate = singleMapNameTemplate + paths.extension)
     
     # Combine all land cover products into one raster
+    gui.PrintTextTime('Combining landcover products into one raster')
     productsList = MakeListString(clippedLandMaps)
     runConfig.gp.Combine_sa(productsList, tmp.combinedRaster)
     
-    # Creating cursor:
-    rows = runConfig.gp.SearchCursor(tmp.combinedRaster, "", "", "", "")
+    # Processing created combined table
+    gui.PrintTextTime('Processing combined table')
+    runConfig.gp.addfield(tmp.combinedRaster, aggregatedFieldName, "SHORT", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
+    rows = runConfig.gp.UpdateCursor(tmp.combinedRaster, "", "", "", "")
     row = rows.next()
     aggregatedTable = []
     while row:
-        parsedRow = []
+        classesInCell = []
         for idx in range(0, numMaps):
-            parsedRow.append(mapping[idx].find(row.getvalue(singleMapNameTemplate % (idx + 1))))
-        
-        #for 
-        aggregatedTable.append(parsedRow)
-        #print '%d\t%d\t%d\n' % (row.getvalue('map_1'), row.getvalue('map_2'), row.getvalue('map_3'))
+            aggregatedClass = mapping[idx].find(row.getValue(singleMapNameTemplate % (idx + 1)))
+            if (aggregatedClass == 0 and idx == 1):
+                gui.PrintText(str(row.getValue(singleMapNameTemplate % (idx + 1))))
+            classesInCell.append(aggregatedClass)
+        aggregatedTable.append(classesInCell)
+#        gui.PrintText('classes: ' + str(classesInCell))
+        listOfClasses = computeBestClass(classesInCell, dissimilarityMatrix)
+        # STOPGAP:
+        # TODO: implement algorithm:
+        bestClass = listOfClasses[0]
+        # END STOPGAP
+        row.setValue(aggregatedFieldName, bestClass)
+#        gui.PrintText(str(listOfClasses))
+#        gui.PrintText('%d\t%d\t%d\n' % (row.getValue('map_1'), row.getValue('map_2'), row.getValue('map_3')))
+        rows.UpdateRow(row)
         row = rows.next()
-    #print aggregatedTable
+    del row
+    del rows
     
+    for idx in range(0, numMaps):
+        runConfig.gp.deletefield(tmp.combinedRaster, singleMapNameTemplate % (idx + 1))
+    
+    # Saving results
+    gui.PrintTextTime('Saving result')
+    runConfig.gp.ExtractByAttributes_sa(tmp.combinedRaster + "." + aggregatedFieldName, \
+        "%s >= 0" % (aggregatedFieldName), paths.output.hybridMap)
+    
+    # Delete temporary directory
+    gui.PrintTextTime('Deleting temporary directory')
+    runConfig.DeleteDir(paths.tmp.dir)

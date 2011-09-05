@@ -27,14 +27,18 @@ if __name__ == '__main__':
     paths = iterableStruct()
     
 #    paths.DATA_DIR = 'C:/ProgramFiles/Cropland Hybrid/in/'
-    paths.DATA_DIR = 'D:/Workspace/IIASA/ArcGIS_Scripting_Hybrid_Maps/Cropland Hybrid/in/'
+    paths.DATA_IN_DIR = 'D:/Workspace/IIASA/ArcGIS_Scripting_Hybrid_Maps/Cropland Hybrid/in/'
+    paths.DATA_OUT_DIR = 'D:/Workspace/IIASA/ArcGIS_Scripting_Hybrid_Maps/Cropland Hybrid/out/'
     
     paths.input = iterableStruct()
+    paths.output = iterableStruct()
     paths.input.landMaps = []
-    paths.input.landMaps.append(paths.DATA_DIR + 'mod_eu1')
-    paths.input.landMaps.append(paths.DATA_DIR + 'glob_eu1')
-    paths.input.landMaps.append(paths.DATA_DIR + 'glc_eu')
+    paths.input.landMaps.append(paths.DATA_IN_DIR + 'mod_eu1')
+    paths.input.landMaps.append(paths.DATA_IN_DIR + 'glob_eu1')
+    paths.input.landMaps.append(paths.DATA_IN_DIR + 'glc_eu')
     
     paths.input.dissimilarityMatrixFile = 'dissimilarity_matrix.txt'
+    
+    paths.output.hybridMap = paths.DATA_OUT_DIR + 'hybrid.img'
     
     ProduceHybridMap(gui, paths = paths)

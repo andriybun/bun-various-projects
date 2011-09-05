@@ -18,12 +18,14 @@ class config():
 
     def __InitPaths__(self, paths):
         self.paths = paths
+        self.paths.extension = '.img'
         self.paths.tmp = iterableStruct()
-        self.paths.tmp.DIR = os.getcwd() + '\\tmp\\'
-        if os.path.isdir(self.paths.tmp.DIR):
-            self.DeleteDir(self.paths.tmp.DIR)
-        os.mkdir(self.paths.tmp.DIR)
-        self.paths.tmp.combinedRaster = self.paths.tmp.DIR + 'combined'
+        self.paths.tmp.dir = os.getcwd() + '\\tmp_%s\\' % (os.getenv('COMPUTERNAME'))
+        if os.path.isdir(self.paths.tmp.dir):
+            self.DeleteDir(self.paths.tmp.dir)
+        os.mkdir(self.paths.tmp.dir)
+        self.paths.tmp.combinedRaster = self.paths.tmp.dir + 'combined' + self.paths.extension
+        self.paths.tmp.singleMapNameTemplate = 'map_%d'
 
     # Verify if rasters exist
     def VerifyRasters(self, ListOfRasters, gui):
