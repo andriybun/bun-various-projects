@@ -13,6 +13,7 @@ from utils import *
 from rasterAgreementTable import rasterAgreementTable
 import arcgisscripting
 import os
+import time
 
 def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, priorityValues2 = None):
     
@@ -159,8 +160,12 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     del row
     del rows
 
+    time.sleep(1)
+
     # Deleting temporary rasters:
     interface.PrintTextTime('Done! Deleting temporary rasters')
+    gp.Delete_management(temp1)
+    gp.Delete_management(runConfig.paths.tmp.sumRast)
     runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')
