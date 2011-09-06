@@ -16,14 +16,16 @@ def MergeTwoRasters(inRaster1, inRaster2, outRaster):
     gp.OverWriteOutput = 1
     gp.Extent = "MAXOF"
     
-    extension = os.path.splitext(os.path.basename)[1]
+    extension = os.path.splitext(os.path.basename(inRaster1))[1]
     
-    #tmpRaster = os.getcwd() + "\\" + "tmpRaster" + extension
+    tmpRaster = os.path.dirname(outRaster) + "\\" + "tmpMerge" + extension
 
     # TODO: add warning if rasters overlap
-    gp.Con_sa(inRaster1, inRaster1, inRaster2, outRaster, "(VALUE >= 0) OR (VALUE < 0)")
+    # TODO: error if different extensions (check)
+    gp.Con_sa(inRaster1, inRaster1, tmpRaster, inRaster2, "(VALUE >= 0) OR (VALUE < 0)")
+    gp.Copy_management(tmpRaster, outRaster)
     
-    #gp.delete_management(tmpRaster)
+#    gp.delete_management(tmpRaster)
 
 
 if __name__ == '__main__':
