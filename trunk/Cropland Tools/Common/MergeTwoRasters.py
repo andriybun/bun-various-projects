@@ -25,7 +25,7 @@ def MergeTwoRasters(inRaster1, inRaster2, outRaster):
     gp.Con_sa(inRaster1, inRaster1, tmpRaster, inRaster2, "(VALUE >= 0) OR (VALUE < 0)")
     gp.Copy_management(tmpRaster, outRaster)
     
-#    gp.delete_management(tmpRaster)
+    gp.delete_management(tmpRaster)
 
 
 if __name__ == '__main__':
