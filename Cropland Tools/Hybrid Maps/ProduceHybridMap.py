@@ -79,8 +79,11 @@ def ProduceHybridMap(gui, paths):
     
     # Saving results
     gui.PrintTextTime('Saving result')
-    runConfig.gp.ExtractByAttributes_sa(tmp.combinedRaster + "." + aggregatedFieldName, \
-        "%s >= 0" % (aggregatedFieldName), paths.output.hybridMap)
+    runConfig.gp.Con_sa(tmp.combinedRaster + "." + aggregatedFieldName, \
+        tmp.combinedRaster + "." + aggregatedFieldName, \
+        paths.output.hybridMap, \
+        "#", \
+        "%s >= 0" % (aggregatedFieldName))
     
     # Delete temporary directory
     gui.PrintTextTime('Deleting temporary directory')
