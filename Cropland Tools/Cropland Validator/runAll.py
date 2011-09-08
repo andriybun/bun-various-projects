@@ -16,6 +16,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
 #        coords = "-18 4 0 17"
 #        #coords = "-18 -35 52 38"
 #        coords = "2 49 8 54" # Benelux
+#        coords = "-18 6.6 -10 16.6"
 
     # initialize paths
     pathsAndUtilities = utils(gui, inputsNotClipped, output);
@@ -69,7 +70,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
     gui.PrintTextTime('-- Subregional level --')
     processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[2],
                  outputs.resultLevel[2], gui)
-    
+
     # now we consider the calibrated result for level 1 as a normal result for this level
     pathsAndUtilities.outputs.resultLevel[1] = pathsAndUtilities.outputs.combinedResult[1]
     # calibrate subregional layer

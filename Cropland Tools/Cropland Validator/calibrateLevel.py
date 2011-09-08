@@ -93,6 +93,6 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     gp.Con_sa(zones, outputs.resultLevel[level], OutRaster2, OutRaster1, "VALUE = 1")
     gp.Con_sa(zones, outputs.resultForCalibratedLevel[level], outputs.combinedResult[level], OutRaster2, "VALUE = -1")
     gui.PrintText('Cleanup temporary rasters')
-    #pathsAndUtilities.cleanUp(tmp)
-    pathsAndUtilities.DeleteDir(tmpDir)
+    pathsAndUtilities.cleanUp(tmp)
+    #pathsAndUtilities.DeleteDir(tmpDir)
 
