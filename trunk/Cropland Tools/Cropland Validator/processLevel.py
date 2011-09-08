@@ -80,10 +80,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
 
     gui.PrintTextTime('Finished')
 
-    try:
-        gp.BuildRasterAttributeTable_management(combined, "OVERWRITE")
-    except:
-        gui.Warning('Warning! Failed to build raster attribute table!')
+    gp.BuildRasterAttributeTable_management(combined, "OVERWRITE")
 
     gui.PrintText('Stage 2. Creating combined raster')
     gui.InitialiseStepProgressor('Creating combined raster')
@@ -183,14 +180,13 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gui.PrintText('Stage 5. Compiling final raster')
     gui.InitialiseStepProgressor('Compiling final raster')
     gp.Con_sa(mark_high32, "0", OutRaster2, "#", "VALUE >= 0")
-
-    gp.ExtractByAttributes_sa(combined + ".BEST_CLASS", \
-        "BEST_CLASS >= %d AND BEST_CLASS <= %d" % (minClass, maxClass), OutRaster2)
+    gp.Con_sa(combined + ".BEST_CLASS", combined + ".BEST_CLASS", OutRaster2, "#", \
+        "BEST_CLASS >= %d AND BEST_CLASS <= %d" % (minClass, maxClass))
 
     gui.InitialiseDefaultProgressor('Cropland validator working...')
 
     gp.Combine_sa("\'" + mark_high32 + "\';\'" + OutRaster2 + "\'", OutRaster1)
-
+    
     gp.Con_sa(OutRaster1, cell_area_min, result, "#", mark_high32name + " > 0 AND " + mark_high32name + " >= TMP2")
 
     # gui.PrintText('Cleanup temporary rasters')
