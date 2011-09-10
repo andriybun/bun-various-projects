@@ -77,8 +77,8 @@ class config():
             self.paths.inputs.LayerList = inputPaths.croplandLayerList
             
             # Result:
-            #extension = ".img"
-            extension = ""
+            extension = ".img"
+            #extension = ""
             resultExtension = ".img"
             self.paths.result = inputPaths.result
             result_name_tuple = os.path.splitext(self.paths.result)
