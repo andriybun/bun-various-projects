@@ -40,7 +40,7 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     # calculating total area of subnational level results
     gp.ZonalStatistics_sa(areaUnits, "Value", outputs.resultLevel[level], sumLevel2, "SUM", "DATA")
     # calculating difference between national and subnational levels
-    gp.Minus_sa(sumLevel2,sumLevel1,differ)
+    gp.Minus_sa(sumLevel2, sumLevel1, differ)
     # selecting areas where the difference is positive
     gp.Con_sa(differ, 1, OutRaster2, "#", "VALUE >= 0")
     gp.Con_sa(differ, -1, OutRaster3, OutRaster2, "VALUE < 0")
@@ -78,8 +78,12 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     gp.Minus_sa(OutRaster3,differ,OutRaster1)
     # selecting only those areas, where difference was < 0# selecting only those areas, where difference was < 0
     gp.Con_sa(zones, OutRaster1, OutRaster2, "#", "VALUE = -1")
-    gp.Int_sa(OutRaster2, differ)
+    # sometimes cropland area in remaining subnational units may result to negative
+    # we select only positive numbers
+    gp.Con_sa(OutRaster2, OutRaster2, OutRaster1, "#", "VALUE > 0")
+    gp.Int_sa(OutRaster1, differ)
     gp.BuildRasterAttributeTable_management(differ,"OVERWRITE")
+
     cursor=gp.SearchCursor(differ)
     if cursor:
         # Processing calibrated raster:
