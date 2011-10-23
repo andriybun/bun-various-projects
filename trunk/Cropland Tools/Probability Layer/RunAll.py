@@ -169,6 +169,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')
+
 #===============================================================================
 # TODO: fix no clip
 #===============================================================================
