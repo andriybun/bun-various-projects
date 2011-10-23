@@ -51,20 +51,24 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     combined      = tmp.combined
     
     combinedName = os.path.splitext(os.path.basename(combined))[0]
-
+    gui.PrintText(units)
     #===============================================================================
     # calculations
     #===============================================================================
     gui.PrintTextTime('Preparing inputs')
     gp.ResetEnvironments()
     gp.Int_sa(units, combined)
-    gp.BuildRasterAttributeTable_management(combined, "OVERWRITE")
+    try:
+        gp.BuildRasterAttributeTable_management(combined, "OVERWRITE")
+    except:
+        gui.Warning('Warning! BuildRasterAttributeTable_management failed')
     # create raster of minimum areas:
     gp.Float_sa(statLayer, OutRaster2)
     gp.Divide_sa(OutRaster2, 100, OutRaster1)
     gp.Times_sa(OutRaster1, cell_area, cell_area_min)
-    gui.PrintTextTime('Stage 1. Preparing national areas')
+    gui.PrintText('Stage 1. Preparing national areas')
     gui.InitialiseStepProgressor('Preparing national areas')
+
     # loop by all the indeces within the range (minClass, maxClass) in reverse order
     for i in range(maxClass, minClass - 1, -1):
         # raster containing the result of calculations for current index
@@ -76,7 +80,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
         gp.Int_sa(OutRaster2, OutRaster1)
         # creating a combined raster of 
         gp.Combine_sa("\'" + combined + "\';\'" + OutRaster1 + "\'", OutRaster)
-        gui.SetProgress(100. * (maxClass - i) / (maxClass - minClass ))
+        gui.SetProgress(100. * (maxClass - i) / max(maxClass - minClass, 1))
 
     gui.PrintTextTime('Finished')
 
@@ -87,7 +91,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     for i in range(maxClass, minClass - 1, -1):
         OutRaster = OutClass % i
         # Adding a new field for the result:
-        gp.addfield (combined,"CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
+        gp.addfield (combined, "CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
         # Creating cursor:
         rowsClasses = gp.SearchCursor(OutRaster, "", "", "", combinedName)
         rowClasses = rowsClasses.next()
@@ -106,10 +110,8 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
         del rowsCombined
         del rowClasses
         del rowsClasses
-        
-        gp.delete_management(OutRaster)
-        gui.SetProgress(100. * (maxClass - i) / (maxClass - minClass ))
-
+        # gp.delete_management(OutRaster)
+        gui.SetProgress(100. * (maxClass - i) / max(maxClass - minClass, 1))
     gui.PrintTextTime('Finished')
 
     gui.PrintText('Stage 3. Processing combined raster')
@@ -178,19 +180,23 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gui.PrintTextTime('Finished')
 
     gui.PrintText('Stage 5. Compiling final raster')
-    gui.InitialiseStepProgressor('Compiling final raster')
-    gp.Con_sa(mark_high32, "0", OutRaster2, "#", "VALUE >= 0")
     gp.Con_sa(combined + ".BEST_CLASS", combined + ".BEST_CLASS", OutRaster2, "#", \
         "BEST_CLASS >= %d AND BEST_CLASS <= %d" % (minClass, maxClass))
 
     gui.InitialiseDefaultProgressor('Cropland validator working...')
+    gp.SingleOutputMapAlgebra_sa(combined + ".BEST_CLASS", OutRaster2)
 
+    # gui.PrintText('%s\n%s' % (mark_high32, OutRaster2))
     gp.Combine_sa("\'" + mark_high32 + "\';\'" + OutRaster2 + "\'", OutRaster1)
     
     gp.Con_sa(OutRaster1, cell_area_min, result, "#", mark_high32name + " > 0 AND " + mark_high32name + " >= TMP2")
 
-    # gui.PrintText('Cleanup temporary rasters')
+    gui.PrintText('Cleanup temporary rasters')
     # pathsAndUtilities.DeleteDir(paramsStruct.tmpDir)
+    for i in range(maxClass, minClass - 1, -1):
+        OutRaster = OutClass % i
+        gp.delete_management(OutRaster)
     
     gui.PrintTextTime('Done')
+
 

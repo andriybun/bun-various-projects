@@ -33,6 +33,10 @@ class utils:
         if output is not None:
             self.outputs.resultStat = output
         self.tmp = rasterNames.tmp
+        try:
+            shutil.rmtree("%s\\Local Settings\\Temp\\" % (os.getenv('USERPROFILE')))
+        except:
+            pass            
 
     # define roots, parameters
     def initParams(self, output = None):

@@ -34,6 +34,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
     # clip rasters and convert to int(if necessary) 
     pathsAndUtilities.clipRasterInt(inputsNotClipped.countries, inputsClipped.countries, coords)
     pathsAndUtilities.clipRasterInt(inputsNotClipped.subnationalUnits, inputsClipped.subnationalUnits, coords)
+    
     pathsAndUtilities.clipRasterInt(inputsNotClipped.subregionalUnits, inputsClipped.subregionalUnits, coords)
     pathsAndUtilities.clipRaster(inputsNotClipped.mark_high_32, inputsClipped.mark_high_32, coords)
     pathsAndUtilities.clipRaster(inputsNotClipped.cell_area, inputsClipped.cell_area, coords)
@@ -60,7 +61,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
     processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[1],
                  outputs.resultLevel[1], gui)
     #verify.checkZonalSums(resultLevel[1])
-    
+
     # calibrate subnational layer
     gui.PrintTextTime('-- Calibrating subnational level --')
     calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 1, gui)
