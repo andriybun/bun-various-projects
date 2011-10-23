@@ -180,8 +180,6 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gui.PrintTextTime('Finished')
 
     gui.PrintText('Stage 5. Compiling final raster')
-    gp.Con_sa(combined + ".BEST_CLASS", combined + ".BEST_CLASS", OutRaster2, "#", \
-        "BEST_CLASS >= %d AND BEST_CLASS <= %d" % (minClass, maxClass))
 
     gui.InitialiseDefaultProgressor('Cropland validator working...')
     gp.SingleOutputMapAlgebra_sa(combined + ".BEST_CLASS", OutRaster2)
