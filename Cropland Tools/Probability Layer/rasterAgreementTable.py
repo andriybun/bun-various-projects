@@ -182,3 +182,40 @@ class rasterAgreementTable():
                     print legend
                 else:
                     gui.PrintText(legend)
+
+    #===============================================================================
+    # Print table
+    #===============================================================================
+    def PrintToFile(self, file, listOfRasters = None):
+        import os
+        file.write('Priority values 1:')
+        file.write(str(self.priorityValues1))
+        file.write('Priority values 2:')
+        file.write(str(self.priorityValues2))
+        i = 0;
+        tableCaption = 'Raster agreement table'
+        headerSeparator = '-------------------------------'
+        for val in self.data[0]['agreementTable']:
+            headerSeparator += '------'
+        header = '%-12s| SumW1 | SumW2 |  Rasters' % (' Cell class')
+        file.write('\n')
+        file.write(tableCaption)
+        file.write(headerSeparator)
+        file.write(header)
+        file.write(headerSeparator)
+
+        for row in self.data:
+            outString = '      %4d  |  %3d  |  %3d' % (i, row['classes1'], row['classes2'])
+            for val in row['agreementTable']:
+                outString += '  |  ' + str(val)
+            i = i + 1
+            file.write(outString)
+        file.write(headerSeparator)
+        file.write('\n')
+        if not(listOfRasters is None):
+            file.write('Rasters:')
+            i = 1
+            for rasterName in listOfRasters:
+                legend = '%d. - %s' % (i, os.path.basename(rasterName))
+                i += 1
+                file.write(legend)

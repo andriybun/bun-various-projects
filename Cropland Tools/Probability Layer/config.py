@@ -31,6 +31,10 @@ class config():
         gui.PrintTextTime("Clipping inputs")
         if doClip == 1:
             self.ClipRasters(coords)
+        try:
+            shutil.rmtree("%s\\Local Settings\\Temp\\" % (os.getenv('USERPROFILE')))
+        except:
+            pass
 
     def __InitPaths__(self, inputPaths = None):
         # Main directories
@@ -40,8 +44,8 @@ class config():
 #            self.paths.HOMEDIR = os.getcwd() + "\\"
             self.paths.HOMEDIR = os.path.dirname(inputPaths.result) + "\\"
         self.paths.INPUTDIR = self.paths.HOMEDIR + "input\\"
-        self.paths.RESULTDIR = self.paths.HOMEDIR + "results\\"
-        self.paths.TMPDIR = self.paths.HOMEDIR + "tmp\\"
+        self.paths.RESULTDIR = self.paths.HOMEDIR + "results_" + os.getenv('COMPUTERNAME') + "\\"
+        self.paths.TMPDIR = self.paths.HOMEDIR + "tmp_" + os.getenv('COMPUTERNAME') + "\\"
         
         self.DeleteDir(self.paths.TMPDIR)
         if not os.path.isdir(self.paths.TMPDIR):
@@ -87,6 +91,7 @@ class config():
                 "' is not a valid img rater name! Changed to '" + \
                 os.path.basename(result_name_tuple[0]) + resultExtension)
                 self.paths.result = result_name_tuple[0] + resultExtension
+                self.paths.description = result_name_tuple[0] + ".txt"
                 result_name_tuple = os.path.splitext(self.paths.result)
 
             self.paths.resultAvg = result_name_tuple[0] + "_avg" + result_name_tuple[1]
