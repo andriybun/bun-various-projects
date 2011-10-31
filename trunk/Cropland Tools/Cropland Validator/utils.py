@@ -153,12 +153,12 @@ class utils:
         tmp.sumLevel1 = paramsStruct.tmpDir + "sum_l1" + extension
         tmp.sumLevel2 = paramsStruct.tmpDir + "sum_l2" + extension
 
-    
         output = iterableStruct()
         output.inputsNotClipped = inputsNotClipped
         output.inputsClipped = inputsClipped
         output.outputs = outputs
         output.tmp = tmp
+        output.logFileName = paramsStruct.tmpDir + 'progress.log'
         
         return output
 
