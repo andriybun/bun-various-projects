@@ -23,11 +23,13 @@ def AddMultipleRasters(inRasterList, outRaster):
     else:
         extension = os.path.splitext(os.path.basename(inRasterList[0]))[1]
         tmpRaster = os.path.dirname(outRaster) + "\\" + "tmpRaster" + extension
+        gp.AddMessage('tmp raster:    ' + tmpRaster)
         gp.AddMessage('adding raster: ' + inRasterList[0])
         gp.Copy_management(inRasterList[0], tmpRaster)
         for raster in inRasterList[1:]:
             gp.AddMessage('adding raster: ' + raster)
             gp.Plus_sa(tmpRaster, raster, outRaster)
+            gp.AddMessage('copying to tmp')
             gp.Copy_management(outRaster, tmpRaster)
         gp.AddMessage('deleting temporary data')
         gp.delete_management(tmpRaster)

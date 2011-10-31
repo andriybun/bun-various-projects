@@ -38,7 +38,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     agreementTable = rasterAgreementTable(priorityValues, priorityValues2)
     agreementTable.Print(interface, runConfig.paths.inputs.LayerList)
     
-    descriptionFile = open(runConfig.paths.description, 'r')
+    descriptionFile = open(runConfig.paths.description, 'w')
     agreementTable.PrintToFile(descriptionFile, runConfig.paths.inputs.LayerList)
     descriptionFile.close()
 
