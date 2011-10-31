@@ -3,13 +3,18 @@
 # Modified: 
 # Name:     Comparison of global cropland cover script modified for use with GUI
 
+import sys
+import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
+
 from iterableStruct import iterableStruct
 from utils import utils
 from processLevel import processLevel
 from calibrateLevel import calibrateLevel
-#from PyQt4 import QtGui, QtCore, Qt
+from Logger import Logger
 
-def runAll(gui, coords = None, inputsNotClipped = None, output = None):
+def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = None):
     gui.PrintTextTime('Calculations started')
 #    # coordinates for clipping rasters:
 #    if coords is None:
@@ -23,22 +28,39 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
 
     if pathsAndUtilities.verifyRasters(pathsAndUtilities.inputsNotClipped, gui) == 1:
         return 1
+
+    # Creating logger object
+    logFile = Logger(pathsAndUtilities.logFile)
+    resumeFromPoint = -999
+    if os.path.exists(pathsAndUtilities.logFile):
+        existingLogFile = open(pathsAndUtilities.logFile, 'r')
+        lines = existingLogFile.readLines()
+        if lines[0] == argv:
+            resumeFromPoint = lines[-1]
+        existingLogFile.close()
+    logFile.AddMessage(argv)
+
     paramsStruct = pathsAndUtilities.paramsStruct
     inputsNotClipped = pathsAndUtilities.inputsNotClipped
     inputsClipped = pathsAndUtilities.inputsClipped
     outputs = pathsAndUtilities.outputs
     tmp = pathsAndUtilities.tmp
     
-    gui.PrintTextTime('-- Preprocessing rastsers --')
-   
-    # clip rasters and convert to int(if necessary) 
-    pathsAndUtilities.clipRasterInt(inputsNotClipped.countries, inputsClipped.countries, coords)
-    pathsAndUtilities.clipRasterInt(inputsNotClipped.subnationalUnits, inputsClipped.subnationalUnits, coords)
-    
-    pathsAndUtilities.clipRasterInt(inputsNotClipped.subregionalUnits, inputsClipped.subregionalUnits, coords)
-    pathsAndUtilities.clipRaster(inputsNotClipped.mark_high_32, inputsClipped.mark_high_32, coords)
-    pathsAndUtilities.clipRaster(inputsNotClipped.cell_area, inputsClipped.cell_area, coords)
-    pathsAndUtilities.clipRaster(inputsNotClipped.statLayer, inputsClipped.statLayer, coords)
+    point = 1
+    if point < resumeFromPoint:
+        gui.PrintTextTime('-- Preprocessing rastsers --')
+       
+        # clip rasters and convert to int(if necessary) 
+        pathsAndUtilities.clipRasterInt(inputsNotClipped.countries, inputsClipped.countries, coords)
+        pathsAndUtilities.clipRasterInt(inputsNotClipped.subnationalUnits, inputsClipped.subnationalUnits, coords)
+        
+        pathsAndUtilities.clipRasterInt(inputsNotClipped.subregionalUnits, inputsClipped.subregionalUnits, coords)
+        pathsAndUtilities.clipRaster(inputsNotClipped.mark_high_32, inputsClipped.mark_high_32, coords)
+        pathsAndUtilities.clipRaster(inputsNotClipped.cell_area, inputsClipped.cell_area, coords)
+        pathsAndUtilities.clipRaster(inputsNotClipped.statLayer, inputsClipped.statLayer, coords)
+
+    logFile.AddMessage(point)
+    point = point + 1
 
     # minimum and maximum classes of territory in "mark high"
     minMaxClass = iterableStruct()
@@ -47,43 +69,66 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None):
     gui.PrintText('Min class = %d' % (minMaxClass.minClass))
     gui.PrintText('Max class = %d' % (minMaxClass.maxClass))
     
-    # convert rasters to proper measurement units
-    pathsAndUtilities.prepareRasters()
+    if point < resumeFromPoint:
+        # convert rasters to proper measurement units
+        pathsAndUtilities.prepareRasters()
     
-    # Processing level 0 (countries):
-    gui.PrintTextTime('-- National level --')
-    processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[0],
-                 outputs.resultLevel[0], gui)
-    #verify.checkZonalSums(resultLevel[0])
+    logFile.AddMessage(point)
+    point = point + 1
     
-    # Processing level 1 (subnational - regions):
-    gui.PrintTextTime('-- Subnational level --')
-    processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[1],
-                 outputs.resultLevel[1], gui)
-    #verify.checkZonalSums(resultLevel[1])
-
-    # calibrate subnational layer
-    gui.PrintTextTime('-- Calibrating subnational level --')
-    calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 1, gui)
-    #verify.checkZonalSums(outputs.combinedResult[1])
-
-    # Processing level 2:
-    gui.PrintTextTime('-- Subregional level --')
-    processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[2],
-                 outputs.resultLevel[2], gui)
-
-    # now we consider the calibrated result for level 1 as a normal result for this level
-    pathsAndUtilities.outputs.resultLevel[1] = pathsAndUtilities.outputs.combinedResult[1]
-    # calibrate subregional layer
-    gui.PrintTextTime('-- Calibrating subregional level --')
-    calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 2, gui)
-    #verify.checkZonalSums(outputs.combinedResult[2])
+    if point < resumeFromPoint:
+        # Processing level 0 (countries):
+        gui.PrintTextTime('-- National level --')
+        processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[0],
+                     outputs.resultLevel[0], gui)
+        #verify.checkZonalSums(resultLevel[0])
+    logFile.AddMessage(point)
+    point = point + 1
     
-    pathsAndUtilities.processResults()
+    if point < resumeFromPoint:
+        # Processing level 1 (subnational - regions):
+        gui.PrintTextTime('-- Subnational level --')
+        processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[1],
+                     outputs.resultLevel[1], gui)
+        #verify.checkZonalSums(resultLevel[1])
+    logFile.AddMessage(point)
+    point = point + 1
+
+    if point < resumeFromPoint:
+        # calibrate subnational layer
+        gui.PrintTextTime('-- Calibrating subnational level --')
+        calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 1, gui)
+        #verify.checkZonalSums(outputs.combinedResult[1])
+    logFile.AddMessage(point)
+    point = point + 1
+
+    if point < resumeFromPoint:
+        # Processing level 2:
+        gui.PrintTextTime('-- Subregional level --')
+        processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[2],
+                     outputs.resultLevel[2], gui)
+    logFile.AddMessage(point)
+    point = point + 1
+
+    if point < resumeFromPoint:
+        # now we consider the calibrated result for level 1 as a normal result for this level
+        pathsAndUtilities.outputs.resultLevel[1] = pathsAndUtilities.outputs.combinedResult[1]
+        # calibrate subregional layer
+        gui.PrintTextTime('-- Calibrating subregional level --')
+        calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 2, gui)
+        #verify.checkZonalSums(outputs.combinedResult[2])
+    logFile.AddMessage(point)
+    point = point + 1
+
+    if point < resumeFromPoint:
+        gui.PrintTextTime('-- Processing results --')
+        pathsAndUtilities.processResults()
+    logFile.AddMessage(point)
+    point = point + 1
     
     # Delete tmp files
     gui.PrintTextTime('-- Cleanup temporary files --')
     pathsAndUtilities.cleanUp(inputsClipped)
     pathsAndUtilities.cleanUp(tmp)
-
+    
     gui.PrintTextTime('Finished')

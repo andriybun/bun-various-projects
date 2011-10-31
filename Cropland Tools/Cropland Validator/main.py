@@ -32,4 +32,4 @@ output = sys.argv[8]
 
 interface = GeoprocessingInfo()
 
-runAll(interface, coords, inputsNotClipped, output)
+runAll(interface, coords, inputsNotClipped, output, sys.argv)
