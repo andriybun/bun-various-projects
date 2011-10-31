@@ -50,8 +50,6 @@ if __name__ == '__main__':
 #    inRasterList.append("D:\\Workspace\\IIASA\\ArcGIS_Scripting_Hybrid_Maps\\Merge Rasters\\south_sud1km.img")
 #    inRasterList.append("D:\\Workspace\\IIASA\\ArcGIS_Scripting_Hybrid_Maps\\Merge Rasters\\europe_pecent_cr_2000_Clip.img")
 #    inRasterList.append("D:\\Workspace\\IIASA\\ArcGIS_Scripting_Hybrid_Maps\\Merge Rasters\\sen_bestagg.img")
-    
-    
-    outRaster = "D:\\Workspace\\IIASA\\ArcGIS_Scripting_Hybrid_Maps\\Merge Rasters\\del_1.img"
+#    outRaster = "D:\\Workspace\\IIASA\\ArcGIS_Scripting_Hybrid_Maps\\Merge Rasters\\del_1.img"
     
     MergeMultipleRasters(inRasterList, outRaster)

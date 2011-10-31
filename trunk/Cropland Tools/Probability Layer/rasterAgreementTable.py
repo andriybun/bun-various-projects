@@ -188,34 +188,35 @@ class rasterAgreementTable():
     #===============================================================================
     def PrintToFile(self, file, listOfRasters = None):
         import os
-        file.write('Priority values 1:')
-        file.write(str(self.priorityValues1))
-        file.write('Priority values 2:')
-        file.write(str(self.priorityValues2))
+        file.write('Priority values 1:\n')
+        file.write(str(self.priorityValues1) + '\n')
+        file.write('Priority values 2:\n')
+        file.write(str(self.priorityValues2) + '\n')
         i = 0;
-        tableCaption = 'Raster agreement table'
+        tableCaption = 'Raster agreement table\n'
         headerSeparator = '-------------------------------'
-        for val in self.data[0]['agreementTable']:
+        for val in self.data[0]['agreementTable\n']:
             headerSeparator += '------'
-        header = '%-12s| SumW1 | SumW2 |  Rasters' % (' Cell class')
+        headerSeparator += '\n'
+        header = '%-12s| SumW1 | SumW2 |  Rasters\n' % (' Cell class')
         file.write('\n')
-        file.write(tableCaption)
-        file.write(headerSeparator)
-        file.write(header)
-        file.write(headerSeparator)
+        file.write(tableCaption + '\n')
+        file.write(headerSeparator + '\n')
+        file.write(header + '\n')
+        file.write(headerSeparator + '\n')
 
         for row in self.data:
             outString = '      %4d  |  %3d  |  %3d' % (i, row['classes1'], row['classes2'])
             for val in row['agreementTable']:
                 outString += '  |  ' + str(val)
             i = i + 1
-            file.write(outString)
-        file.write(headerSeparator)
-        file.write('\n')
+            file.write(outString + '\n')
+        file.write(headerSeparator + '\n')
+        file.write('\n\n')
         if not(listOfRasters is None):
-            file.write('Rasters:')
+            file.write('Rasters:\n')
             i = 1
             for rasterName in listOfRasters:
                 legend = '%d. - %s' % (i, os.path.basename(rasterName))
                 i += 1
-                file.write(legend)
+                file.write(legend + '\n')

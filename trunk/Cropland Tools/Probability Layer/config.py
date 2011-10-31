@@ -69,6 +69,7 @@ class config():
                 os.mkdir(self.paths.RESULTDIR)
 
             self.paths.result = self.paths.RESULTDIR + "mark_high" + extension
+            self.paths.description = self.paths.RESULTDIR + "mark_high.txt"
             self.paths.resultAvg = self.paths.RESULTDIR + "mark_high_avg" + extension
             self.paths.resultMin = self.paths.RESULTDIR + "mark_high_min" + extension
             self.paths.resultMax = self.paths.RESULTDIR + "mark_high_max" + extension
@@ -86,12 +87,12 @@ class config():
             resultExtension = ".img"
             self.paths.result = inputPaths.result
             result_name_tuple = os.path.splitext(self.paths.result)
+            self.paths.description = result_name_tuple[0] + ".txt"
             if result_name_tuple[1] != resultExtension:
                 self.gui.Warning("Warning: '" + os.path.basename(self.paths.result) + \
                 "' is not a valid img rater name! Changed to '" + \
                 os.path.basename(result_name_tuple[0]) + resultExtension)
                 self.paths.result = result_name_tuple[0] + resultExtension
-                self.paths.description = result_name_tuple[0] + ".txt"
                 result_name_tuple = os.path.splitext(self.paths.result)
 
             self.paths.resultAvg = result_name_tuple[0] + "_avg" + result_name_tuple[1]
