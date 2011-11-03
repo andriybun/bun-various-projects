@@ -28,6 +28,7 @@ class rasterAgreementTable():
         self.weights = self.GetWeights(self.priorityValues1)
         self.GetClasses()
         self.SortTable(['classes1', 'classes2'])
+        self.SetResultingClasses()
 
     #===============================================================================
     # Method to parse rasters' priorities to weights
@@ -77,7 +78,11 @@ class rasterAgreementTable():
                 self.classes1[i] += self.agreementTable[i][j] * self.weights[j]
                 self.classes2[i] += self.agreementTable[i][j] * self.priorityValues2[j]
                 
-            self.data.append(dict(classes1 = self.classes1[i], classes2 = self.classes2[i], agreementTable = self.agreementTable[i]))
+            self.data.append(dict(resultingClass = -1, \
+                classes1 = self.classes1[i], \
+                classes2 = self.classes2[i], \
+                agreementTable = self.agreementTable[i] \
+            ))
 
         self.classes1.sort()
     
@@ -116,6 +121,15 @@ class rasterAgreementTable():
             i = i + 1
         return i
 
+    def FindClass(self, val1, val2):
+        i = 0
+        while (self.data[i]['classes1'] != val1) or (self.data[i]['classes2'] != val2):
+            i = i + 1
+        return self.data[i]['resultingClass']
+
+    #===============================================================================
+    # Bubble sort
+    #===============================================================================
     def BubbleSort(self, tab, field):
         i = 0
         while (i < len(tab) - 1):
@@ -130,7 +144,20 @@ class rasterAgreementTable():
             else:
                 i = i + 1
         return tab
-        
+
+    #===============================================================================
+    # Set resulting classes 
+    #===============================================================================
+    def SetResultingClasses(self):
+        currentClass = 1
+        numRecords = len(self.data)
+        self.data[0]['resultingClass'] = currentClass
+        for idx in range(1, numRecords):
+            if self.data[idx]['classes1'] != self.data[idx-1]['classes1'] and \
+               self.data[idx]['classes2'] != self.data[idx-1]['classes2']:
+                currentClass += 1
+            self.data[idx]['resultingClass'] = currentClass
+
     #===============================================================================
     # Print table
     #===============================================================================
@@ -156,6 +183,7 @@ class rasterAgreementTable():
             gui.PrintText(headerSeparator)
         for row in self.data:
             outString = '      %4d  |  %3d  |  %3d' % (i, row['classes1'], row['classes2'])
+#            outString = '      %4d  |  %3d  |  %3d' % (row['resultingClass'], row['classes1'], row['classes2'])
             for val in row['agreementTable']:
                 outString += '  |  ' + str(val)
             i = i + 1
@@ -195,7 +223,7 @@ class rasterAgreementTable():
         i = 0;
         tableCaption = 'Raster agreement table\n'
         headerSeparator = '-------------------------------'
-        for val in self.data[0]['agreementTable\n']:
+        for val in self.data[0]['agreementTable']:
             headerSeparator += '------'
         headerSeparator += '\n'
         header = '%-12s| SumW1 | SumW2 |  Rasters\n' % (' Cell class')
@@ -220,3 +248,8 @@ class rasterAgreementTable():
                 legend = '%d. - %s' % (i, os.path.basename(rasterName))
                 i += 1
                 file.write(legend + '\n')
+
+if __name__ == "__main__":
+    RAT = rasterAgreementTable([2, 1, 1, 1, 1])
+    RAT.Print()
+    print str(RAT.FindFirst(8, 4))

@@ -119,7 +119,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     areaByUnitsFieldName = os.path.splitext(os.path.basename(temp3))[0]
     # Adding a new field for the result:
     interface.PrintText("started processing table")
-    gp.addfield (temp1, "LAND_CLASS","LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
+    gp.addfield(temp1, "LAND_CLASS","LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
     # Creating cursor:
     rows = gp.UpdateCursor(temp1, "", "", "", unitsFieldName + "; " + sumRastOneFieldName + "; "  + sumRastTwoFieldName + "; " + areaByUnitsFieldName + " DESC")
     x = 0
