@@ -7,7 +7,7 @@ Created on Mon Nov 29 15:23:01 2010
 @name:   
 """
 
-from common import MakeListString
+from common import *
 from config import config
 from utils import *
 from rasterAgreementTable import rasterAgreementTable
@@ -103,7 +103,8 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     # determining zones within countries:
     gp.Combine_sa("\'" + runConfig.paths.tmp.sumRast + "\';\'" + runConfig.paths.inputs.units + "\'", temp2)
     # calculating zonal sum of cell areas by zones within countries:
-    gp.ZonalStatistics_sa(temp2, "Value", temp1, temp3, "SUM", "DATA")
+    #gp.ZonalStatistics_sa(temp2, "Value", temp1, temp3, "SUM", "DATA")
+    ZonalStatistics(temp2, temp1, temp3, "SUM")
     # combining rasters in order to obtain value attribute table with columns
     # "countries", "sum of input rasters", "area by country":
     # 'temp3' field refers to total area of land class by country
@@ -154,7 +155,6 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         prevRastAgree = currRastAgree
         prevRastAgree2 = currRastAgree2
         #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
-
     #===============================================================================
     # Writing results to the output raster
     #===============================================================================
@@ -173,7 +173,6 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     runConfig.DeleteDir(runConfig.paths.TMPDIR)
 
     interface.PrintTextTime('Finished')
-
 #===============================================================================
 # TODO: fix no clip
 #===============================================================================

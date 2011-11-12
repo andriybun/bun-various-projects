@@ -45,9 +45,9 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
     inputsClipped = pathsAndUtilities.inputsClipped
     outputs = pathsAndUtilities.outputs
     tmp = pathsAndUtilities.tmp
-    
+
     point = 1
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         gui.PrintTextTime('-- Preprocessing rastsers --')
        
         # clip rasters and convert to int(if necessary) 
@@ -68,61 +68,67 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
     minMaxClass.maxClass = pathsAndUtilities.gp.GetRasterProperties_management(inputsClipped.mark_high_32, "MAXIMUM")
     gui.PrintText('Min class = %d' % (minMaxClass.minClass))
     gui.PrintText('Max class = %d' % (minMaxClass.maxClass))
-    
-    if point < resumeFromPoint:
+
+    if point >= resumeFromPoint:
         # convert rasters to proper measurement units
         pathsAndUtilities.prepareRasters()
-    
+
     logFile.AddMessage(point)
     point = point + 1
     
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         # Processing level 0 (countries):
         gui.PrintTextTime('-- National level --')
         processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[0],
                      outputs.resultLevel[0], gui)
         #verify.checkZonalSums(resultLevel[0])
+
     logFile.AddMessage(point)
     point = point + 1
     
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         # Processing level 1 (subnational - regions):
         gui.PrintTextTime('-- Subnational level --')
         processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[1],
                      outputs.resultLevel[1], gui)
         #verify.checkZonalSums(resultLevel[1])
+
     logFile.AddMessage(point)
     point = point + 1
 
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         # calibrate subnational layer
         gui.PrintTextTime('-- Calibrating subnational level --')
         calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 1, gui)
         #verify.checkZonalSums(outputs.combinedResult[1])
+
     logFile.AddMessage(point)
     point = point + 1
 
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         # Processing level 2:
         gui.PrintTextTime('-- Subregional level --')
         processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[2],
                      outputs.resultLevel[2], gui)
+
     logFile.AddMessage(point)
     point = point + 1
 
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         # now we consider the calibrated result for level 1 as a normal result for this level
         pathsAndUtilities.outputs.resultLevel[1] = pathsAndUtilities.outputs.combinedResult[1]
         # calibrate subregional layer
         gui.PrintTextTime('-- Calibrating subregional level --')
         calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 2, gui)
         #verify.checkZonalSums(outputs.combinedResult[2])
+
     logFile.AddMessage(point)
     point = point + 1
 
-    if point < resumeFromPoint:
+    if point >= resumeFromPoint:
         gui.PrintTextTime('-- Processing results --')
         pathsAndUtilities.processResults()
+
     logFile.AddMessage(point)
     point = point + 1
     
