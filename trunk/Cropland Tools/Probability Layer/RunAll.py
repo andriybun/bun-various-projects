@@ -159,7 +159,8 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     # Writing results to the output raster
     #===============================================================================
     interface.PrintTextTime('Writing result...')
-    gp.ExtractByAttributes_sa(temp1 + ".LAND_CLASS", "LAND_CLASS > 0", runConfig.paths.result)
+    gp.ExtractByAttributes_sa(temp1 + ".LAND_CLASS", "LAND_CLASS > 0", temp2)
+    gp.Con_sa(temp2, temp2, runConfig.paths.result, "#", "VALUE > 0")
 
     del row
     del rows
@@ -169,6 +170,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     # Deleting temporary rasters:
     interface.PrintTextTime('Done! Deleting temporary rasters')
     gp.Delete_management(temp1)
+    gp.Delete_management(temp2)
     gp.Delete_management(runConfig.paths.tmp.sumRast)
     runConfig.DeleteDir(runConfig.paths.TMPDIR)
 

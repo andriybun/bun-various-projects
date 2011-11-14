@@ -30,6 +30,8 @@ class utils:
             self.inputsNotClipped = inputsNotClipped
         self.inputsClipped = rasterNames.inputsClipped
         self.outputs = rasterNames.outputs
+        self.logFileName = rasterNames.logFileName
+
         if output is not None:
             self.outputs.resultStat = output
         self.tmp = rasterNames.tmp

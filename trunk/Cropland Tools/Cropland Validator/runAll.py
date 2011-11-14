@@ -30,15 +30,17 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         return 1
 
     # Creating logger object
-    logFile = Logger(pathsAndUtilities.logFile)
+    logFile = Logger(pathsAndUtilities.logFileName)
     resumeFromPoint = -999
-    if os.path.exists(pathsAndUtilities.logFile):
+    gui.PrintText(pathsAndUtilities.logFileName)
+    
+    if os.path.exists(pathsAndUtilities.logFileName):
         existingLogFile = open(pathsAndUtilities.logFile, 'r')
         lines = existingLogFile.readLines()
-        if lines[0] == argv:
+        if lines[0] == str(argv):
             resumeFromPoint = lines[-1]
         existingLogFile.close()
-    logFile.AddMessage(argv)
+    logFile.AddMessage(str(argv))
 
     paramsStruct = pathsAndUtilities.paramsStruct
     inputsNotClipped = pathsAndUtilities.inputsNotClipped
@@ -59,7 +61,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         pathsAndUtilities.clipRaster(inputsNotClipped.cell_area, inputsClipped.cell_area, coords)
         pathsAndUtilities.clipRaster(inputsNotClipped.statLayer, inputsClipped.statLayer, coords)
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
 
     # minimum and maximum classes of territory in "mark high"
@@ -73,7 +75,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         # convert rasters to proper measurement units
         pathsAndUtilities.prepareRasters()
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
     
     if point >= resumeFromPoint:
@@ -83,7 +85,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
                      outputs.resultLevel[0], gui)
         #verify.checkZonalSums(resultLevel[0])
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
     
     if point >= resumeFromPoint:
@@ -93,7 +95,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
                      outputs.resultLevel[1], gui)
         #verify.checkZonalSums(resultLevel[1])
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
 
     if point >= resumeFromPoint:
@@ -102,7 +104,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 1, gui)
         #verify.checkZonalSums(outputs.combinedResult[1])
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
 
     if point >= resumeFromPoint:
@@ -111,7 +113,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         processLevel(paramsStruct, pathsAndUtilities, minMaxClass, inputsClipped.levelStatisticsName[2],
                      outputs.resultLevel[2], gui)
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
 
     if point >= resumeFromPoint:
@@ -122,14 +124,14 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, 2, gui)
         #verify.checkZonalSums(outputs.combinedResult[2])
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
 
     if point >= resumeFromPoint:
         gui.PrintTextTime('-- Processing results --')
         pathsAndUtilities.processResults()
 
-    logFile.AddMessage(point)
+    logFile.AddMessage(str(point))
     point = point + 1
     
     # Delete tmp files
