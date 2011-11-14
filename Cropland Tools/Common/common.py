@@ -83,17 +83,11 @@ def ZonalStatistics(inZoneRaster, inValueRaster, outRaster, statisticsType, gp =
 #    tmpZoneRasterName = "tmp_zone.img"
 #    tmpZoneRaster = GetTmpDir() + tmpZoneRasterName
 #    gp.Copy_management(inZoneRaster, tmpZoneRaster)
-    gp.AddMessage("after copy")
     statisticsTableName = "stat_table"
     statisticsTable = GetTmpDir() + statisticsTableName
     gp.ZonalStatisticsAsTable_sa(inZoneRaster, "Value", inValueRaster, statisticsTable, "DATA")
-    gp.AddMessage("%s\tZonal Statistics as Table" % (time.strftime("%H:%M:%S", time.localtime())))
-#    gp.AddJoin_management(inZoneRaster, "Value", statisticsTable, "Value", "KEEP_ALL")
     gp.joinfield(inZoneRaster, "Value", statisticsTable, "Value", statisticsType)
-    gp.AddMessage("%s\tAdd Join" % (time.strftime("%H:%M:%S", time.localtime())))
-    gp.AddMessage(inZoneRaster + "." + statisticsTableName + ":" + statisticsType)
-    gp.ExtractByAttributes_sa(inZoneRaster + "." + statisticsType,\
-        "1 = 1", outRaster)
+    gp.ExtractByAttributes_sa(inZoneRaster + "." + statisticsType, "1 = 1", outRaster)
     gp.Delete_management(statisticsTable)
     gp.deletefield(inZoneRaster, statisticsType)
 
