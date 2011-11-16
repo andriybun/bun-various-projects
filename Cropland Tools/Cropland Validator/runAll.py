@@ -131,7 +131,7 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         gui.PrintTextTime('-- Processing results --')
         pathsAndUtilities.processResults()
 
-    logFile.AddMessage(str(point))
+#    logFile.AddMessage(str(point))
     point = point + 1
     
     # Delete tmp files

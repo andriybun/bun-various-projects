@@ -127,12 +127,12 @@ class utils:
         # results of level analysis
         outputs.resultLevel = []
         outputs.resultForCalibratedLevel = ['dummy']
-        outputs.combinedResult = ['dummy']
         outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_0" + extension)
         outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_1" + extension)
         outputs.resultLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resLevel_2" + extension)
         outputs.resultForCalibratedLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCalibr_1" + extension)
         outputs.resultForCalibratedLevel.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCalibr_2" + extension)
+        outputs.combinedResult = [ outputs.resultLevel[0] ]
         outputs.combinedResult.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCombi_1" + extension)
         outputs.combinedResult.append(paramsStruct.homeDir + paramsStruct.resultDir + "resCombi_2" + extension)
         outputs.resultStat = outputs.combinedResult[2] + "st" + extension
