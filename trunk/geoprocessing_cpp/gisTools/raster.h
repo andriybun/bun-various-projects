@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <string>
 #include <map>
+#include <vector>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -48,8 +49,7 @@ private:
 	bool validateExtent(const raster & other);
 	void saveHdr();
 	void copyFile(const string & source, const string & destination);
-	//void incMap(map<float, float> &mp, float key, float val);
-	//void incMap(map<float, int> &mp, float key, float val);
+	void copyProperties(raster & destination);
 	void incMap(map<float, statisticsStructT> &mp, float key, float val);
 public:
 	enum statisticsTypeT
@@ -68,11 +68,12 @@ public:
 
 	// Geoprocessing methods:
 	raster & copy(const string & destinationName);
-	void copy(const raster & destinationRaster); 
+	void copy(raster & destinationRaster); 
 	void removeFromDisc();
-	void rasterArithmetics(float (*func)(float, float), const float num, const raster & outRaster);
-	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, const raster & outRaster);
-	void zonalStatistics(const raster & inZoneRaster, const raster & outRaster, statisticsTypeT statisticsType = SUM);
+	void rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster);
+	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
+
+	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
 
 	//friend void plus(const raster & first, const float num/*const raster & second*/, raster &result);
 };
