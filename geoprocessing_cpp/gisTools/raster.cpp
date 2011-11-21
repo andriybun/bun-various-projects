@@ -128,22 +128,6 @@ void raster::copyFile(const string & source, const string & destination)
 #endif
 }
 
-
-// TODO: replace with one map<float, structureWithStatistics> - should be more efficient
-//void raster::incMap(map<float, float> &mp, float key, float val)
-//{
-//	val += mp[key];
-//	mp.erase(key);
-//	mp.insert(make_pair<float, float>(key, val));
-//}
-//
-//void raster::incMap(map<float, int> &mp, float key, float val)
-//{
-//	val += mp[key];
-//	mp.erase(key);
-//	mp.insert(make_pair<float, int>(key, val));
-//}
-
 void raster::incMap(map<float, statisticsStructT> &mp, float key, float val)
 {
 	statisticsStructT tmp = mp[key];
@@ -175,11 +159,22 @@ raster & raster::copy(const string & destinationName)
 	return destinationRaster;
 }
 
-void raster::copy(const raster & destinationRaster)
+void raster::copy(raster & destinationRaster)
 {
 	string destinationName = destinationRaster.rasterPath;
 	copyFile(rasterPath + ".hdr", destinationName + ".hdr");
 	copyFile(rasterPath + ".flt", destinationName + ".flt");
+	copyProperties(destinationRaster);
+}
+
+void raster::copyProperties(raster & destination)
+{
+	destination.horResolution = horResolution;
+	destination.verResolution = verResolution;
+	destination.xMin = xMin;
+	destination.yMin = yMin;
+	destination.cellSize = cellSize;
+	destination.noDataValue = noDataValue;
 }
 
 void raster::removeFromDisc()
@@ -188,7 +183,7 @@ void raster::removeFromDisc()
 	DeleteFile((LPCTSTR)((rasterPath + ".flt").c_str()));
 }
 
-void raster::rasterArithmetics(float (*func)(float, float), const float num, const raster & outRaster)
+void raster::rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster)
 {
 	string thisHdrPath = (*this).rasterPath + ".hdr";
 	string thisFltPath = (*this).rasterPath + ".flt";
@@ -196,6 +191,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const float num, con
 	string outFltPath = outRaster.rasterPath + ".flt";
 
 	copyFile(thisHdrPath, outHdrPath);
+	copyProperties(outRaster);
 
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
@@ -234,7 +230,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const float num, con
     delete [] buf;
 }
 
-void raster::rasterArithmetics(float (*func)(float, float), const raster & inRaster, const raster & outRaster)
+void raster::rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster)
 {
 	validateExtent(inRaster);
 
@@ -246,6 +242,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const raster & inRas
 	string outFltPath = outRaster.rasterPath + ".flt";
 
 	copyFile(thisHdrPath, outHdrPath);
+	copyProperties(outRaster);
 
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
@@ -290,7 +287,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const raster & inRas
 	delete [] buf2;
 }
 
-void raster::zonalStatistics(const raster & inZoneRaster, const raster & outRaster, statisticsTypeT statisticsType)
+void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType)
 {
 	validateExtent(inZoneRaster);
 
@@ -302,6 +299,7 @@ void raster::zonalStatistics(const raster & inZoneRaster, const raster & outRast
 	string outFltPath = outRaster.rasterPath + ".flt";
 
 	copyFile(thisHdrPath, outHdrPath);
+	copyProperties(outRaster);
 
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
