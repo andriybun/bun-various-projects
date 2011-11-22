@@ -94,7 +94,7 @@ raster::~raster()
 
 }
 
-bool raster::validateExtent(const raster & other)
+bool raster::validateExtent(const raster & other) const
 {
 	bool result = ((*this).cellSize == other.cellSize) 
 		&& ((*this).horResolution == other.horResolution)
@@ -119,13 +119,23 @@ void raster::saveHdr()
 	file.close();
 }
 
-void raster::copyFile(const string & source, const string & destination)
+void raster::copyFile(const string & source, const string & destination) const
 {
 #if defined(_WIN32) || defined(_WIN64) || defined(OS_WINDOWS)
 	system((string("copy \"") + source.c_str() + "\" \"" + destination.c_str() + "\"").c_str());
 #else
 	system((string("cp \"") + thisHdrPath.c_str() + "\" \"" + outHdrPath.c_str() + "\"").c_str());
 #endif
+}
+
+void raster::copyProperties(raster & destination) const
+{
+	destination.horResolution = horResolution;
+	destination.verResolution = verResolution;
+	destination.xMin = xMin;
+	destination.yMin = yMin;
+	destination.cellSize = cellSize;
+	destination.noDataValue = noDataValue;
 }
 
 void raster::incMap(map<float, statisticsStructT> &mp, float key, float val)
@@ -165,16 +175,6 @@ void raster::copy(raster & destinationRaster)
 	copyFile(rasterPath + ".hdr", destinationName + ".hdr");
 	copyFile(rasterPath + ".flt", destinationName + ".flt");
 	copyProperties(destinationRaster);
-}
-
-void raster::copyProperties(raster & destination)
-{
-	destination.horResolution = horResolution;
-	destination.verResolution = verResolution;
-	destination.xMin = xMin;
-	destination.yMin = yMin;
-	destination.cellSize = cellSize;
-	destination.noDataValue = noDataValue;
 }
 
 void raster::removeFromDisc()
@@ -382,4 +382,32 @@ void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, st
 
 	delete [] buf;
 	delete [] bufZone;
+}
+
+// Friend functions:
+void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster)
+{
+	size_t numRasters = inRastersVector.size();
+	vector<string> hdrPathsVector;
+	vector<string> fltPathsVector;
+	hdrPathsVector.resize(numRasters);
+	fltPathsVector.resize(numRasters);
+	hdrPathsVector[0] = inRastersVector[0].rasterPath + ".hdr";
+	fltPathsVector[0] = inRastersVector[0].rasterPath + ".flt";
+	for (size_t idx = 1; idx < numRasters; idx++)
+	{
+		inRastersVector[0].validateExtent(inRastersVector[idx]);
+		hdrPathsVector[idx] = inRastersVector[idx].rasterPath + ".hdr";
+		fltPathsVector[idx] = inRastersVector[idx].rasterPath + ".flt";
+	}
+	string outHdrPath = outRaster.rasterPath + ".hdr";
+	string outFltPath = outRaster.rasterPath + ".flt";
+
+	inRastersVector[0].copyFile(hdrPathsVector[0], outHdrPath);
+	inRastersVector[0].copyProperties(outRaster);
+
+	int numCells = inRastersVector[0].horResolution * inRastersVector[0].verResolution;
+	int bufSize = ceil(2. * xmin(numCells, MAX_READ_BUFFER_ELEMENTS) / numRasters);
+
+
 }
