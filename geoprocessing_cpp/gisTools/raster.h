@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <string>
 #include <map>
+#include <cmath>
 #include <vector>
 #include <sstream>
 #include <fstream>
@@ -25,7 +26,6 @@ using namespace std;
 #define xmax(a, b)  (((a)>(b)) ? (a) : (b))
 
 const int MAX_READ_BUFFER_ELEMENTS	= 100 * 1024 * 1024;
-const int MAX_READ_BUFFER_SIZE		= MAX_READ_BUFFER_ELEMENTS * 8;
 
 //template <class T>
 class raster
@@ -46,10 +46,10 @@ private:
 	double cellSize;
 	float noDataValue;
 
-	bool validateExtent(const raster & other);
+	bool validateExtent(const raster & other) const;
 	void saveHdr();
-	void copyFile(const string & source, const string & destination);
-	void copyProperties(raster & destination);
+	void copyFile(const string & source, const string & destination) const;
+	void copyProperties(raster & destination) const;
 	void incMap(map<float, statisticsStructT> &mp, float key, float val);
 public:
 	enum statisticsTypeT
@@ -75,9 +75,9 @@ public:
 
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
 
-	//friend void plus(const raster & first, const float num/*const raster & second*/, raster &result);
+	friend void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster);
 };
 
-//void plus(const raster & first, const float num/*const raster & second*/, raster &result);
+void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster);
 
 #endif
