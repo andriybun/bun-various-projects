@@ -138,7 +138,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="gisTools.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName); $(PYTHON_LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
