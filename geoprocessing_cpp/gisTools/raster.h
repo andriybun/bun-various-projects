@@ -17,8 +17,14 @@
 #include <typeinfo>
 
 #include <windows.h>
-
 #include <assert.h>
+
+// Using python.h in raster.cpp requires setting system variable:
+//   PYTHON_INCLUDE = {path to your pythonXX\include\ directory}
+// and adding $(PYTHON_INCLUDE) to additional include directories in project properties
+// The main project will require setting system variable:
+//   PYTHON_LIB = {path to your pythonXX\libs\ directory}
+// and adding $(PYTHON_LIB) to additional library dependencies in project properties
 
 using namespace std;
 
@@ -72,8 +78,10 @@ public:
 	void removeFromDisc();
 	void rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster);
 	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
-
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
+
+	// Conversion
+	void convertToRaster();
 
 	friend void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster);
 };

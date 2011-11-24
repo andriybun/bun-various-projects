@@ -1,3 +1,4 @@
+#include <Python.h>
 #include "raster.h"
 
 raster::raster(const string & rasterName)
@@ -5,9 +6,9 @@ raster::raster(const string & rasterName)
 	rasterPath = rasterName;
 
 	ifstream f;
-	string fileName = rasterName + ".hdr";
+	string hdrFileName = rasterName + ".hdr";
 
-	f.open(fileName.c_str(), ios::in);
+	f.open(hdrFileName.c_str(), ios::in);
 	if (f.is_open())
 	{
 		string line;
@@ -185,6 +186,7 @@ void raster::removeFromDisc()
 
 void raster::rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster)
 {
+	printf("Executing raster arithmetics\n");
 	string thisHdrPath = (*this).rasterPath + ".hdr";
 	string thisFltPath = (*this).rasterPath + ".flt";
 	string outHdrPath = outRaster.rasterPath + ".hdr";
@@ -232,6 +234,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const float num, ras
 
 void raster::rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster)
 {
+	printf("Executing raster arithmetics\n");
 	validateExtent(inRaster);
 
 	string thisHdrPath = (*this).rasterPath + ".hdr";
@@ -289,6 +292,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const raster & inRas
 
 void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType)
 {
+	printf("Executing zonal statistics\n");
 	validateExtent(inZoneRaster);
 
 	string thisHdrPath = (*this).rasterPath + ".hdr";
@@ -384,30 +388,105 @@ void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, st
 	delete [] bufZone;
 }
 
+// Conversion methods:
+void raster::convertToRaster()
+{
+	printf("Converting \"%s.flt\" to raster\n", rasterPath.c_str());
+	Py_Initialize();
+	string conversionCommand = string("gp.FloatToRaster_conversion(r\"") + rasterPath + ".flt\", r\"" + rasterPath + ".img\")\n";
+	PyRun_SimpleString("import arcgisscripting\n");
+	PyRun_SimpleString("gp = arcgisscripting.create()");
+	PyRun_SimpleString("gp.OverWriteOutput = 1");
+	PyRun_SimpleString(conversionCommand.c_str());
+	Py_Finalize();
+}
+
 // Friend functions:
 void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster)
 {
+	printf("Executing multiple raster arithmetics\n");
 	size_t numRasters = inRastersVector.size();
 	vector<string> hdrPathsVector;
 	vector<string> fltPathsVector;
+	vector<float *> bufVector;
+	vector<ifstream *> inRasterFileVector;
+	ofstream outRasterFile;
+
 	hdrPathsVector.resize(numRasters);
 	fltPathsVector.resize(numRasters);
+	bufVector.resize(numRasters);
+	inRasterFileVector.resize(numRasters);
+
 	hdrPathsVector[0] = inRastersVector[0].rasterPath + ".hdr";
 	fltPathsVector[0] = inRastersVector[0].rasterPath + ".flt";
+	string outHdrPath = outRaster.rasterPath + ".hdr";
+	string outFltPath = outRaster.rasterPath + ".flt";
+
+	inRasterFileVector[0] = new ifstream;
+	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
+
+	int numCells = inRastersVector[0].horResolution * inRastersVector[0].verResolution;
+	int bufSize = xmin(numCells, ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
+
+	bufVector[0] = new float[bufSize];
+	float * outBuf = new float[bufSize];
+	
+	// Initializing all vectors, buffers etc.
 	for (size_t idx = 1; idx < numRasters; idx++)
 	{
 		inRastersVector[0].validateExtent(inRastersVector[idx]);
 		hdrPathsVector[idx] = inRastersVector[idx].rasterPath + ".hdr";
 		fltPathsVector[idx] = inRastersVector[idx].rasterPath + ".flt";
+		inRasterFileVector[idx] = new ifstream;
+		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
+		bufVector[idx] = new float[bufSize];
 	}
-	string outHdrPath = outRaster.rasterPath + ".hdr";
-	string outFltPath = outRaster.rasterPath + ".flt";
+	ifstream inr;
+	inr.open(fltPathsVector[0].c_str(), ios::in | ios::binary);
 
 	inRastersVector[0].copyFile(hdrPathsVector[0], outHdrPath);
 	inRastersVector[0].copyProperties(outRaster);
+	outRasterFile.open(outFltPath.c_str(), ios::out | ios::binary);
 
-	int numCells = inRastersVector[0].horResolution * inRastersVector[0].verResolution;
-	int bufSize = ceil(2. * xmin(numCells, MAX_READ_BUFFER_ELEMENTS) / numRasters);
+	// Main loop
+	int numCellsProcessed = 0;
+	while(numCellsProcessed < numCells)
+	{
+		bufSize = min(bufSize, numCells - numCellsProcessed);
+		numCellsProcessed += bufSize;
+		for (size_t rasterIdx = 0; rasterIdx < numRasters; rasterIdx++)
+		{
+			inRasterFileVector[rasterIdx]->read(reinterpret_cast<char*>(bufVector[rasterIdx]), sizeof(float) * bufSize);
+		}
+		for (int i = 0; i < bufSize; i++)
+		{
+			bool isData = true;
+			vector<float> passArg;
+			for (size_t rasterIdx = 0; rasterIdx < numRasters; rasterIdx++)
+			{
+				if (bufVector[rasterIdx][i] == inRastersVector[rasterIdx].noDataValue) isData = false;
+				passArg.push_back(bufVector[rasterIdx][i]);
+			}
+			if (isData)
+			{
+				outBuf[i] = func(passArg);
+			}
+			else
+			{
+				outBuf[i] = outRaster.noDataValue;
+			}
+		}
+		outRasterFile.write(reinterpret_cast<char *>(outBuf), sizeof(float) * bufSize);
+		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
+	}
 
-
+	// Freeing up memory
+	for (size_t idx = 0; idx < numRasters; idx++)
+	{
+		delete [] bufVector[idx];
+		inRasterFileVector[idx]->close();
+		delete [] inRasterFileVector[idx];
+	}
+	delete [] outBuf;
+	outRasterFile.close();
 }
