@@ -35,10 +35,10 @@ class utils:
         if output is not None:
             self.outputs.resultStat = output
         self.tmp = rasterNames.tmp
-        try:
-            shutil.rmtree("%s\\Local Settings\\Temp\\" % (os.getenv('USERPROFILE')))
-        except:
-            pass            
+#        try:
+#            shutil.rmtree("%s\\Local Settings\\Temp\\" % (os.getenv('USERPROFILE')))
+#        except:
+#            pass            
 
     # define roots, parameters
     def initParams(self, output = None):
@@ -160,7 +160,7 @@ class utils:
         output.inputsClipped = inputsClipped
         output.outputs = outputs
         output.tmp = tmp
-        output.logFileName = paramsStruct.tmpDir + 'progress.log'
+        output.logFileName = paramsStruct.tmpDir + 'progress_log.txt'
         
         return output
 
@@ -169,8 +169,8 @@ class utils:
         for rasterName in listOfRasters:
             if (not self.gp.Exists(rasterName)):
                 gui.PrintText('Error: Raster does not exist: ' + rasterName);
+                gui.Error('Raster does not exist: ' + rasterName)
                 return 1
-#                raise IOError('Raster does not exist: ' + rasterName)
 
     # clip an area from input raster and convert result to integer
     def clipRasterInt(self, inputRaster, outputRaster, coords):

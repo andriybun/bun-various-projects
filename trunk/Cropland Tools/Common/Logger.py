@@ -6,9 +6,12 @@ class Logger():
 #        if os.path.exists(self.FileName):
 #            os.remove(self.FileName)
 
-    def __del__(self):
-        os.remove(self.FileName)
+#    def __del__(self):
+#        os.remove(self.FileName)
         
+    def delete(self):
+        os.remove(self.FileName)
+
     def AddMessage(self, MessageStr):
         if os.path.exists(self.FileName):
             logFile = open(self.FileName, 'a')

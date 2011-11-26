@@ -90,14 +90,20 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gui.InitialiseStepProgressor('Creating combined raster')
     for i in range(maxClass, minClass - 1, -1):
         OutRaster = OutClass % i
+#        gui.PrintText('** class %d' % i)
         # Adding a new field for the result:
         gp.addfield (combined, "CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
+#        gui.PrintText('\tadd field')
         # Creating cursor:
         rowsClasses = gp.SearchCursor(OutRaster, "", "", "", combinedName)
+#        gui.PrintText('\tsearch cursor')
         rowClasses = rowsClasses.next()
+#        gui.PrintText('\trow classes next')
         rowsCombined = gp.UpdateCursor(combined, "", "", "", "VALUE")
+#        gui.PrintText('\tupdate cursor')
         rowCombined = rowsCombined.next()
         while rowClasses:
+            gui.PrintText(str(rowCombined.VALUE) + " --> " + str(rowClasses.getValue(combinedName)))
             while rowCombined.VALUE != rowClasses.getValue(combinedName):
                 rowCombined = rowsCombined.next()
             if (math.fabs(rowCombined.VALUE - rowClasses.getValue(combinedName)) > 1):
@@ -110,7 +116,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
         del rowsCombined
         del rowClasses
         del rowsClasses
-        # gp.delete_management(OutRaster)
+#        gp.delete_management(OutRaster)
         gui.SetProgress(100. * (maxClass - i) / max(maxClass - minClass, 1))
     gui.PrintTextTime('Finished')
 
