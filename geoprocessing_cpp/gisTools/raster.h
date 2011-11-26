@@ -54,6 +54,7 @@ private:
 
 	bool validateExtent(const raster & other) const;
 	void saveHdr();
+	bool fileExists(const string & fileName);
 	void copyFile(const string & source, const string & destination) const;
 	void copyProperties(raster & destination) const;
 	void incMap(map<float, statisticsStructT> &mp, float key, float val);
@@ -66,7 +67,7 @@ public:
 		MAX,
 		COUNT
 	};
-
+	// TODO: implement constructor from *.img file, if not exists - empty raster
 	raster(const string & rasterName);
 	raster(const raster& g);
 	raster & operator = (const raster& g);
@@ -81,7 +82,8 @@ public:
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
 
 	// Conversion
-	void convertToRaster();
+	void convertRasterToFloat();
+	void convertFloatToRaster();
 
 	friend void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster);
 };
