@@ -143,7 +143,7 @@ class config():
             else:
                 if (not self.gp.Exists(RasterName)):
                     gui.Error('Raster does not exist: ' + RasterName)
-                    raise Exception('Raster validation', 'Raster does not exitst')
+                    raise Exception('Raster validation', 'Raster does not exist: ' + RasterName)
                     flag = False
         return flag
 

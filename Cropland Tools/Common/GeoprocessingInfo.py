@@ -41,6 +41,7 @@ class GeoprocessingInfo():
     
     def Error(self, msg):
         self.gp.AddError(msg)
+        raise Exception(msg)
 
 
 #########################################################
