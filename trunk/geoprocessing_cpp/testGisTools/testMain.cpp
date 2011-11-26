@@ -26,7 +26,7 @@ int main()
 	//inRaster.copy(sumRaster);
 	//inRaster.rasterArithmetics(&processRasters, inRaster2, sumRaster);
 
-	raster inRaster = raster("E:\\GIS\\float\\glob");
+	raster inRaster = raster("E:\\GIS\\img\\glob");
 	raster inZoneRaster = raster("E:\\GIS\\float\\glc");
 	raster sumRaster = raster("E:\\GIS\\float\\zs_sum");
 	raster meanRaster = raster("E:\\GIS\\float\\zs_mean");
@@ -43,10 +43,10 @@ int main()
 	rasterVector.push_back(countRaster);
 	
 	multipleRasterArithmetics(&processMultipleRasters, rasterVector, multipleArithmeticsResultRaster);
-	sumRaster.convertToRaster();
-	meanRaster.convertToRaster();
-	countRaster.convertToRaster();
-	multipleArithmeticsResultRaster.convertToRaster();
+	sumRaster.convertFloatToRaster();
+	meanRaster.convertFloatToRaster();
+	countRaster.convertFloatToRaster();
+	multipleArithmeticsResultRaster.convertFloatToRaster();
 
 
 	return 0;

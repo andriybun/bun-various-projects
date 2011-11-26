@@ -7,6 +7,7 @@ raster::raster(const string & rasterName)
 
 	ifstream f;
 	string hdrFileName = rasterName + ".hdr";
+	string imgFileName = rasterName + ".img";
 
 	f.open(hdrFileName.c_str(), ios::in);
 	if (f.is_open())
@@ -57,7 +58,16 @@ raster::raster(const string & rasterName)
 	}
 	else
 	{
-		cout << "Initialized empty raster" << endl;
+		f.open(imgFileName.c_str(), ios::in);
+		if (f.is_open())
+		{
+			f.close();
+			convertRasterToFloat();
+		}
+		else
+		{
+			cout << "Initialized empty raster" << endl;
+		}
 	}
 }
 
@@ -118,6 +128,16 @@ void raster::saveHdr()
 	file << "NODATA_value  " << noDataValue << endl;
 	file << "byteorder     LSBFIRST" << endl;
 	file.close();
+}
+
+bool raster::fileExists(const string & fileName)
+{
+	ifstream ifile(fileName.c_str());
+	if (ifile)
+	{
+		return true;
+	}
+	return false;
 }
 
 void raster::copyFile(const string & source, const string & destination) const
@@ -389,7 +409,19 @@ void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, st
 }
 
 // Conversion methods:
-void raster::convertToRaster()
+void raster::convertRasterToFloat()
+{
+	printf("Converting \"%s.img\" to float\n", rasterPath.c_str());
+	Py_Initialize();
+	string conversionCommand = string("gp.RasterToFloat_conversion(r\"") + rasterPath + ".img\", r\"" + rasterPath + ".flt\")\n";
+	PyRun_SimpleString("import arcgisscripting\n");
+	PyRun_SimpleString("gp = arcgisscripting.create()");
+	PyRun_SimpleString("gp.OverWriteOutput = 1");
+	PyRun_SimpleString(conversionCommand.c_str());
+	Py_Finalize();
+}
+
+void raster::convertFloatToRaster()
 {
 	printf("Converting \"%s.flt\" to raster\n", rasterPath.c_str());
 	Py_Initialize();
