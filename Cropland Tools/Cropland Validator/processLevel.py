@@ -89,8 +89,9 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     gui.PrintText('Stage 2. Creating combined raster')
     gui.InitialiseStepProgressor('Creating combined raster')
     for i in range(maxClass, minClass - 1, -1):
+#    for i in range(30, minClass - 1, -1):
         OutRaster = OutClass % i
-#        gui.PrintText('** class %d' % i)
+        gui.PrintText('** class %d' % i)
         # Adding a new field for the result:
         gp.addfield (combined, "CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
 #        gui.PrintText('\tadd field')
@@ -103,7 +104,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
 #        gui.PrintText('\tupdate cursor')
         rowCombined = rowsCombined.next()
         while rowClasses:
-            gui.PrintText(str(rowCombined.VALUE) + " --> " + str(rowClasses.getValue(combinedName)))
+#            gui.PrintText(str(rowCombined.VALUE) + " --> " + str(rowClasses.getValue(combinedName)))
             while rowCombined.VALUE != rowClasses.getValue(combinedName):
                 rowCombined = rowsCombined.next()
             if (math.fabs(rowCombined.VALUE - rowClasses.getValue(combinedName)) > 1):

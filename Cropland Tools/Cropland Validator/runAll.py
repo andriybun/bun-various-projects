@@ -40,10 +40,10 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
         existingLogFile.close()
         if string.replace(lines[0], '\n', '') == str(argv):
             if len(lines) == 1:
-                resumeFromPoint = 1
+                resumeFromPoint = 0
             else:
                 resumeFromPoint = int(lines[-1])
-            gui.PrintText('Unfinished job found. Resuming...')
+            gui.Warning('Unfinished job found. Resuming (%d)...' % (resumeFromPoint))
         else:
             os.remove(pathsAndUtilities.logFileName)
             logFile.AddMessage(str(argv))
@@ -58,8 +58,9 @@ def runAll(gui, coords = None, inputsNotClipped = None, output = None, argv = No
 
     point = 1
     if point > resumeFromPoint:
+        
         gui.PrintTextTime('-- Preprocessing rastsers --')
-       
+
         # clip rasters and convert to int(if necessary) 
         pathsAndUtilities.clipRasterInt(inputsNotClipped.countries, inputsClipped.countries, coords)
         pathsAndUtilities.clipRasterInt(inputsNotClipped.subnationalUnits, inputsClipped.subnationalUnits, coords)

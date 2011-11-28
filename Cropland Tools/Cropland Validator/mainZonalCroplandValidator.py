@@ -37,9 +37,9 @@ else:
     clippedLevel0 = GetTmpDir() + "clippedLevel0.img"
     clippedLevel1 = GetTmpDir() + "clippedLevel1.img"
     clippedLevel2 = GetTmpDir() + "clippedLevel2.img"
-#    ConClip(conditionalRaster, inputsNotClipped.countries, zonalCondition, clippedLevel0)
-#    ConClip(conditionalRaster, inputsNotClipped.subnationalUnits, zonalCondition, clippedLevel1)
-#    ConClip(conditionalRaster, inputsNotClipped.subregionalUnits, zonalCondition, clippedLevel2)
+    ConClip(conditionalRaster, inputsNotClipped.countries, zonalCondition, clippedLevel0)
+    ConClip(conditionalRaster, inputsNotClipped.subnationalUnits, zonalCondition, clippedLevel1)
+    ConClip(conditionalRaster, inputsNotClipped.subregionalUnits, zonalCondition, clippedLevel2)
     inputsNotClipped.countries = clippedLevel0
     inputsNotClipped.subnationalUnits = clippedLevel1
     inputsNotClipped.subregionalUnits = clippedLevel2
