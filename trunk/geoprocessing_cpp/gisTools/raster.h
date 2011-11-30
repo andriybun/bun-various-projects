@@ -67,7 +67,39 @@ public:
 		MAX,
 		COUNT
 	};
-	// TODO: implement constructor from *.img file, if not exists - empty raster
+
+	// tableT class for tables
+	class tableT
+	{
+	private:
+		map< float, vector<float> > data;
+		size_t numCols;
+	public:
+		tableT(size_t sz)
+		{
+			numCols = sz;
+		}
+
+		~tableT()
+		{
+
+		}
+
+		void inc(const float key, const vector<float> & val)
+		{
+			assert(val.size() == numCols);
+			vector<float> tmp;
+			tmp = data[key];
+			for (size_t idx = 0; idx < numCols; idx++)
+			{
+				tmp[idx] += val[idx];
+			}
+			data.erase(key);
+			data.insert(make_pair<float, vector<float>>(key, tmp));
+		}
+	};
+	// end of tableT class
+
 	raster(const string & rasterName);
 	raster(const raster& g);
 	raster & operator = (const raster& g);
@@ -85,9 +117,22 @@ public:
 	void convertRasterToFloat();
 	void convertFloatToRaster();
 
-	friend void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster);
+	friend void multipleRasterArithmetics(
+		float (*func)(const vector<float> & ), 
+		const vector<raster> & inRastersVector, 
+		raster & outRaster);
+	friend void multipleRasterArithmeticsAsTable(
+		float (*func)(const vector<float> & , vector<float> & ), 
+		const vector<raster> & inRastersVector, 
+		raster::tableT & outTable);
+
 };
 
-void multipleRasterArithmetics(float (*func)(vector<float>), const vector<raster> & inRastersVector, raster & outRaster);
+void multipleRasterArithmetics(float (*func)(const vector<float> & ), 
+							   const vector<raster> & inRastersVector, 
+							   raster & outRaster);
+void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
+									  const vector<raster> & inRastersVector, 
+									  raster::tableT & outTable);
 
 #endif

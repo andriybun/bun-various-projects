@@ -8,7 +8,7 @@ float processRasters(float val1, float val2)
 	return (val1 + 2) * val2;
 }
 
-float processMultipleRasters(vector<float> vec)
+float processMultipleRasters(const vector<float> & vec)
 {
 	float sum = 0;
 	for (size_t idx = 0; idx < vec.size(); idx++)
