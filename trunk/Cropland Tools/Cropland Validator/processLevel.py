@@ -146,7 +146,6 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     for i in range(0, len(count)):
         natSum = 0
         resSum = 0
-        resIndex = 29
         absDiff = count[i]
         for j in range(maxClass - minClass, -1, -1):
             natSum += croplandClasses[i][j]
