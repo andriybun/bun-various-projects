@@ -23,10 +23,12 @@ int main()
 	raster areaRaster = raster("E:\\GIS\\cropland data\\area_grid");
 	raster classRaster = raster("E:\\GIS\\cropland data\\prob_classes");
 	raster inZoneRaster = raster("E:\\GIS\\cropland data\\countries");
+	raster outCroplandRaster = raster("E:\\GIS\\cropland data\\validated_cropland");
+	raster outErrorRaster = raster("E:\\GIS\\cropland data\\validated_cropland_error");
 
-	raster::tableT probabilitySummary;
-	
-	areaRaster.zonalSumByClassAsTable(inZoneRaster, classRaster, probabilitySummary);
+	areaRaster.validateCropland(inZoneRaster, classRaster, outCroplandRaster, outErrorRaster);
+	outCroplandRaster.convertFloatToRaster();
+	outErrorRaster.convertFloatToRaster();
 
 	return 0;
 	//////////////////////////////////////////////////////////////////////////

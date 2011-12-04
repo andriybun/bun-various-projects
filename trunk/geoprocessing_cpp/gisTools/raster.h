@@ -55,6 +55,14 @@ public:
 		int count;
 	};
 private:
+	struct unitResultT
+	{
+		int bestClass;
+		float bestEstimate;
+		float error;
+	};
+	typedef map <float, unitResultT> summaryTableT;
+
 	string rasterPath;
 	int horResolution;
 	int verResolution;
@@ -119,7 +127,13 @@ public:
 	statisticsStructT describe();
 
 	// Some specific methods
-	void zonalSumByClassAsTable(const raster & inZoneRaster, raster & inClassRaster, tableT & outTable);
+	void zonalSumByClassAsTable(const raster & inZoneRaster,
+		raster & inClassRaster,
+		summaryTableT calibratedResults);
+	void validateCropland(const raster & inZoneRaster,
+		raster & inClassRaster,
+		raster & outCroplandRaster,
+		raster & errorRaster);
 
 	// Conversion
 	void convertRasterToFloat();
