@@ -155,6 +155,10 @@
 				RelativePath=".\raster.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\rasterAlgorithms.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
