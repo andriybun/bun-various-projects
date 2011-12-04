@@ -18,27 +18,42 @@ float processMultipleRasters(const vector<float> & vec)
 	return sum;
 }
 
+float preprocessCellAreas(const vector<float> & vec)
+{
+	return (vec[0] / (float)10) * (vec[1] / (float)100);
+}
+
 int main()
 {
-	raster areaRaster = raster("E:\\GIS\\cropland data\\area_grid");
-	raster classRaster = raster("E:\\GIS\\cropland data\\prob_classes");
-	raster inZoneRaster = raster("E:\\GIS\\cropland data\\countries");
-	raster outCroplandRaster = raster("E:\\GIS\\cropland data\\validated_cropland");
-	raster outErrorRaster = raster("E:\\GIS\\cropland data\\validated_cropland_error");
+	bool deleteFloats = true;
+	raster areaRaster("E:\\GIS\\cropland data\\area_grid");
+	raster statRaster("E:\\GIS\\cropland data\\cl_mean");
+	raster classRaster("E:\\GIS\\cropland data\\prob_classes");
+	raster inZoneRaster("E:\\GIS\\cropland data\\countries");
+	raster outCroplandRaster("E:\\GIS\\cropland data\\validated_cropland", deleteFloats);
+	raster outErrorRaster("E:\\GIS\\cropland data\\validated_cropland_error", deleteFloats);
 
-	areaRaster.validateCropland(inZoneRaster, classRaster, outCroplandRaster, outErrorRaster);
+	raster tmpCellAreaStat("E:\\GIS\\cropland data\\tmp_cell_area_min", deleteFloats);
+
+	vector<raster> rasterVector;
+	rasterVector.push_back(areaRaster);
+	rasterVector.push_back(statRaster);
+	
+	multipleRasterArithmetics(&preprocessCellAreas, rasterVector, tmpCellAreaStat);
+	tmpCellAreaStat.validateCropland(inZoneRaster, classRaster, outCroplandRaster, outErrorRaster);
+
 	outCroplandRaster.convertFloatToRaster();
 	outErrorRaster.convertFloatToRaster();
 
 	return 0;
 	//////////////////////////////////////////////////////////////////////////
 
-	//raster inRaster = raster("E:\\GIS\\img\\glob");
-	//raster inZoneRaster = raster("E:\\GIS\\float\\glc");
-	//raster sumRaster = raster("E:\\GIS\\float\\zs_sum");
-	//raster meanRaster = raster("E:\\GIS\\float\\zs_mean");
-	//raster countRaster = raster("E:\\GIS\\float\\zs_count");
-	//raster multipleArithmeticsResultRaster = raster("E:\\GIS\\float\\xxx_ma_result");
+	//raster inRaster("E:\\GIS\\img\\glob");
+	//raster inZoneRaster("E:\\GIS\\float\\glc");
+	//raster sumRaster("E:\\GIS\\float\\zs_sum");
+	//raster meanRaster("E:\\GIS\\float\\zs_mean");
+	//raster countRaster("E:\\GIS\\float\\zs_count");
+	//raster multipleArithmeticsResultRaster("E:\\GIS\\float\\xxx_ma_result");
 
 	//inRaster.zonalStatistics(inZoneRaster, sumRaster, raster::SUM);
 	//inRaster.zonalStatistics(inZoneRaster, meanRaster, raster::MEAN);

@@ -1,11 +1,12 @@
 #include <Python.h>
 #include "raster.h"
 
-raster::raster(const string & rasterName)
+raster::raster(const string & rasterName, bool isTemporary)
 {
 	rasterPath = rasterName;
 	isDescribed = false;
 	initializedFromImg = false;
+	isTmp = isTemporary;
 
 	if (!readRasterProperties())
 	{
@@ -30,6 +31,8 @@ raster::raster(const string & rasterName)
 // Copy constructor
 raster::raster(const raster & g)
 {
+	isTmp = false;
+	initializedFromImg = false;
 	rasterPath = g.rasterPath;
 	horResolution = g.horResolution;
 	verResolution = g.verResolution;
@@ -42,6 +45,8 @@ raster::raster(const raster & g)
 // Assignment operator overloading
 raster & raster::operator = (const raster & g)
 {
+	isTmp = false;
+	initializedFromImg = false;
 	if (this != &g)
 	{
 		rasterPath = g.rasterPath;
@@ -58,7 +63,7 @@ raster & raster::operator = (const raster & g)
 // Destructor
 raster::~raster()
 {
-	if (initializedFromImg)
+	if (initializedFromImg || isTmp)
 	{
 		removeFloatFromDisc();
 	}
@@ -513,6 +518,7 @@ void raster::convertFloatToRaster()
 // Friend functions:
 void multipleRasterArithmetics(float (*func)(const vector<float> &), const vector<raster> & inRastersVector, raster & outRaster)
 {
+
 	printf("Executing multiple raster arithmetics\n");
 	size_t numRasters = inRastersVector.size();
 	vector<string> hdrPathsVector;
@@ -533,10 +539,11 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &), const vecto
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
+	ASSERT_INT(inRasterFileVector[0]->is_open());
 
 	int numCells = inRastersVector[0].horResolution * inRastersVector[0].verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
-
+	
 	bufVector[0] = new float[bufSize];
 	float * outBuf = new float[bufSize];
 	
@@ -548,12 +555,13 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &), const vecto
 		fltPathsVector[idx] = inRastersVector[idx].rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
+		ASSERT_INT(inRasterFileVector[idx]->is_open());
 		bufVector[idx] = new float[bufSize];
 	}
-
 	inRastersVector[0].copyFile(hdrPathsVector[0], outHdrPath);
 	inRastersVector[0].copyProperties(outRaster);
 	outRasterFile.open(outFltPath.c_str(), ios::out | ios::binary);
+	ASSERT_INT(outRasterFile.is_open());
 
 	// Main loop
 	int numCellsProcessed = 0;

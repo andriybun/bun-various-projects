@@ -3,7 +3,7 @@
 
 void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 									raster & inClassRaster,
-									summaryTableT calibratedResults)
+									summaryTableT & calibratedResults)
 {
 	validateExtent(inZoneRaster);
 	validateExtent(inClassRaster);
@@ -186,10 +186,22 @@ void raster::validateCropland(const raster & inZoneRaster,
 			{
 				if (inBufZone[i] != inZoneRaster.noDataValue)
 				{
-					unitResultT unitResult = calibratedResults[inBufZone[i]];
-					outBufError[i] = unitResult.error;
+					summaryTableT::iterator unitResultIter = calibratedResults.find(inBufZone[i]);
+					if (unitResultIter != calibratedResults.end())
+					{
+						unitResultT unitResult = unitResultIter->second;
+						outBufError[i] = unitResultIter->second.error;
+					}
+					else
+					{
+						outBufError[i] = outErrorRaster.noDataValue;
+					}
 				}
-				outBufCropland[i] = inZoneRaster.noDataValue;
+				else
+				{
+					outBufError[i] = outErrorRaster.noDataValue;
+				}
+				outBufCropland[i] = outCroplandRaster.noDataValue;
 			}
 		}
 		outCroplandFile.write(reinterpret_cast<char *>(outBufCropland), sizeof(float) * bufSize);
