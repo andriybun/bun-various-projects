@@ -18,13 +18,15 @@
 
 #include <windows.h>
 
-#define ASSERT_INT(ARG)											\
-	{															\
-		if (!(ARG))												\
-		{														\
-			fprintf (stderr, "Assertion failed: " #ARG "\n");	\
-			exit(1);											\
-		}														\
+#define ASSERT_INT(ARG)														\
+	{																		\
+		if (!(ARG))															\
+		{																	\
+			fprintf(stderr, __TIME__ "\n");									\
+			fprintf(stderr, "File: " __FILE__ " \tline: %d\n", __LINE__);	\
+			fprintf(stderr, "Assertion failed: " #ARG "\n");				\
+			exit(1);														\
+		}																	\
 	}
 
 // Using python.h in raster.cpp requires setting system variable:
@@ -39,7 +41,7 @@ using namespace std;
 #define xmin(a, b)  (((a)<(b)) ? (a) : (b))
 #define xmax(a, b)  (((a)>(b)) ? (a) : (b))
 
-const int MAX_READ_BUFFER_ELEMENTS	= 100 * 1024 * 1024;
+const int MAX_READ_BUFFER_ELEMENTS	= 40 * 1024 * 1024;
 
 //template <class T>
 class raster
@@ -73,6 +75,7 @@ private:
 	bool isDescribed;
 	statisticsStructT description;
 	bool initializedFromImg;
+	bool isTmp;
 
 	bool readRasterProperties();
 	bool validateExtent(const raster & other) const;
@@ -112,9 +115,9 @@ public:
 	};
 	// end of tableT class
 
-	raster(const string & rasterName);
-	raster(const raster& g);
-	raster & operator = (const raster& g);
+	raster(const string & rasterName, bool isTemporary = false);
+	raster(const raster & g);
+	raster & operator = (const raster & g);
 	~raster();
 
 	// Generic geoprocessing methods:
@@ -129,7 +132,7 @@ public:
 	// Some specific methods
 	void zonalSumByClassAsTable(const raster & inZoneRaster,
 		raster & inClassRaster,
-		summaryTableT calibratedResults);
+		summaryTableT & calibratedResults);
 	void validateCropland(const raster & inZoneRaster,
 		raster & inClassRaster,
 		raster & outCroplandRaster,
