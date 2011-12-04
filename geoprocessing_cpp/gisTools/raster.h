@@ -17,7 +17,15 @@
 #include <typeinfo>
 
 #include <windows.h>
-#include <assert.h>
+
+#define ASSERT_INT(ARG)											\
+	{															\
+		if (!(ARG))												\
+		{														\
+			fprintf (stderr, "Assertion failed: " #ARG "\n");	\
+			exit(1);											\
+		}														\
+	}
 
 // Using python.h in raster.cpp requires setting system variable:
 //   PYTHON_INCLUDE = {path to your pythonXX\include\ directory}
@@ -36,14 +44,17 @@ const int MAX_READ_BUFFER_ELEMENTS	= 100 * 1024 * 1024;
 //template <class T>
 class raster
 {
-private:
+public:
+	// Structure with statistics
 	struct statisticsStructT
 	{
 		float sumVal;
 		float minVal;
 		float maxVal;
+		float meanVal;
 		int count;
 	};
+private:
 	string rasterPath;
 	int horResolution;
 	int verResolution;
@@ -51,7 +62,11 @@ private:
 	double yMin;
 	double cellSize;
 	float noDataValue;
+	bool isDescribed;
+	statisticsStructT description;
+	bool initializedFromImg;
 
+	bool readRasterProperties();
 	bool validateExtent(const raster & other) const;
 	void saveHdr();
 	bool fileExists(const string & fileName);
@@ -59,6 +74,7 @@ private:
 	void copyProperties(raster & destination) const;
 	void incMap(map<float, statisticsStructT> &mp, float key, float val);
 public:
+	// List of possible statistics to compute
 	enum statisticsTypeT
 	{
 		SUM,
@@ -67,36 +83,24 @@ public:
 		MAX,
 		COUNT
 	};
-
 	// tableT class for tables
 	class tableT
 	{
+	public:
+		typedef map< float, vector<float> > dataT;
 	private:
-		map< float, vector<float> > data;
+		dataT data;
+		bool sized;
 		size_t numCols;
 	public:
-		tableT(size_t sz)
-		{
-			numCols = sz;
-		}
-
-		~tableT()
-		{
-
-		}
-
-		void inc(const float key, const vector<float> & val)
-		{
-			assert(val.size() == numCols);
-			vector<float> tmp;
-			tmp = data[key];
-			for (size_t idx = 0; idx < numCols; idx++)
-			{
-				tmp[idx] += val[idx];
-			}
-			data.erase(key);
-			data.insert(make_pair<float, vector<float>>(key, tmp));
-		}
+		tableT();
+		tableT(size_t sz);
+		~tableT();
+		void setNumCols(size_t n);
+		void inc(const float key, const vector<float> & val);
+		void inc(const float key, const size_t idx, const float val);
+		size_t size();
+		friend class raster;
 	};
 	// end of tableT class
 
@@ -105,13 +109,17 @@ public:
 	raster & operator = (const raster& g);
 	~raster();
 
-	// Geoprocessing methods:
-	raster & copy(const string & destinationName);
+	// Generic geoprocessing methods:
+	raster copy(const string & destinationName);
 	void copy(raster & destinationRaster); 
-	void removeFromDisc();
+	void removeFloatFromDisc();
 	void rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster);
 	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
+	statisticsStructT describe();
+
+	// Some specific methods
+	void zonalSumByClassAsTable(const raster & inZoneRaster, raster & inClassRaster, tableT & outTable);
 
 	// Conversion
 	void convertRasterToFloat();
@@ -121,18 +129,18 @@ public:
 		float (*func)(const vector<float> & ), 
 		const vector<raster> & inRastersVector, 
 		raster & outRaster);
-	friend void multipleRasterArithmeticsAsTable(
-		float (*func)(const vector<float> & , vector<float> & ), 
-		const vector<raster> & inRastersVector, 
-		raster::tableT & outTable);
+	//friend void multipleRasterArithmeticsAsTable(
+	//	float (*func)(const vector<float> & , vector<float> & ), 
+	//	const vector<raster> & inRastersVector, 
+	//	raster::tableT & outTable);
 
 };
 
 void multipleRasterArithmetics(float (*func)(const vector<float> & ), 
 							   const vector<raster> & inRastersVector, 
 							   raster & outRaster);
-void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
-									  const vector<raster> & inRastersVector, 
-									  raster::tableT & outTable);
+//void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
+//									  const vector<raster> & inRastersVector, 
+//									  raster::tableT & outTable);
 
 #endif

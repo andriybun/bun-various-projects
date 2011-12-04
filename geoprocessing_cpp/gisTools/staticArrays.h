@@ -56,8 +56,8 @@
 	template <class T>
 	T & staticArray<T>::operator [] (int idx)
 	{
-		assert(idx >= 0);
-		assert(idx < dim1size);
+		ASSERT_INT(idx >= 0);
+		ASSERT_INT(idx < dim1size);
 		return data[idx];
 	}
 
@@ -118,8 +118,8 @@
 	template <class T>
 	staticArray<T> & staticArray2d<T>::operator [] (int dim0)
 	{
-		assert(dim0 >= 0);
-		assert(dim0 < dim0size);
+		ASSERT_INT(dim0 >= 0);
+		ASSERT_INT(dim0 < dim0size);
 		return data[dim0];
 	}
 
