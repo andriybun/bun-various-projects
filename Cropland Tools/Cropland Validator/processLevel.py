@@ -147,13 +147,14 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
         natSum = 0
         resSum = 0
         absDiff = count[i]
-        for j in range(maxClass - minClass, -1, -1):
+        resIndex = maxClass
+        for j in range(maxClass, minClass-1, -1):
             natSum += croplandClasses[i][j]
             tmpDiff = abs(natSum - count[i])
             if (tmpDiff <= absDiff):
                 absDiff = tmpDiff
                 resSum = natSum
-                resIndex = j + 1
+                resIndex = j
         resSums.append(resSum)
         resIDs.append(resIndex)
 
