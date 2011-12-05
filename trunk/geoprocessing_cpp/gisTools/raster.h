@@ -43,7 +43,12 @@ using namespace std;
 
 const int MAX_READ_BUFFER_ELEMENTS	= 40 * 1024 * 1024;
 
-//template <class T>
+struct runParamsT
+{
+	string tmpDir;
+	string resultDir;
+};
+
 class raster
 {
 public:
@@ -56,6 +61,7 @@ public:
 		float meanVal;
 		int count;
 	};
+	typedef map<float, statisticsStructT> zonalStatisticsTableT;
 private:
 	struct unitResultT
 	{
@@ -83,7 +89,7 @@ private:
 	bool fileExists(const string & fileName);
 	void copyFile(const string & source, const string & destination) const;
 	void copyProperties(raster & destination) const;
-	void incMap(map<float, statisticsStructT> &mp, float key, float val);
+	void incMap(zonalStatisticsTableT &mp, float key, float val);
 public:
 	// List of possible statistics to compute
 	enum statisticsTypeT
@@ -126,6 +132,7 @@ public:
 	void removeFloatFromDisc();
 	void rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster);
 	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
+	void zonalStatisticsAsTable(const raster & inZoneRaster, zonalStatisticsTableT & zonalStatisticsTable, statisticsTypeT statisticsType = SUM);
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
 	statisticsStructT describe();
 
@@ -133,10 +140,6 @@ public:
 	void zonalSumByClassAsTable(const raster & inZoneRaster,
 		raster & inClassRaster,
 		summaryTableT & calibratedResults);
-	void validateCropland(const raster & inZoneRaster,
-		raster & inClassRaster,
-		raster & outCroplandRaster,
-		raster & errorRaster);
 
 	// Conversion
 	void convertRasterToFloat();
@@ -150,6 +153,17 @@ public:
 	//	float (*func)(const vector<float> & , vector<float> & ), 
 	//	const vector<raster> & inRastersVector, 
 	//	raster::tableT & outTable);
+	friend void validateCropland(raster & inCroplandRaster,
+		raster & inZoneRaster,
+		raster & inClassRaster,
+		raster & outCroplandRaster,
+		raster & errorRaster);
+	friend void calibrateCropland(const raster & statisticsLevelUp,
+		const raster & statisticsLevel,
+		raster & resultLevelUp,
+		raster & resultLevel,
+		raster & calibratedResultLevel,
+		const runParamsT & params);
 
 };
 
@@ -159,5 +173,16 @@ void multipleRasterArithmetics(float (*func)(const vector<float> & ),
 //void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
 //									  const vector<raster> & inRastersVector, 
 //									  raster::tableT & outTable);
+void validateCropland(raster & inCroplandRaster,
+					  raster & inZoneRaster,
+					  raster & inClassRaster,
+					  raster & outCroplandRaster,
+					  raster & errorRaster);
+void calibrateCropland(const raster & statisticsLevelUp,
+					   const raster & statisticsLevel,
+					   raster & resultLevelUp,
+					   raster & resultLevel,
+					   raster & calibratedResultLevel,
+					   const runParamsT & params);
 
 #endif

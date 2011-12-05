@@ -117,18 +117,19 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 	}
 }
 
-void raster::validateCropland(const raster & inZoneRaster,
-							  raster & inClassRaster,
-							  raster & outCroplandRaster,
-							  raster & outErrorRaster)
+void validateCropland(raster & inCroplandRaster,
+					  raster & inZoneRaster,
+					  raster & inClassRaster,
+					  raster & outCroplandRaster,
+					  raster & outErrorRaster)
 {
 	// Compute statistics
-	summaryTableT calibratedResults;
-	zonalSumByClassAsTable(inZoneRaster, inClassRaster, calibratedResults);
+	raster::summaryTableT calibratedResults;
+	inCroplandRaster.zonalSumByClassAsTable(inZoneRaster, inClassRaster, calibratedResults);
 
 	// Write statistics to resulting files
-	string inCroplandHdrPath = (*this).rasterPath + ".hdr";
-	string inCroplandFltPath = (*this).rasterPath + ".flt";
+	string inCroplandHdrPath = inCroplandRaster.rasterPath + ".hdr";
+	string inCroplandFltPath = inCroplandRaster.rasterPath + ".flt";
 	string inZoneHdrPath = inZoneRaster.rasterPath + ".hdr";
 	string inZoneFltPath = inZoneRaster.rasterPath + ".flt";
 	string inClassFltPath = inClassRaster.rasterPath + ".flt";
@@ -138,10 +139,10 @@ void raster::validateCropland(const raster & inZoneRaster,
 	string outErrorHdrPath = outErrorRaster.rasterPath + ".hdr";
 	string outErrorFltPath = outErrorRaster.rasterPath + ".flt";
 
-	copyFile(inZoneHdrPath, outCroplandHdrPath);
-	copyFile(inZoneHdrPath, outErrorHdrPath);
-	copyProperties(outCroplandRaster);
-	copyProperties(outErrorRaster);
+	inCroplandRaster.copyFile(inZoneHdrPath, outCroplandHdrPath);
+	inCroplandRaster.copyFile(inZoneHdrPath, outErrorHdrPath);
+	inCroplandRaster.copyProperties(outCroplandRaster);
+	inCroplandRaster.copyProperties(outErrorRaster);
 
 	ifstream inCroplandFile;
 	inCroplandFile.open(inCroplandFltPath.c_str(), ios::out | ios::binary);
@@ -154,7 +155,7 @@ void raster::validateCropland(const raster & inZoneRaster,
 	ofstream outErrorFile;
 	outErrorFile.open(outErrorFltPath.c_str(), ios::out | ios::binary);
 
-	int numCells = inZoneRaster.horResolution * inZoneRaster.verResolution;
+	int numCells = inCroplandRaster.horResolution * inCroplandRaster.verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
 
 	float * inBufCropland = new float[bufSize];
@@ -174,11 +175,11 @@ void raster::validateCropland(const raster & inZoneRaster,
 		inClassFile.read(reinterpret_cast<char*>(inBufClass), sizeof(float) * bufSize);
 		for (int i = 0; i < bufSize; i++)
 		{
-			if ((inBufCropland[i] != (*this).noDataValue)
+			if ((inBufCropland[i] != inCroplandRaster.noDataValue)
 				&& (inBufZone[i] != inZoneRaster.noDataValue)
 				&& (inBufClass[i] != inClassRaster.noDataValue))
 			{
-				unitResultT unitResult = calibratedResults[inBufZone[i]];
+				raster::unitResultT unitResult = calibratedResults[inBufZone[i]];
 				outBufCropland[i] = (unitResult.bestClass <= inBufClass[i]) ? inBufCropland[i] : inZoneRaster.noDataValue;
 				outBufError[i] = unitResult.error;
 			}
@@ -186,10 +187,10 @@ void raster::validateCropland(const raster & inZoneRaster,
 			{
 				if (inBufZone[i] != inZoneRaster.noDataValue)
 				{
-					summaryTableT::iterator unitResultIter = calibratedResults.find(inBufZone[i]);
+					raster::summaryTableT::iterator unitResultIter = calibratedResults.find(inBufZone[i]);
 					if (unitResultIter != calibratedResults.end())
 					{
-						unitResultT unitResult = unitResultIter->second;
+						raster::unitResultT unitResult = unitResultIter->second;
 						outBufError[i] = unitResultIter->second.error;
 					}
 					else
@@ -220,4 +221,20 @@ void raster::validateCropland(const raster & inZoneRaster,
 	delete [] inBufClass;
 	delete [] outBufCropland;
 	delete [] outBufError;
+}
+
+void calibrateCropland(const raster & statisticsLevelUpRaster,
+					   const raster & statisticsLevelRaster,
+					   raster & resultLevelUpRaster,
+					   raster & resultLevelRaster,
+					   raster & calibratedResultLevelRaster,
+					   const runParamsT & params)
+{
+	raster::zonalStatisticsTableT sumLevelUp;		// sum of cropland per administrative units for results at the above level
+	raster::zonalStatisticsTableT sumLevel;			// sum of cropland per administrative units for results at the current level
+
+	resultLevelUpRaster.zonalStatisticsAsTable(statisticsLevelRaster, sumLevelUp, raster::SUM);
+	resultLevelUpRaster.zonalStatisticsAsTable(statisticsLevelRaster, sumLevelUp, raster::SUM);
+
+
 }

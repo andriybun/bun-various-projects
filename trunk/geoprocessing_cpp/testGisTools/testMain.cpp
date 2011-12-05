@@ -23,28 +23,47 @@ float preprocessCellAreas(const vector<float> & vec)
 	return (vec[0] / (float)10) * (vec[1] / (float)100);
 }
 
+float preprocessCellAreas(float area, float stat)
+{
+	return (area / (float)10) * (stat / (float)100);
+}
+
 int main()
 {
+	printf(__TIME__ "\n");
 	bool deleteFloats = true;
 	raster areaRaster("E:\\GIS\\cropland data\\area_grid");
 	raster statRaster("E:\\GIS\\cropland data\\cl_mean");
 	raster classRaster("E:\\GIS\\cropland data\\prob_classes");
-	raster inZoneRaster("E:\\GIS\\cropland data\\countries");
-	raster outCroplandRaster("E:\\GIS\\cropland data\\validated_cropland", deleteFloats);
-	raster outErrorRaster("E:\\GIS\\cropland data\\validated_cropland_error", deleteFloats);
+	raster inZoneRasterLevel0("E:\\GIS\\cropland data\\level0_countries");
+	raster inZoneRasterLevel1("E:\\GIS\\cropland data\\level1_regions");
+	
+	// Results for levels:
+	raster outCroplandRasterLevel0("E:\\GIS\\cropland calibrated\\validated_cropland_level0", deleteFloats);
+	raster outCroplandRasterLevel1("E:\\GIS\\cropland calibrated\\validated_cropland_level1", deleteFloats);
 
+	// Difference between results and reported statistics:
+	raster outErrorRasterLevel0("E:\\GIS\\cropland calibrated\\validated_cropland_error_level0", deleteFloats);
+	raster outErrorRasterLevel1("E:\\GIS\\cropland calibrated\\validated_cropland_error_level1", deleteFloats);
+
+	// Calibrated results:
+	raster outCroplandRasterLevel0("E:\\GIS\\cropland calibrated\\validated_cropland_level0", deleteFloats);
+	
+	// Temporary:
 	raster tmpCellAreaStat("E:\\GIS\\cropland data\\tmp_cell_area_min", deleteFloats);
 
-	vector<raster> rasterVector;
-	rasterVector.push_back(areaRaster);
-	rasterVector.push_back(statRaster);
-	
-	multipleRasterArithmetics(&preprocessCellAreas, rasterVector, tmpCellAreaStat);
-	tmpCellAreaStat.validateCropland(inZoneRaster, classRaster, outCroplandRaster, outErrorRaster);
+	//areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
+	//validateCropland(tmpCellAreaStat, inZoneRasterLevel0, classRaster, outCroplandRasterLevel0, outErrorRasterLevel0);
+	//validateCropland(tmpCellAreaStat, inZoneRasterLevel1, classRaster, outCroplandRasterLevel1, outErrorRasterLevel1);
 
-	outCroplandRaster.convertFloatToRaster();
-	outErrorRaster.convertFloatToRaster();
+	//outCroplandRasterLevel0.convertFloatToRaster();
+	//outCroplandRasterLevel1.convertFloatToRaster();
+	//outErrorRasterLevel0.convertFloatToRaster();
+	//outErrorRasterLevel1.convertFloatToRaster();
 
+	calibrateCropland(outCroplandRasterLevel0, outCroplandRasterLevel1, );
+
+	printf(__TIME__ "\n");
 	return 0;
 	//////////////////////////////////////////////////////////////////////////
 

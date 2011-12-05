@@ -180,7 +180,7 @@ void raster::copyProperties(raster & destination) const
 	destination.noDataValue = noDataValue;
 }
 
-void raster::incMap(map<float, statisticsStructT> &mp, float key, float val)
+void raster::incMap(zonalStatisticsTableT &mp, float key, float val)
 {
 	statisticsStructT tmp = mp[key];
 	if (tmp.count == 0)
@@ -392,35 +392,30 @@ void raster::rasterArithmetics(float (*func)(float, float), const raster & inRas
 	delete [] buf2;
 }
 
-void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType)
+void raster::zonalStatisticsAsTable(const raster & inZoneRaster,
+									zonalStatisticsTableT & zonalStatisticsTable,
+									statisticsTypeT statisticsType)
 {
-	printf("Executing zonal statistics\n");
 	validateExtent(inZoneRaster);
+	ASSERT_INT(zonalStatisticsTable.size() == 0);
+
+	printf("Executing zonal statistics (as table)\n");
 
 	string thisHdrPath = (*this).rasterPath + ".hdr";
 	string thisFltPath = (*this).rasterPath + ".flt";
 	string inZoneHdrPath = inZoneRaster.rasterPath + ".hdr";
 	string inZoneFltPath = inZoneRaster.rasterPath + ".flt";
-	string outHdrPath = outRaster.rasterPath + ".hdr";
-	string outFltPath = outRaster.rasterPath + ".flt";
-
-	copyFile(thisHdrPath, outHdrPath);
-	copyProperties(outRaster);
 
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
 	ifstream inZoneFile;
 	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
-	ofstream outFile;
-	outFile.open(outFltPath.c_str(), ios::out | ios::binary);
 
 	int numCells = (*this).horResolution * (*this).verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
 
 	float * buf = new float[bufSize];
 	float * bufZone = new float[bufSize];
-
-	map<float, statisticsStructT> zonalStatTable;
 
 	// First run: compute statistics
 	printf("First run: computing statistics\n");
@@ -435,16 +430,52 @@ void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, st
 		{
 			if ((buf[i] != (*this).noDataValue) && (bufZone[i] != inZoneRaster.noDataValue))
 			{
-				incMap(zonalStatTable, bufZone[i], buf[i]);
+				incMap(zonalStatisticsTable, bufZone[i], buf[i]);
 			}
 		}
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
 	}
+	thisFile.close();
+	inZoneFile.close();
+
+	delete [] buf;
+	delete [] bufZone;
+}
+
+void raster::zonalStatistics(const raster & inZoneRaster,
+							 raster & outRaster,
+							 statisticsTypeT statisticsType)
+{
+	validateExtent(inZoneRaster);
+	printf("Executing zonal statistics\n");
+
+	string inZoneHdrPath = inZoneRaster.rasterPath + ".hdr";
+	string inZoneFltPath = inZoneRaster.rasterPath + ".flt";
+	string outHdrPath = outRaster.rasterPath + ".hdr";
+	string outFltPath = outRaster.rasterPath + ".flt";
+
+	copyFile(inZoneHdrPath, outHdrPath);
+	copyProperties(outRaster);
+
+	// First run: compute statistics
+	zonalStatisticsTableT zonalStatisticsTable;
+	zonalStatisticsAsTable(inZoneRaster, zonalStatisticsTable, statisticsType);
+
+	ifstream inZoneFile;
+	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
+	ofstream outFile;
+	outFile.open(outFltPath.c_str(), ios::out | ios::binary);
+
+	int numCells = (*this).horResolution * (*this).verResolution;
+	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
+
+	float * outBuf = new float[bufSize];
+	float * bufZone = new float[bufSize];
+	
 	// Second run: write statistics to out file
 	printf("Second run: writing statistics to file\n");
-	bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
-	inZoneFile.seekg(0, ios::beg);
-	numCellsProcessed = 0;
+	
+	int numCellsProcessed = 0;
 	while(numCellsProcessed < numCells)
 	{
 		bufSize = min(bufSize, numCells - numCellsProcessed);
@@ -454,39 +485,38 @@ void raster::zonalStatistics(const raster & inZoneRaster, raster & outRaster, st
 		{
 			if (bufZone[i] != inZoneRaster.noDataValue)
 			{
-				statisticsStructT tmp = zonalStatTable[bufZone[i]];
+				statisticsStructT tmp = zonalStatisticsTable[bufZone[i]];
 				switch (statisticsType)
 				{
 				case SUM:
-					buf[i] = tmp.sumVal;
+					outBuf[i] = tmp.sumVal;
 					break;
 				case MEAN:
-					buf[i] = tmp.sumVal / tmp.count;
+					outBuf[i] = tmp.sumVal / tmp.count;
 					break;
 				case MAX:
-					buf[i] = tmp.maxVal;
+					outBuf[i] = tmp.maxVal;
 					break;
 				case MIN:
-					buf[i] = tmp.minVal;
+					outBuf[i] = tmp.minVal;
 					break;
 				case COUNT:
-					buf[i] = (float)tmp.count;
+					outBuf[i] = (float)tmp.count;
 					break;
 				}
 			}
 			else
 			{
-				buf[i] = (*this).noDataValue;
+				outBuf[i] = (*this).noDataValue;
 			}
 		}
-		outFile.write(reinterpret_cast<char *>(buf), sizeof(float) * bufSize);
+		outFile.write(reinterpret_cast<char *>(outBuf), sizeof(float) * bufSize);
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
 	}
-	thisFile.close();
 	inZoneFile.close();
 	outFile.close();
 
-	delete [] buf;
+	delete [] outBuf;
 	delete [] bufZone;
 }
 
