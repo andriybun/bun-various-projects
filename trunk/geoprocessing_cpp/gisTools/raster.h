@@ -38,10 +38,18 @@
 
 using namespace std;
 
-#define xmin(a, b)  (((a)<(b)) ? (a) : (b))
-#define xmax(a, b)  (((a)>(b)) ? (a) : (b))
+#define xmin(a, b)					(((a)<(b)) ? (a) : (b))
+#define xmax(a, b)					(((a)>(b)) ? (a) : (b))
+#define compare_eq(a, b, epsilon)	((fabs((a)-(b)) < epsilon) ? true : false)
 
 const int MAX_READ_BUFFER_ELEMENTS	= 40 * 1024 * 1024;
+const double EPSILON				= 1e-7;
+
+// Simple arithmetic operations functions to use with raster arithmetics:
+float xplus(float val1, float val2);
+float xminus(float val1, float val2);
+float xtimes(float val1, float val2);
+float xdivide(float val1, float val2);
 
 struct runParamsT
 {
@@ -88,6 +96,7 @@ private:
 	void saveHdr();
 	bool fileExists(const string & fileName);
 	void copyFile(const string & source, const string & destination) const;
+	void deleteFile(const string & fileName) const;
 	void copyProperties(raster & destination) const;
 	void incMap(zonalStatisticsTableT &mp, float key, float val);
 public:
@@ -114,8 +123,12 @@ public:
 		tableT(size_t sz);
 		~tableT();
 		void setNumCols(size_t n);
+		void insert(const float key, const vector<float> & val);
 		void inc(const float key, const vector<float> & val);
 		void inc(const float key, const size_t idx, const float val);
+		// TODO: optimize
+		dataT::iterator find(const vector<float> & val);
+		bool exists(const vector<float> & val);
 		size_t size();
 		friend class raster;
 	};
@@ -134,6 +147,7 @@ public:
 	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
 	void zonalStatisticsAsTable(const raster & inZoneRaster, zonalStatisticsTableT & zonalStatisticsTable, statisticsTypeT statisticsType = SUM);
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
+	void combineAsTable(const vector<raster> & inRastersVector, tableT & outTable);
 	statisticsStructT describe();
 
 	// Some specific methods
@@ -149,6 +163,10 @@ public:
 		float (*func)(const vector<float> & ), 
 		const vector<raster> & inRastersVector, 
 		raster & outRaster);
+	friend void multipleRasterArithmetics(
+		void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
+		const vector<raster> & inRastersVector,
+		vector<raster *> & outRastersVector);
 	//friend void multipleRasterArithmeticsAsTable(
 	//	float (*func)(const vector<float> & , vector<float> & ), 
 	//	const vector<raster> & inRastersVector, 
@@ -158,11 +176,17 @@ public:
 		raster & inClassRaster,
 		raster & outCroplandRaster,
 		raster & errorRaster);
-	friend void calibrateCropland(const raster & statisticsLevelUp,
+	friend void validateCropland(raster & inCroplandRaster,
+		raster & inZoneRaster,
+		raster & inClassRaster,
+		raster & outCroplandRaster);
+	friend void calibrateCropland(raster & inCroplandRaster,
+		raster & inClassRaster,
+		const raster & statisticsLevelUp,
 		const raster & statisticsLevel,
 		raster & resultLevelUp,
 		raster & resultLevel,
-		raster & calibratedResultLevel,
+		raster & outCalibratedRasterLevel,
 		const runParamsT & params);
 
 };
@@ -170,6 +194,9 @@ public:
 void multipleRasterArithmetics(float (*func)(const vector<float> & ), 
 							   const vector<raster> & inRastersVector, 
 							   raster & outRaster);
+void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
+							   const vector<raster> & inRastersVector,
+							   vector<raster *> & outRastersVector);
 //void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
 //									  const vector<raster> & inRastersVector, 
 //									  raster::tableT & outTable);
@@ -178,11 +205,17 @@ void validateCropland(raster & inCroplandRaster,
 					  raster & inClassRaster,
 					  raster & outCroplandRaster,
 					  raster & errorRaster);
-void calibrateCropland(const raster & statisticsLevelUp,
-					   const raster & statisticsLevel,
+void validateCropland(raster & inCroplandRaster,
+					  raster & inZoneRaster,
+					  raster & inClassRaster,
+					  raster & outCroplandRaster);
+void calibrateCropland(raster & inCroplandRaster,
+					   raster & inClassRaster,
+					   raster & statisticsLevelUp,
+					   raster & statisticsLevel,
 					   raster & resultLevelUp,
 					   raster & resultLevel,
-					   raster & calibratedResultLevel,
+					   raster & outCalibratedRasterLevel,
 					   const runParamsT & params);
 
 #endif
