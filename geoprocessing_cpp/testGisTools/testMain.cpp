@@ -58,9 +58,19 @@ int main()
 	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", deleteFloats);
 
 	areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
-	validateCropland(tmpCellAreaStat, inZoneRasterLevel0, classRaster, outCroplandRasterLevel0, outErrorRasterLevel0);
-	validateCropland(tmpCellAreaStat, inZoneRasterLevel1, classRaster, outCroplandRasterLevel1, outErrorRasterLevel1);
 
+	validateCropland(
+		tmpCellAreaStat,
+		inZoneRasterLevel0,
+		classRaster,
+		outCroplandRasterLevel0,
+		outErrorRasterLevel0);
+	validateCropland(
+		tmpCellAreaStat,
+		inZoneRasterLevel1,
+		classRaster,
+		outCroplandRasterLevel1,
+		outErrorRasterLevel1);
 	calibrateCropland(
 		tmpCellAreaStat,
 		classRaster,
@@ -92,7 +102,7 @@ int main()
 	//inRaster.zonalStatistics(inZoneRaster, meanRaster, raster::MEAN);
 	//inRaster.zonalStatistics(inZoneRaster, countRaster, raster::COUNT);
 
-	//vector<raster> rasterVector;
+	//vector<raster *> rasterVector;
 	//rasterVector.push_back(sumRaster);
 	//rasterVector.push_back(meanRaster);
 	//rasterVector.push_back(countRaster);

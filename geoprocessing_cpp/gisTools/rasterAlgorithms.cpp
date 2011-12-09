@@ -314,14 +314,21 @@ void getCalibratedZones(const vector<float> & valVector,
 						vector<float> & result)
 {
 	float resultLevel = valVector[0];
-	float resultLevelUp = valVector[1];
-	float sumLevel = valVector[2];
-	float sumLevelUp = valVector[3];
+	float sumLevel = valVector[1];
+	float sumLevelUp = valVector[2];
 
-	// get cells of cropland from results of current level
-	result[0] = (resultLevel > resultLevelUp) ? resultLevel : noDataValuesOutVector[0];
-	// get mask of cells for which calibration is needed
-	result[1] = (resultLevel < resultLevelUp) ? 1 : noDataValuesOutVector[1];
+	if ((sumLevel == noDataValuesVector[1]) && (sumLevelUp == noDataValuesVector[2]))
+	{
+		result[0] = noDataValuesOutVector[0];
+		result[1] = noDataValuesOutVector[1];
+	}
+	else
+	{
+		// get cells of cropland from results of current level
+		result[0] = ((sumLevel >= sumLevelUp) && (resultLevel != noDataValuesVector[0])) ? resultLevel : noDataValuesOutVector[0];
+		// get mask of cells for which calibration is needed
+		result[1] = (sumLevel < sumLevelUp) ? 1 : noDataValuesOutVector[1];
+	}
 }
 
 void combineLevels(const vector<float> & valVector,
@@ -333,33 +340,38 @@ void combineLevels(const vector<float> & valVector,
 	float resultCalibrated = valVector[1];
 	float resultLevel = valVector[2];
 
+	result.resize(1);
+
 	if (compare_eq(zonesToCalibrate, 1, EPSILON))
 	{
 		if (!compare_eq(resultCalibrated, noDataValuesVector[1], EPSILON))
 		{
-			result.push_back(resultCalibrated);
+			result[0] = resultCalibrated;
+			printf("%f\t%f\t%f\n", zonesToCalibrate, resultCalibrated, resultLevel);
+
 		}
 		else 
 		{
-			result.push_back(noDataValuesOutVector[0]);
+			result[0] = noDataValuesOutVector[0];
 		}
 	}
 	else
 	{
 		if (!compare_eq(resultLevel, noDataValuesVector[2], EPSILON))
 		{
-			result.push_back(resultLevel);
+			result[0] = resultLevel;
+			printf("%f\t%f\t%f\n", zonesToCalibrate, resultCalibrated, resultLevel);
 		}
 		else 
 		{
-			result.push_back(noDataValuesOutVector[0]);
+			result[0] = noDataValuesOutVector[0];
 		}
 	}
 }
 
 float selectAreaByMask(float val, float mask)
 {
-	return val;
+	return xmax(val, (float)0);
 }
 
 void calibrateCropland(raster & inCroplandRaster,
@@ -385,11 +397,10 @@ void calibrateCropland(raster & inCroplandRaster,
 	resultLevelRaster.zonalStatistics(statisticsLevelRaster, sumLevelRaster, raster::SUM);
 	resultLevelUpRaster.zonalStatistics(statisticsLevelRaster, sumLevelUpRaster, raster::SUM);
 
-	vector<raster> passVector;
-	passVector.push_back(resultLevelRaster);
-	passVector.push_back(resultLevelUpRaster);
-	passVector.push_back(sumLevelRaster);
-	passVector.push_back(sumLevelUpRaster);
+	vector<raster *> passVector;
+	passVector.push_back(&resultLevelRaster);
+	passVector.push_back(&sumLevelRaster);
+	passVector.push_back(&sumLevelUpRaster);
 	
 	vector<raster *> getBackVector;
 	getBackVector.push_back(&levelResultsToUseRaster);
@@ -402,22 +413,21 @@ void calibrateCropland(raster & inCroplandRaster,
 	validateCropland(inCroplandRaster, calibratedStatisticsLevelRaster, inClassRaster, resultsForCalibratedZonesRaster);
 
 	passVector.clear();
-	passVector.push_back(zonesToCalibrateRaster);
-	passVector.push_back(resultsForCalibratedZonesRaster);
-	passVector.push_back(resultLevelRaster);
+	passVector.push_back(&zonesToCalibrateRaster);
+	passVector.push_back(&resultsForCalibratedZonesRaster);
+	passVector.push_back(&resultLevelRaster);
 	
 	getBackVector.clear();
 	getBackVector.push_back(&outCalibratedRasterLevel);
 
 	multipleRasterArithmetics(&combineLevels, passVector, getBackVector);
 
-	// outCalibratedRasterLevel
-
 	//levelResultsToUseRaster.convertFloatToRaster();
 	//levelSumToUseRaster.convertFloatToRaster();
-	zonesToCalibrateRaster.convertFloatToRaster();
-	differenceRaster.convertFloatToRaster();
-	calibratedStatisticsLevelRaster.convertFloatToRaster();
+	//zonesToCalibrateRaster.convertFloatToRaster();
+	//differenceRaster.convertFloatToRaster();
+	//resultsForCalibratedZonesRaster.convertFloatToRaster();
+	//calibratedStatisticsLevelRaster.convertFloatToRaster();
 
 	printf(__TIME__ "\n");
 }
