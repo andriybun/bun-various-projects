@@ -91,20 +91,14 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     for i in range(maxClass, minClass - 1, -1):
 #    for i in range(30, minClass - 1, -1):
         OutRaster = OutClass % i
-        gui.PrintText('** class %d' % i)
         # Adding a new field for the result:
         gp.addfield (combined, "CLASS_" + str(i),"LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
-#        gui.PrintText('\tadd field')
         # Creating cursor:
         rowsClasses = gp.SearchCursor(OutRaster, "", "", "", combinedName)
-#        gui.PrintText('\tsearch cursor')
         rowClasses = rowsClasses.next()
-#        gui.PrintText('\trow classes next')
         rowsCombined = gp.UpdateCursor(combined, "", "", "", "VALUE")
-#        gui.PrintText('\tupdate cursor')
         rowCombined = rowsCombined.next()
         while rowClasses:
-#            gui.PrintText(str(rowCombined.VALUE) + " --> " + str(rowClasses.getValue(combinedName)))
             while rowCombined.VALUE != rowClasses.getValue(combinedName):
                 rowCombined = rowsCombined.next()
             if (math.fabs(rowCombined.VALUE - rowClasses.getValue(combinedName)) > 1):
@@ -126,7 +120,7 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
     count = []
     croplandClasses = []
 
-    rows = gp.SearchCursor(combined,"","","","VALUE")
+    rows = gp.SearchCursor(combined, "", "", "", "VALUE")
     # Copy table to 2D array:
     row = rows.next()
     rowID = 0
@@ -142,14 +136,14 @@ def processLevel(paramsStruct, pathsAndUtilities, minMaxClass, unitsName, result
 
     resSums = []
     resIDs = []
-
+    gui.PrintText("len(count) = %d" % (len(count)))
     for i in range(0, len(count)):
         natSum = 0
         resSum = 0
         absDiff = count[i]
         resIndex = maxClass
         for j in range(maxClass, minClass-1, -1):
-            natSum += croplandClasses[i][j]
+            natSum += croplandClasses[i][j-1]
             tmpDiff = abs(natSum - count[i])
             if (tmpDiff <= absDiff):
                 absDiff = tmpDiff
