@@ -34,7 +34,10 @@ def calibrateLevel(paramsStruct, pathsAndUtilities, minMaxClass, level, gui):
     gui.PrintText('\t\tPreparing zones and calibrated areas')
     # selecting only those areas, with values
     gp.Con_sa(statisticsLevel2, statisticsLevel2, areaUnits, "#", "VALUE > 0")
-    gp.BuildRasterAttributeTable_management(areaUnits,"OVERWRITE")
+    try:
+        gp.BuildRasterAttributeTable_management(areaUnits,"OVERWRITE")
+    except:
+        gui.Warning('Warning! BuildRasterAttributeTable_management failed')
     if gp.getCount(areaUnits) > 0:
         # calculating total area of national level results
         gp.ZonalStatistics_sa(areaUnits, "Value", outputs.combinedResult[level-1], sumLevel1, "SUM", "DATA")
