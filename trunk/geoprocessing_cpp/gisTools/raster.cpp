@@ -395,7 +395,7 @@ void raster::rasterArithmetics(float (*func)(float, float), const raster & inRas
 		inFile.read(reinterpret_cast<char*>(buf2), sizeof(float) * bufSize);
 		for (int i = 0; i < bufSize; i++)
 		{
-			if ((buf[i] != (*this).noDataValue) || (buf2[i] != inRaster.noDataValue))
+			if ((buf[i] != (*this).noDataValue) && (buf2[i] != inRaster.noDataValue))
 			{
 				buf[i] = func(buf[i], buf2[i]);
 			}
@@ -543,12 +543,12 @@ void raster::zonalStatistics(const raster & inZoneRaster,
 	delete [] bufZone;
 }
 
-void raster::combineAsTable(const vector<raster> & inRastersVector, raster::tableT & outTable)
+void raster::combineAsTable(const vector<raster *> & inRastersVector, raster::tableT & outTable)
 {
 	ASSERT_INT(!outTable.sized);
 	printf("Executing combine (as table)\n");
-	vector<raster> tmpRastersVector = inRastersVector;
-	tmpRastersVector.insert(tmpRastersVector.begin(), *this);
+	vector<raster *> tmpRastersVector = inRastersVector;
+	tmpRastersVector.insert(tmpRastersVector.begin(), this);
 	size_t numRasters = tmpRastersVector.size();
 	outTable.setNumCols(numRasters);
 
@@ -563,14 +563,14 @@ void raster::combineAsTable(const vector<raster> & inRastersVector, raster::tabl
 	vector<float *> bufVector;
 	bufVector.resize(numRasters);
 
-	hdrPathsVector[0] = tmpRastersVector[0].rasterPath + ".hdr";
-	fltPathsVector[0] = tmpRastersVector[0].rasterPath + ".flt";
+	hdrPathsVector[0] = tmpRastersVector[0]->rasterPath + ".hdr";
+	fltPathsVector[0] = tmpRastersVector[0]->rasterPath + ".flt";
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
 	ASSERT_INT(inRasterFileVector[0]->is_open());
 
-	int numCells = tmpRastersVector[0].horResolution * tmpRastersVector[0].verResolution;
+	int numCells = tmpRastersVector[0]->horResolution * tmpRastersVector[0]->verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
 
 	bufVector[0] = new float[bufSize];
@@ -579,9 +579,9 @@ void raster::combineAsTable(const vector<raster> & inRastersVector, raster::tabl
 	// Initializing all vectors, buffers etc.
 	for (size_t idx = 1; idx < numRasters; idx++)
 	{
-		tmpRastersVector[0].validateExtent(tmpRastersVector[idx]);
-		hdrPathsVector[idx] = tmpRastersVector[idx].rasterPath + ".hdr";
-		fltPathsVector[idx] = tmpRastersVector[idx].rasterPath + ".flt";
+		tmpRastersVector[0]->validateExtent(*tmpRastersVector[idx]);
+		hdrPathsVector[idx] = tmpRastersVector[idx]->rasterPath + ".hdr";
+		fltPathsVector[idx] = tmpRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
 		ASSERT_INT(inRasterFileVector[idx]->is_open());
@@ -605,7 +605,7 @@ void raster::combineAsTable(const vector<raster> & inRastersVector, raster::tabl
 			vector<float> passArg;
 			for (size_t rasterIdx = 0; rasterIdx < numRasters; rasterIdx++)
 			{
-				if (bufVector[rasterIdx][i] == tmpRastersVector[rasterIdx].noDataValue) isData = false;
+				if (bufVector[rasterIdx][i] == tmpRastersVector[rasterIdx]->noDataValue) isData = false;
 				passArg.push_back(bufVector[rasterIdx][i]);
 			}
 			if (isData && !outTable.exists(passArg))
@@ -652,7 +652,7 @@ void raster::convertFloatToRaster()
 
 // Friend functions:
 void multipleRasterArithmetics(float (*func)(const vector<float> &),
-							   const vector<raster> & inRastersVector,
+							   const vector<raster *> & inRastersVector,
 							   raster & outRaster)
 {
 
@@ -669,8 +669,8 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 	bufVector.resize(numRasters);
 	inRasterFileVector.resize(numRasters);
 
-	hdrPathsVector[0] = inRastersVector[0].rasterPath + ".hdr";
-	fltPathsVector[0] = inRastersVector[0].rasterPath + ".flt";
+	hdrPathsVector[0] = inRastersVector[0]->rasterPath + ".hdr";
+	fltPathsVector[0] = inRastersVector[0]->rasterPath + ".flt";
 	string outHdrPath = outRaster.rasterPath + ".hdr";
 	string outFltPath = outRaster.rasterPath + ".flt";
 
@@ -678,7 +678,7 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
 	ASSERT_INT(inRasterFileVector[0]->is_open());
 
-	int numCells = inRastersVector[0].horResolution * inRastersVector[0].verResolution;
+	int numCells = inRastersVector[0]->horResolution * inRastersVector[0]->verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
 	
 	bufVector[0] = new float[bufSize];
@@ -687,16 +687,16 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 	// Initializing all vectors, buffers etc.
 	for (size_t idx = 1; idx < numRasters; idx++)
 	{
-		inRastersVector[0].validateExtent(inRastersVector[idx]);
-		hdrPathsVector[idx] = inRastersVector[idx].rasterPath + ".hdr";
-		fltPathsVector[idx] = inRastersVector[idx].rasterPath + ".flt";
+		inRastersVector[0]->validateExtent(*inRastersVector[idx]);
+		hdrPathsVector[idx] = inRastersVector[idx]->rasterPath + ".hdr";
+		fltPathsVector[idx] = inRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
 		ASSERT_INT(inRasterFileVector[idx]->is_open());
 		bufVector[idx] = new float[bufSize];
 	}
-	inRastersVector[0].copyFile(hdrPathsVector[0], outHdrPath);
-	inRastersVector[0].copyProperties(outRaster);
+	inRastersVector[0]->copyFile(hdrPathsVector[0], outHdrPath);
+	inRastersVector[0]->copyProperties(outRaster);
 	outRasterFile.open(outFltPath.c_str(), ios::out | ios::binary);
 	ASSERT_INT(outRasterFile.is_open());
 
@@ -716,7 +716,7 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 			vector<float> passArg;
 			for (size_t rasterIdx = 0; rasterIdx < numRasters; rasterIdx++)
 			{
-				if (bufVector[rasterIdx][i] == inRastersVector[rasterIdx].noDataValue) isData = false;
+				if (bufVector[rasterIdx][i] == inRastersVector[rasterIdx]->noDataValue) isData = false;
 				passArg.push_back(bufVector[rasterIdx][i]);
 			}
 			if (isData)
@@ -744,7 +744,7 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 }
 
 void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
-							   const vector<raster> & inRastersVector,
+							   const vector<raster *> & inRastersVector,
 							   vector<raster *> & outRastersVector)
 {
 	printf("Executing multiple raster arithmetics\n");
@@ -770,39 +770,39 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 	hdrOutPathsVector.resize(numOutRasters);
 	fltOutPathsVector.resize(numOutRasters);
 
-	hdrPathsVector[0] = inRastersVector[0].rasterPath + ".hdr";
-	fltPathsVector[0] = inRastersVector[0].rasterPath + ".flt";
+	hdrPathsVector[0] = inRastersVector[0]->rasterPath + ".hdr";
+	fltPathsVector[0] = inRastersVector[0]->rasterPath + ".flt";
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
 	ASSERT_INT(inRasterFileVector[0]->is_open());
 
-	int numCells = inRastersVector[0].horResolution * inRastersVector[0].verResolution;
+	int numCells = inRastersVector[0]->horResolution * inRastersVector[0]->verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
 
 	bufVector[0] = new float[bufSize];
 
 	// Initializing all vectors, buffers etc.
 	noDataValuesVector.resize(numRasters);
-	noDataValuesVector[0] = inRastersVector[0].noDataValue;
+	noDataValuesVector[0] = inRastersVector[0]->noDataValue;
 	for (size_t idx = 1; idx < numRasters; idx++)
 	{
-		inRastersVector[0].validateExtent(inRastersVector[idx]);
-		hdrPathsVector[idx] = inRastersVector[idx].rasterPath + ".hdr";
-		fltPathsVector[idx] = inRastersVector[idx].rasterPath + ".flt";
+		inRastersVector[0]->validateExtent(*inRastersVector[idx]);
+		hdrPathsVector[idx] = inRastersVector[idx]->rasterPath + ".hdr";
+		fltPathsVector[idx] = inRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
 		ASSERT_INT(inRasterFileVector[idx]->is_open());
 		bufVector[idx] = new float[bufSize];
-		noDataValuesVector[idx] = inRastersVector[idx].noDataValue;
+		noDataValuesVector[idx] = inRastersVector[idx]->noDataValue;
 	}
 	noDataValuesOutVector.resize(numOutRasters);
 	for (size_t idx = 0; idx < numOutRasters; idx++)
 	{
 		hdrOutPathsVector[idx] = outRastersVector[idx]->rasterPath + ".hdr";
 		fltOutPathsVector[idx] = outRastersVector[idx]->rasterPath + ".flt";
-		inRastersVector[0].copyFile(hdrPathsVector[0], hdrOutPathsVector[idx]);
-		inRastersVector[0].copyProperties(*outRastersVector[idx]);
+		inRastersVector[0]->copyFile(hdrPathsVector[0], hdrOutPathsVector[idx]);
+		inRastersVector[0]->copyProperties(*outRastersVector[idx]);
 		fltOutPathsVector[idx].c_str();
 		outRasterFileVector[idx] = new ofstream;
 		outRasterFileVector[idx]->open(fltOutPathsVector[idx].c_str(), ios::out | ios::binary);
@@ -827,7 +827,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 			vector<float> passArg;
 			for (size_t rasterIdx = 0; rasterIdx < numRasters; rasterIdx++)
 			{
-				if (bufVector[rasterIdx][i] == inRastersVector[rasterIdx].noDataValue) isData = false;
+				if (bufVector[rasterIdx][i] == inRastersVector[rasterIdx]->noDataValue) isData = false;
 				passArg.push_back(bufVector[rasterIdx][i]);
 			}
 			vector<float> result;
@@ -937,7 +937,7 @@ size_t raster::tableT::size()
 }
 // end tableT class
 
-//void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> &), const vector<raster> & inRastersVector, raster::tableT & outTable)
+//void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> &), const vector<raster *> & inRastersVector, raster::tableT & outTable)
 //{
 //	printf("Executing multiple raster arithmetics as table\n");
 //	size_t numRasters = inRastersVector.size();

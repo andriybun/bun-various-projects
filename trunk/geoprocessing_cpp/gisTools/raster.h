@@ -1,6 +1,10 @@
-//   Name:          GridData class 2 + any type
-//   Author:        Andriy Bun; Mykola Gusti
-//   Date:          26.08.2009
+//   Name:          Raster class for geoprocessing dadta in ESRI binary grid format
+//   Author:        Andriy Bun
+//   Date:          09.12.2011
+
+// TODO: introduce functions/methods accounting for nodata
+// TODO: output time
+// TODO: improve logging
 
 #ifndef raster_h_
 #define raster_h_
@@ -40,10 +44,10 @@ using namespace std;
 
 #define xmin(a, b)					(((a)<(b)) ? (a) : (b))
 #define xmax(a, b)					(((a)>(b)) ? (a) : (b))
-#define compare_eq(a, b, epsilon)	((fabs((a)-(b)) < epsilon) ? true : false)
+#define compare_eq(a, b, epsilon)	((fabs(float(a)-float(b)) < epsilon) ? true : false)
 
 const int MAX_READ_BUFFER_ELEMENTS	= 40 * 1024 * 1024;
-const double EPSILON				= 1e-7;
+const double EPSILON				= 1e-6;
 
 // Simple arithmetic operations functions to use with raster arithmetics:
 float xplus(float val1, float val2);
@@ -147,7 +151,7 @@ public:
 	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
 	void zonalStatisticsAsTable(const raster & inZoneRaster, zonalStatisticsTableT & zonalStatisticsTable, statisticsTypeT statisticsType = SUM);
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
-	void combineAsTable(const vector<raster> & inRastersVector, tableT & outTable);
+	void combineAsTable(const vector<raster *> & inRastersVector, tableT & outTable);
 	statisticsStructT describe();
 
 	// Some specific methods
@@ -161,15 +165,15 @@ public:
 
 	friend void multipleRasterArithmetics(
 		float (*func)(const vector<float> & ), 
-		const vector<raster> & inRastersVector, 
+		const vector<raster *> & inRastersVector, 
 		raster & outRaster);
 	friend void multipleRasterArithmetics(
 		void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
-		const vector<raster> & inRastersVector,
+		const vector<raster *> & inRastersVector,
 		vector<raster *> & outRastersVector);
 	//friend void multipleRasterArithmeticsAsTable(
 	//	float (*func)(const vector<float> & , vector<float> & ), 
-	//	const vector<raster> & inRastersVector, 
+	//	const vector<raster *> & inRastersVector, 
 	//	raster::tableT & outTable);
 	friend void validateCropland(raster & inCroplandRaster,
 		raster & inZoneRaster,
@@ -192,13 +196,13 @@ public:
 };
 
 void multipleRasterArithmetics(float (*func)(const vector<float> & ), 
-							   const vector<raster> & inRastersVector, 
+							   const vector<raster *> & inRastersVector, 
 							   raster & outRaster);
 void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
-							   const vector<raster> & inRastersVector,
+							   const vector<raster *> & inRastersVector,
 							   vector<raster *> & outRastersVector);
 //void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
-//									  const vector<raster> & inRastersVector, 
+//									  const vector<raster *> & inRastersVector, 
 //									  raster::tableT & outTable);
 void validateCropland(raster & inCroplandRaster,
 					  raster & inZoneRaster,
