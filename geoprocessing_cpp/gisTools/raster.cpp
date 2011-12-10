@@ -7,12 +7,11 @@ raster::raster(const string & rasterName, bool isTemporary)
 	isDescribed = false;
 	initializedFromImg = false;
 	isTmp = isTemporary;
-
+	printf("Raster name: %s\n", rasterPath.c_str());
 	if (!readRasterProperties())
 	{
 		ifstream f;
 		string imgFileName = rasterName + ".img";
-
 		f.open(imgFileName.c_str(), ios::in);
 		if (f.is_open())
 		{
@@ -20,10 +19,11 @@ raster::raster(const string & rasterName, bool isTemporary)
 			convertRasterToFloat();
 			readRasterProperties();
 			initializedFromImg = true;
+			printf("Initialized float raster from img-file\n");
 		}
 		else
 		{
-			cout << "Initialized empty raster" << endl;
+			printf("Initialized empty raster\n");
 		}
 	}
 }
