@@ -95,15 +95,10 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 		//cout << maxClass-1 << "\t" << minClass-1 << endl;
 		for (int cl = (int)maxClass; cl >= (int)minClass; cl--)
 		{
-			//cout << "\t->" << cl << "\t" << minClass-1 << "\n";
-			//cout << "\t" << cl << "\t" << row->second[cl] << endl;
 			rowSum += row->second[cl-1];
-			//cout << "\trowSum\n";
 			float curDiff = fabs(targetSum - rowSum);
-			//cout << "\tcurDiff\n";
 			if ((curDiff <= absDiff) || (rowResult.bestEstimate == (float)0))
 			{
-				//cout << "\t++\n";
 				absDiff = curDiff;
 				rowResult.bestEstimate = rowSum;
 				rowResult.bestClass = cl;

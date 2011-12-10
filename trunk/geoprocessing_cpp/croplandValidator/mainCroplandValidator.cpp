@@ -29,6 +29,7 @@ int main(int argc, char * argv[])
 	runParams.resultDir = string(argv[1]) + "\\";
 	runParams.tmpDir = string(argv[2]) + "\\";
 
+	// TODO: specify if input/output and validate existance of file
 	// TODO: put float grids to temporary folder
 	raster areaRaster(argv[3]);
 	raster statisticsRasterLevel0(argv[4]);
@@ -37,7 +38,7 @@ int main(int argc, char * argv[])
 	raster probabilityRaster(argv[7]);
 	raster statRaster(argv[8]);
 	raster output(argv[9]);
-	
+
 	// Results for levels:
 	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", deleteFloats);
 	raster outCroplandRasterLevel1(runParams.resultDir + "validated_cropland_level1", deleteFloats);
