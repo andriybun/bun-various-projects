@@ -15,21 +15,13 @@ int main(int argc, char * argv[])
 	// Command line arguments:
 	// 1 - resultDir
 	// 2 - tmpDir
-	// 3 - probabilityGrid
+	// 3 - areaGrid
 	// 4 - statisticsLevel0
 	// 5 - statisticsLevel1
 	// 6 - statisticsLevel2
-	// 7 - areaGrid
+	// 7 - probabilityGrid
 	// 8 - statGrid
 	// 9 - output
-
-	//inputsNotClipped.mark_high_32     = sys.argv[1]
-	//inputsNotClipped.countries        = sys.argv[2]
-	//inputsNotClipped.subnationalUnits = sys.argv[3]
-	//inputsNotClipped.subregionalUnits = sys.argv[4]
-	//inputsNotClipped.cell_area        = sys.argv[5]
-	//inputsNotClipped.statLayer        = sys.argv[6]
-	//output = sys.argv[7]
 
 	printf(__TIME__ "\n");
 	bool deleteFloats = true;
