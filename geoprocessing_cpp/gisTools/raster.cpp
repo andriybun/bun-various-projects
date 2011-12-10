@@ -137,11 +137,27 @@ bool raster::validateExtent(const raster & other) const
 		&& compare_eq((*this).yMin, other.yMin, EPSILON);
 	if (!result)
 	{
-		cout << compare_eq((*this).cellSize, other.cellSize, EPSILON) << endl;
-		cout << ((*this).horResolution == other.horResolution) << endl;
-		cout << ((*this).verResolution == other.verResolution) << endl;
-		cout << compare_eq((*this).xMin, other.xMin, EPSILON) << endl;
-		cout << compare_eq((*this).yMin, other.yMin, EPSILON) << endl;
+		printf("Error: input rasters' extents and/or cellsize disagree!\n");
+		if (!compare_eq((*this).cellSize, other.cellSize, EPSILON))
+		{
+			printf("cell size:      %f - %f\n", (*this).cellSize, other.cellSize);
+		}
+		if (!compare_eq((*this).horResolution, other.horResolution, EPSILON))
+		{
+			printf("hor resolution: %f - %f\n", (*this).horResolution, other.horResolution);
+		}
+		if (!compare_eq((*this).verResolution, other.verResolution, EPSILON))
+		{
+			printf("ver resolution: %f - %f\n", (*this).verResolution, other.verResolution);
+		}
+		if (!compare_eq((*this).xMin, other.xMin, EPSILON))
+		{
+			printf("x min:          %f - %f\n", (*this).xMin, other.xMin);
+		}
+		if (!compare_eq((*this).yMin, other.yMin, EPSILON))
+		{
+			printf("y min:          %f - %f\n", (*this).yMin, other.yMin);
+		}
 	}
 	ASSERT_INT(result);
 	return result;
