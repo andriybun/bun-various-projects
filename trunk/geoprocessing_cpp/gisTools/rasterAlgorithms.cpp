@@ -342,8 +342,6 @@ void combineLevels(const vector<float> & valVector,
 		if (!compare_eq(resultCalibrated, noDataValuesVector[1], EPSILON))
 		{
 			result[0] = resultCalibrated;
-			printf("%f\t%f\t%f\n", zonesToCalibrate, resultCalibrated, resultLevel);
-
 		}
 		else 
 		{
@@ -355,7 +353,6 @@ void combineLevels(const vector<float> & valVector,
 		if (!compare_eq(resultLevel, noDataValuesVector[2], EPSILON))
 		{
 			result[0] = resultLevel;
-			printf("%f\t%f\t%f\n", zonesToCalibrate, resultCalibrated, resultLevel);
 		}
 		else 
 		{
