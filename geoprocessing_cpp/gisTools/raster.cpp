@@ -142,13 +142,13 @@ bool raster::validateExtent(const raster & other) const
 		{
 			printf("cell size:      %f - %f\n", (*this).cellSize, other.cellSize);
 		}
-		if (!compare_eq((*this).horResolution, other.horResolution, EPSILON))
+		if (horResolution != other.horResolution)
 		{
-			printf("hor resolution: %f - %f\n", (*this).horResolution, other.horResolution);
+			printf("hor resolution: %d - %d\n", (*this).horResolution, other.horResolution);
 		}
-		if (!compare_eq((*this).verResolution, other.verResolution, EPSILON))
+		if (verResolution != other.verResolution)
 		{
-			printf("ver resolution: %f - %f\n", (*this).verResolution, other.verResolution);
+			printf("ver resolution: %d - %d\n", (*this).verResolution, other.verResolution);
 		}
 		if (!compare_eq((*this).xMin, other.xMin, EPSILON))
 		{
