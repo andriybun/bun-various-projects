@@ -26,61 +26,79 @@ int main(int argc, char * argv[])
 	printf(__TIME__ "\n");
 	bool deleteFloats = true;
 	runParamsT runParams;
-	runParams.resultDir = argv[1];
-	runParams.tmpDir = argv[2];
-	//runParams.resultDir = "E:\\GIS\\cropland calibrated\\";
-	//runParams.tmpDir = "E:\\GIS\\cropland calibrated\\tmp\\";
+	runParams.resultDir = string(argv[1]) + "\\";
+	runParams.tmpDir = string(argv[2]) + "\\";
 
-	raster areaRaster("E:\\GIS\\cropland data\\area_grid");
-	raster statRaster("E:\\GIS\\cropland data\\cl_mean");
-	raster classRaster("E:\\GIS\\cropland data\\prob_classes");
-	raster inZoneRasterLevel0("E:\\GIS\\cropland data\\level0_countries");
-	raster inZoneRasterLevel1("E:\\GIS\\cropland data\\level1_regions");
-
+	// TODO: put float grids to temporary folder
+	raster areaRaster(argv[3]);
+	raster statisticsRasterLevel0(argv[4]);
+	raster statisticsRasterLevel1(argv[5]);
+	raster statisticsRasterLevel2(argv[6]);
+	raster probabilityRaster(argv[7]);
+	raster statRaster(argv[8]);
+	raster output(argv[9]);
+	
 	// Results for levels:
 	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", deleteFloats);
 	raster outCroplandRasterLevel1(runParams.resultDir + "validated_cropland_level1", deleteFloats);
+	raster outCroplandRasterLevel2(runParams.resultDir + "validated_cropland_level2", deleteFloats);
 
 	// Difference between results and reported statistics:
 	raster outErrorRasterLevel0(runParams.tmpDir + "validated_cropland_error_level0", deleteFloats);
 	raster outErrorRasterLevel1(runParams.tmpDir + "validated_cropland_error_level1", deleteFloats);
+	raster outErrorRasterLevel2(runParams.tmpDir + "validated_cropland_error_level2", deleteFloats);
 
 	// Calibrated results:
 	raster outCalibratedRasterLevel1(runParams.resultDir + "calibrated_cropland_level1", deleteFloats);
+	//raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", deleteFloats);
 
 	// Temporary:
 	// Product of cell area and cropland percentage
 	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", deleteFloats);
 
 	areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
-
 	validateCropland(
 		tmpCellAreaStat,
-		inZoneRasterLevel0,
-		classRaster,
+		statisticsRasterLevel0,
+		probabilityRaster,
 		outCroplandRasterLevel0,
 		outErrorRasterLevel0);
 	validateCropland(
 		tmpCellAreaStat,
-		inZoneRasterLevel1,
-		classRaster,
+		statisticsRasterLevel1,
+		probabilityRaster,
 		outCroplandRasterLevel1,
 		outErrorRasterLevel1);
 	calibrateCropland(
 		tmpCellAreaStat,
-		classRaster,
-		inZoneRasterLevel0,
-		inZoneRasterLevel1,
+		probabilityRaster,
+		statisticsRasterLevel0,
+		statisticsRasterLevel1,
 		outCroplandRasterLevel0,
 		outCroplandRasterLevel1,
 		outCalibratedRasterLevel1,
 		runParams);
+	validateCropland(
+		tmpCellAreaStat,
+		statisticsRasterLevel2,
+		probabilityRaster,
+		outCroplandRasterLevel2,
+		outErrorRasterLevel2);
+	calibrateCropland(
+		tmpCellAreaStat,
+		probabilityRaster,
+		statisticsRasterLevel1,		// TODO: validate with level 1 then change to statisticsRasterLevel0,
+		statisticsRasterLevel2,
+		outCroplandRasterLevel1,
+		outCroplandRasterLevel2,
+		output,
+		runParams);
 
 	outCroplandRasterLevel0.convertFloatToRaster();
 	outCroplandRasterLevel1.convertFloatToRaster();
+	outCroplandRasterLevel2.convertFloatToRaster();
 	outCalibratedRasterLevel1.convertFloatToRaster();
-	//outErrorRasterLevel0.convertFloatToRaster();
-	//outErrorRasterLevel1.convertFloatToRaster();
+	output.convertFloatToRaster();
 
 	printf(__TIME__ "\n");
 	return 0;
