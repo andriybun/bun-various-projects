@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+// additional include directory: $(PYTHON_INCLUDE)
+//#include <Python.h>
 
 #include "raster.h"
 
@@ -30,6 +32,9 @@ int main(int argc, char * argv[])
 
 	printf(__TIME__ "\n");
 	bool deleteFloats = true;
+
+	//Py_Initialize();
+
 	runParamsT runParams;
 	runParams.resultDir = string(argv[1]) + "\\";
 	runParams.tmpDir = string(argv[2]) + "\\";
@@ -107,6 +112,8 @@ int main(int argc, char * argv[])
 	outCalibratedRasterLevel1.convertFloatToRaster();
 	outCalibratedRasterLevel2.convertFloatToRaster();
 	output.convertFloatToRaster();
+	
+	//Py_Finalize();
 
 	printf(__TIME__ "\n");
 	return 0;
