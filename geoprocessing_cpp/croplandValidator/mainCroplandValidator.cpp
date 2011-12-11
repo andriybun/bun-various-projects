@@ -8,6 +8,11 @@ float preprocessCellAreas(float area, float stat)
 	return (area / (float)10) * (stat / (float)100);
 }
 
+float postprocessResults(float calibratedResult, float stat)
+{
+	return stat;
+}
+
 int main(int argc, char * argv[])
 {
 	ASSERT_INT(argc == 10);
@@ -51,7 +56,7 @@ int main(int argc, char * argv[])
 
 	// Calibrated results:
 	raster outCalibratedRasterLevel1(runParams.resultDir + "calibrated_cropland_level1", deleteFloats);
-	//raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", deleteFloats);
+	raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", deleteFloats);
 
 	// Temporary:
 	// Product of cell area and cropland percentage
@@ -92,13 +97,15 @@ int main(int argc, char * argv[])
 		statisticsRasterLevel2,
 		outCroplandRasterLevel1,
 		outCroplandRasterLevel2,
-		output,
+		outCalibratedRasterLevel2,
 		runParams);
+	outCalibratedRasterLevel2.rasterArithmetics(&postprocessResults, probabilityRaster, output);
 
 	outCroplandRasterLevel0.convertFloatToRaster();
 	outCroplandRasterLevel1.convertFloatToRaster();
 	outCroplandRasterLevel2.convertFloatToRaster();
 	outCalibratedRasterLevel1.convertFloatToRaster();
+	outCalibratedRasterLevel2.convertFloatToRaster();
 	output.convertFloatToRaster();
 
 	printf(__TIME__ "\n");
