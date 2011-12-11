@@ -5,6 +5,7 @@
 // TODO: introduce functions/methods accounting for nodata
 // TODO: output time
 // TODO: improve logging
+// TODO: investigate crashing when initialized from *.img on memory allocation
 
 #ifndef raster_h_
 #define raster_h_

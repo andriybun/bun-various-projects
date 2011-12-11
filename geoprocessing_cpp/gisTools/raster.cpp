@@ -1,4 +1,4 @@
-#include <Python.h>
+//#include <Python.h>
 #include "raster.h"
 
 raster::raster(const string & rasterName, bool isTemporary)
@@ -129,7 +129,6 @@ bool raster::readRasterProperties()
 
 bool raster::validateExtent(const raster & other) const
 {
-	// TODO: real compare!
 	bool result = compare_eq((*this).cellSize, other.cellSize, EPSILON) 
 		&& ((*this).horResolution == other.horResolution)
 		&& ((*this).verResolution == other.verResolution)
@@ -639,31 +638,36 @@ void raster::combineAsTable(const vector<raster *> & inRastersVector, raster::ta
 		inRasterFileVector[idx]->close();
 		delete [] inRasterFileVector[idx];
 	}
+	delete [] outBuf;
 }
 
 // Conversion methods:
 void raster::convertRasterToFloat()
 {
 	printf("Converting \"%s.img\" to float\n", rasterPath.c_str());
-	Py_Initialize();
-	string conversionCommand = string("gp.RasterToFloat_conversion(r\"") + rasterPath + ".img\", r\"" + rasterPath + ".flt\")\n";
-	PyRun_SimpleString("import arcgisscripting\n");
-	PyRun_SimpleString("gp = arcgisscripting.create()");
-	PyRun_SimpleString("gp.OverWriteOutput = 1");
-	PyRun_SimpleString(conversionCommand.c_str());
-	Py_Finalize();
+	string conversionCommand = string("convertRasterToFloat.py \"") + rasterPath + ".img\" \"" + rasterPath + ".flt\"\n";
+	ASSERT_INT(!system(conversionCommand.c_str()));
+	//Py_Initialize();
+	//string conversionCommand = string("gp.RasterToFloat_conversion(r\"") + rasterPath + ".img\", r\"" + rasterPath + ".flt\")\n";
+	//PyRun_SimpleString("import arcgisscripting\n");
+	//PyRun_SimpleString("gp = arcgisscripting.create()");
+	//PyRun_SimpleString("gp.OverWriteOutput = 1");
+	//PyRun_SimpleString(conversionCommand.c_str());
+	//Py_Finalize();
 }
 
 void raster::convertFloatToRaster()
 {
 	printf("Converting \"%s.flt\" to raster\n", rasterPath.c_str());
-	Py_Initialize();
-	string conversionCommand = string("gp.FloatToRaster_conversion(r\"") + rasterPath + ".flt\", r\"" + rasterPath + ".img\")\n";
-	PyRun_SimpleString("import arcgisscripting\n");
-	PyRun_SimpleString("gp = arcgisscripting.create()");
-	PyRun_SimpleString("gp.OverWriteOutput = 1");
-	PyRun_SimpleString(conversionCommand.c_str());
-	Py_Finalize();
+	string conversionCommand = string("convertFloatToRaster.py \"") + rasterPath + ".flt\" \"" + rasterPath + ".img\"\n";
+	ASSERT_INT(!system(conversionCommand.c_str()));
+	//Py_Initialize();
+	//string conversionCommand = string("gp.FloatToRaster_conversion(r\"") + rasterPath + ".flt\", r\"" + rasterPath + ".img\")\n";
+	//PyRun_SimpleString("import arcgisscripting\n");
+	//PyRun_SimpleString("gp = arcgisscripting.create()");
+	//PyRun_SimpleString("gp.OverWriteOutput = 1");
+	//PyRun_SimpleString(conversionCommand.c_str());
+	//Py_Finalize();
 }
 
 // Friend functions:
