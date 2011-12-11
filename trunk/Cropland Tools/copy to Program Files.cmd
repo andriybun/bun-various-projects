@@ -1,1 +1,1 @@
-xcopy "..\Cropland Tools" "C:\Program Files\Cropland Tools\" /E
+xcopy "..\Cropland Tools" "C:\Program Files\Cropland Tools\" /E /Y
