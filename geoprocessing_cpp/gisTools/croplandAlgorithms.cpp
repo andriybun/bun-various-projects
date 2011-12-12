@@ -1,4 +1,4 @@
-#include <Python.h>
+//#include <Python.h>
 #include "raster.h"
 
 void raster::zonalSumByClassAsTable(const raster & inZoneRaster,

@@ -22,19 +22,11 @@
 
 #include <windows.h>
 
-#include "tableT.h"
+#include "assertInt.h"
 #include "errorCodes.h"
+#include "tableT.h"
+#include "rasterFriends.h"
 
-#define ASSERT_INT(ARG, ERROR_CODE)											\
-	{																		\
-		if (!(ARG))															\
-		{																	\
-			fprintf(stderr, __TIME__ "\n");									\
-			fprintf(stderr, "File: " __FILE__ " \tline: %d\n", __LINE__);	\
-			fprintf(stderr, "Assertion failed: " #ARG "\n");				\
-			exit(ERROR_CODE);												\
-		}																	\
-	}
 
 // Using python.h in raster.cpp requires setting system variable:
 //   PYTHON_INCLUDE = {path to your pythonXX\include\ directory}
@@ -57,12 +49,6 @@ float xplus(float val1, float val2);
 float xminus(float val1, float val2);
 float xtimes(float val1, float val2);
 float xdivide(float val1, float val2);
-
-struct runParamsT
-{
-	string tmpDir;
-	string resultDir;
-};
 
 class raster
 {
@@ -171,36 +157,6 @@ public:
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
 		const runParamsT & params);
-
 };
-
-void multipleRasterArithmetics(float (*func)(const vector<float> & ), 
-							   const vector<raster *> & inRastersVector, 
-							   raster & outRaster);
-void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
-							   const vector<raster *> & inRastersVector,
-							   vector<raster *> & outRastersVector);
-//void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
-//									  const vector<raster *> & inRastersVector, 
-//									  tableT & outTable);
-
-// Cropland algorithms:
-void validateCropland(raster & inCroplandRaster,
-					  raster & inZoneRaster,
-					  raster & inClassRaster,
-					  raster & outCroplandRaster,
-					  raster & errorRaster);
-void validateCropland(raster & inCroplandRaster,
-					  raster & inZoneRaster,
-					  raster & inClassRaster,
-					  raster & outCroplandRaster);
-void calibrateCropland(raster & inCroplandRaster,
-					   raster & inClassRaster,
-					   raster & statisticsLevelUp,
-					   raster & statisticsLevel,
-					   raster & resultLevelUp,
-					   raster & resultLevel,
-					   raster & outCalibratedRasterLevel,
-					   const runParamsT & params);
 
 #endif

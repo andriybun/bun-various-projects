@@ -1,5 +1,6 @@
 //#include <Python.h>
 #include "raster.h"
+#include "rasterFriends.h"
 
 // Friend functions:
 void multipleRasterArithmetics(float (*func)(const vector<float> &),
