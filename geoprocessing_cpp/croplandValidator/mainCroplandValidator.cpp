@@ -17,7 +17,7 @@ float postprocessResults(float calibratedResult, float stat)
 
 int main(int argc, char * argv[])
 {
-	ASSERT_INT(argc == 10);
+	ASSERT_INT(argc == 10, INCORRECT_INPUT_PARAMS);
 
 	// Command line arguments:
 	// 1 - resultDir

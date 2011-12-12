@@ -158,7 +158,7 @@ bool raster::validateExtent(const raster & other) const
 			printf("y min:          %f - %f\n", (*this).yMin, other.yMin);
 		}
 	}
-	ASSERT_INT(result);
+	ASSERT_INT(result, WRONG_EXTENT);
 	return result;
 }
 
@@ -256,7 +256,7 @@ raster::statisticsStructT raster::describe()
 	string fltPath = rasterPath + ".flt";
 	ifstream thisFile;
 	thisFile.open(fltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(thisFile.is_open());
+	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
 
 	int numCells = (*this).horResolution * (*this).verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
@@ -387,13 +387,13 @@ void raster::rasterArithmetics(float (*func)(float, float), const raster & inRas
 
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
-	ASSERT_INT(thisFile.is_open());
+	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
 	ifstream inFile;
 	inFile.open(inFltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(inFile.is_open());
+	ASSERT_INT(inFile.is_open(), FILE_NOT_OPEN);
 	ofstream outFile;
 	outFile.open(outFltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(outFile.is_open());
+	ASSERT_INT(outFile.is_open(), FILE_NOT_OPEN);
 
 	int numCells = (*this).horResolution * (*this).verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
@@ -437,7 +437,7 @@ void raster::zonalStatisticsAsTable(const raster & inZoneRaster,
 {
 	printf("Executing zonal statistics (as table)\n");
 	validateExtent(inZoneRaster);
-	ASSERT_INT(zonalStatisticsTable.size() == 0);
+	ASSERT_INT(zonalStatisticsTable.size() == 0, OTHER_ERROR);
 
 	string thisHdrPath = (*this).rasterPath + ".hdr";
 	string thisFltPath = (*this).rasterPath + ".flt";
@@ -560,7 +560,7 @@ void raster::zonalStatistics(const raster & inZoneRaster,
 
 void raster::combineAsTable(const vector<raster *> & inRastersVector, raster::tableT & outTable)
 {
-	ASSERT_INT(!outTable.sized);
+	ASSERT_INT(!outTable.sized, OTHER_ERROR);
 	printf("Executing combine (as table)\n");
 	vector<raster *> tmpRastersVector = inRastersVector;
 	tmpRastersVector.insert(tmpRastersVector.begin(), this);
@@ -583,7 +583,7 @@ void raster::combineAsTable(const vector<raster *> & inRastersVector, raster::ta
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
-	ASSERT_INT(inRasterFileVector[0]->is_open());
+	ASSERT_INT(inRasterFileVector[0]->is_open(), FILE_NOT_OPEN);
 
 	int numCells = tmpRastersVector[0]->horResolution * tmpRastersVector[0]->verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
@@ -599,7 +599,7 @@ void raster::combineAsTable(const vector<raster *> & inRastersVector, raster::ta
 		fltPathsVector[idx] = tmpRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
-		ASSERT_INT(inRasterFileVector[idx]->is_open());
+		ASSERT_INT(inRasterFileVector[idx]->is_open(), FILE_NOT_OPEN);
 		bufVector[idx] = new float[bufSize];
 	}
 
@@ -646,7 +646,7 @@ void raster::convertRasterToFloat()
 {
 	printf("Converting \"%s.img\" to float\n", rasterPath.c_str());
 	string conversionCommand = string("convertRasterToFloat.py \"") + rasterPath + ".img\" \"" + rasterPath + ".flt\"\n";
-	ASSERT_INT(!system(conversionCommand.c_str()));
+	ASSERT_INT(!system(conversionCommand.c_str()), RASTER_TO_FLOAT_CONVERSION_ERROR);
 	//Py_Initialize();
 	//string conversionCommand = string("gp.RasterToFloat_conversion(r\"") + rasterPath + ".img\", r\"" + rasterPath + ".flt\")\n";
 	//PyRun_SimpleString("import arcgisscripting\n");
@@ -660,7 +660,7 @@ void raster::convertFloatToRaster()
 {
 	printf("Converting \"%s.flt\" to raster\n", rasterPath.c_str());
 	string conversionCommand = string("convertFloatToRaster.py \"") + rasterPath + ".flt\" \"" + rasterPath + ".img\"\n";
-	ASSERT_INT(!system(conversionCommand.c_str()));
+	ASSERT_INT(!system(conversionCommand.c_str()), FLOAT_TO_RASTER_CONVERSION_ERROR);
 	//Py_Initialize();
 	//string conversionCommand = string("gp.FloatToRaster_conversion(r\"") + rasterPath + ".flt\", r\"" + rasterPath + ".img\")\n";
 	//PyRun_SimpleString("import arcgisscripting\n");
@@ -696,7 +696,7 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
-	ASSERT_INT(inRasterFileVector[0]->is_open());
+	ASSERT_INT(inRasterFileVector[0]->is_open(), FILE_NOT_OPEN);
 
 	int numCells = inRastersVector[0]->horResolution * inRastersVector[0]->verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
@@ -712,13 +712,13 @@ void multipleRasterArithmetics(float (*func)(const vector<float> &),
 		fltPathsVector[idx] = inRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
-		ASSERT_INT(inRasterFileVector[idx]->is_open());
+		ASSERT_INT(inRasterFileVector[idx]->is_open(), FILE_NOT_OPEN);
 		bufVector[idx] = new float[bufSize];
 	}
 	inRastersVector[0]->copyFile(hdrPathsVector[0], outHdrPath);
 	inRastersVector[0]->copyProperties(outRaster);
 	outRasterFile.open(outFltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(outRasterFile.is_open());
+	ASSERT_INT(outRasterFile.is_open(), FILE_NOT_OPEN);
 
 	// Main loop
 	int numCellsProcessed = 0;
@@ -795,7 +795,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
-	ASSERT_INT(inRasterFileVector[0]->is_open());
+	ASSERT_INT(inRasterFileVector[0]->is_open(), FILE_NOT_OPEN);
 
 	int numCells = inRastersVector[0]->horResolution * inRastersVector[0]->verResolution;
 	int bufSize = xmin(numCells, (int)ceil(2. * MAX_READ_BUFFER_ELEMENTS / numRasters));
@@ -812,7 +812,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 		fltPathsVector[idx] = inRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
-		ASSERT_INT(inRasterFileVector[idx]->is_open());
+		ASSERT_INT(inRasterFileVector[idx]->is_open(), FILE_NOT_OPEN);
 		bufVector[idx] = new float[bufSize];
 		noDataValuesVector[idx] = inRastersVector[idx]->noDataValue;
 	}
@@ -826,7 +826,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 		fltOutPathsVector[idx].c_str();
 		outRasterFileVector[idx] = new ofstream;
 		outRasterFileVector[idx]->open(fltOutPathsVector[idx].c_str(), ios::out | ios::binary);
-		ASSERT_INT(outRasterFileVector[idx]->is_open());
+		ASSERT_INT(outRasterFileVector[idx]->is_open(), FILE_NOT_OPEN);
 		outBufVector[idx] = new float[bufSize];
 		noDataValuesOutVector[idx] = outRastersVector[idx]->noDataValue;
 	}
@@ -898,20 +898,20 @@ raster::tableT::~tableT()
 
 void raster::tableT::setNumCols(size_t n)
 {
-	ASSERT_INT(!sized);
+	ASSERT_INT(!sized, OTHER_ERROR);
 	numCols = n;
 	sized = true;
 }
 
 void raster::tableT::insert(const float key, const vector<float> & val)
 {
-	ASSERT_INT(val.size() == numCols);
+	ASSERT_INT(val.size() == numCols, OTHER_ERROR);
 	data.insert(make_pair<float, vector<float>>(key, val));
 }
 
 void raster::tableT::inc(const float key, const vector<float> & val)
 {
-	ASSERT_INT(val.size() == numCols);
+	ASSERT_INT(val.size() == numCols, OTHER_ERROR);
 	vector<float> tmp;
 	tmp = data[key];
 	for (size_t idx = 0; idx < numCols; idx++)
@@ -924,7 +924,7 @@ void raster::tableT::inc(const float key, const vector<float> & val)
 
 void raster::tableT::inc(const float key, const size_t idx, const float val)
 {
-	ASSERT_INT(idx < numCols + 1);
+	ASSERT_INT(idx < numCols + 1, OTHER_ERROR);
 	vector<float> tmp = data[key];
 	if (tmp.size() == 0)
 	{

@@ -23,14 +23,16 @@
 
 #include <windows.h>
 
-#define ASSERT_INT(ARG)														\
+#include "errorCodes.h"
+
+#define ASSERT_INT(ARG, ERROR_CODE)											\
 	{																		\
 		if (!(ARG))															\
 		{																	\
 			fprintf(stderr, __TIME__ "\n");									\
 			fprintf(stderr, "File: " __FILE__ " \tline: %d\n", __LINE__);	\
 			fprintf(stderr, "Assertion failed: " #ARG "\n");				\
-			exit(1);														\
+			exit(ERROR_CODE);												\
 		}																	\
 	}
 
