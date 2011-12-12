@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
 		outCroplandRasterLevel2,
 		outCalibratedRasterLevel2,
 		runParams);
-	outCalibratedRasterLevel2.rasterArithmetics(&postprocessResults, probabilityRaster, output);
+	outCalibratedRasterLevel2.rasterArithmetics(&postprocessResults, statRaster, output);
 
 	outCroplandRasterLevel0.convertFloatToRaster();
 	outCroplandRasterLevel1.convertFloatToRaster();
