@@ -22,6 +22,7 @@
 
 #include <windows.h>
 
+#include "tableT.h"
 #include "errorCodes.h"
 
 #define ASSERT_INT(ARG, ERROR_CODE)											\
@@ -115,30 +116,6 @@ public:
 		MAX,
 		COUNT
 	};
-	// tableT class for tables
-	class tableT
-	{
-	public:
-		typedef map< float, vector<float> > dataT;
-	private:
-		dataT data;
-		bool sized;
-		size_t numCols;
-	public:
-		tableT();
-		tableT(size_t sz);
-		~tableT();
-		void setNumCols(size_t n);
-		void insert(const float key, const vector<float> & val);
-		void inc(const float key, const vector<float> & val);
-		void inc(const float key, const size_t idx, const float val);
-		// TODO: optimize
-		dataT::iterator find(const vector<float> & val);
-		bool exists(const vector<float> & val);
-		size_t size();
-		friend class raster;
-	};
-	// end of tableT class
 
 	raster(const string & rasterName, bool isTemporary = false);
 	raster(const raster & g);
@@ -156,7 +133,7 @@ public:
 	void combineAsTable(const vector<raster *> & inRastersVector, tableT & outTable);
 	statisticsStructT describe();
 
-	// Some specific methods
+	// Some cropland specific methods
 	void zonalSumByClassAsTable(const raster & inZoneRaster,
 		raster & inClassRaster,
 		summaryTableT & calibratedResults);
@@ -176,7 +153,7 @@ public:
 	//friend void multipleRasterArithmeticsAsTable(
 	//	float (*func)(const vector<float> & , vector<float> & ), 
 	//	const vector<raster *> & inRastersVector, 
-	//	raster::tableT & outTable);
+	//	tableT & outTable);
 	friend void validateCropland(raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
@@ -205,7 +182,9 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 							   vector<raster *> & outRastersVector);
 //void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
 //									  const vector<raster *> & inRastersVector, 
-//									  raster::tableT & outTable);
+//									  tableT & outTable);
+
+// Cropland algorithms:
 void validateCropland(raster & inCroplandRaster,
 					  raster & inZoneRaster,
 					  raster & inClassRaster,
