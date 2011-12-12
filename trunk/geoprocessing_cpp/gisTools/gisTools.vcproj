@@ -163,12 +163,20 @@
 				RelativePath=".\rasterFriends.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\tableT.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\assertInt.h"
+				>
+			</File>
 			<File
 				RelativePath=".\errorCodes.h"
 				>
@@ -178,7 +186,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\rasterFriends.h"
+				>
+			</File>
+			<File
 				RelativePath=".\staticArrays.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tableT.h"
 				>
 			</File>
 		</Filter>
