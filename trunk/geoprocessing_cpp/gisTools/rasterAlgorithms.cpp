@@ -383,7 +383,7 @@ void calibrateCropland(raster & inCroplandRaster,
 	raster levelSumToUseRaster(runParams.tmpDir + "level_sum_to_use", !debugMode);
 	raster zonesToCalibrateRaster(runParams.tmpDir + "zones_to_calibrate", !debugMode);
 	raster differenceRaster(runParams.tmpDir + "difference", !debugMode);
-	raster calibratedStatisticsLevelRaster(runParams.tmpDir + "calibrated_statistics_level1", !debugMode); 	// Calibrated statistics for level 1
+	raster calibratedStatisticsLevelRaster(runParams.tmpDir + "calibrated_statistics_level", !debugMode); 	// Calibrated statistics for level 1
 	raster resultsForCalibratedZonesRaster(runParams.tmpDir + "results_for_calibrated_zones", !debugMode); 	// Calibrated statistics for level 1
 
 	resultLevelRaster.zonalStatistics(statisticsLevelRaster, sumLevelRaster, raster::SUM);
