@@ -9,7 +9,7 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 
 	validateExtent(inZoneRaster);
 	validateExtent(inClassRaster);
-	ASSERT_INT(calibratedResults.size() == 0);
+	ASSERT_INT(calibratedResults.size() == 0, OTHER_ERROR);
 
 	string thisHdrPath = (*this).rasterPath + ".hdr";
 	string thisFltPath = (*this).rasterPath + ".flt";
@@ -29,13 +29,13 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
-	ASSERT_INT(thisFile.is_open());
+	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
 	ifstream inZoneFile;
 	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(inZoneFile.is_open());
+	ASSERT_INT(inZoneFile.is_open(), FILE_NOT_OPEN);
 	ifstream inClassFile;
 	inClassFile.open(inClassFltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(inClassFile.is_open());
+	ASSERT_INT(inClassFile.is_open(), FILE_NOT_OPEN);
 
 	int numCells = (*this).horResolution * (*this).verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
