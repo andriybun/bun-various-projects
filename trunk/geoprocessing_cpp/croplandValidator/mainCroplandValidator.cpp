@@ -17,7 +17,7 @@ float postprocessResults(float calibratedResult, float stat)
 
 int main(int argc, char * argv[])
 {
-	ASSERT_INT(argc == 10, INCORRECT_INPUT_PARAMS);
+	ASSERT_INT(argc == 11, INCORRECT_INPUT_PARAMS);
 
 	// Command line arguments:
 	// 1 - resultDir
@@ -34,18 +34,19 @@ int main(int argc, char * argv[])
 	bool deleteFloats = true;
 
 	runParamsT runParams;
-	runParams.resultDir = string(argv[1]) + "\\";
-	runParams.tmpDir = string(argv[2]) + "\\";
+	runParams.workingDir = string(argv[1]) + "\\";
+	runParams.resultDir = string(argv[2]) + "\\";
+	runParams.tmpDir = string(argv[3]) + "\\";
 
 	// TODO: specify if input/output and validate existance of file
 	// TODO: put float grids to temporary folder
-	raster areaRaster(argv[3]);
-	raster statisticsRasterLevel0(argv[4]);
-	raster statisticsRasterLevel1(argv[5]);
-	raster statisticsRasterLevel2(argv[6]);
-	raster probabilityRaster(argv[7]);
-	raster statRaster(argv[8]);
-	raster output(argv[9]);
+	raster areaRaster(argv[4]);
+	raster statisticsRasterLevel0(argv[5]);
+	raster statisticsRasterLevel1(argv[6]);
+	raster statisticsRasterLevel2(argv[7]);
+	raster probabilityRaster(argv[8]);
+	raster statRaster(argv[9]);
+	raster output(argv[10]);
 
 	// Results for levels:
 	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", deleteFloats);
