@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 if __name__ == "__main__":
-    runFileName = "croplandValidator.exe"
+    runFileName = os.path.dirname(sys.argv[0]) + "\\croplandValidator.exe"
     
     areaGrid         = os.path.splitext(sys.argv[1])[0]
     statisticsLevel0 = os.path.splitext(sys.argv[2])[0]
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if not os.path.exists(tmpDir):
         os.mkdir(tmpDir)
         deleteTmpDir = True
-        
+
     executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
         runFileName, \
         resultDir, \
