@@ -13,6 +13,7 @@ class tableT;
 
 struct runParamsT
 {
+	string workingDir;
 	string tmpDir;
 	string resultDir;
 };
