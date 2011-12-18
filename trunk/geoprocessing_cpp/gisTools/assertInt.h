@@ -1,16 +1,20 @@
 #ifndef ASSERT_INT_H_
 #define ASSERT_INT_H_
 
-#define ASSERT_INT(ARG, ERROR_CODE)										\
-	{																	\
-	if (!(ARG))															\
-		{																\
-		fprintf(stderr, __TIME__ "\n");									\
-		fprintf(stderr, "File: " __FILE__ " \tline: %d\n", __LINE__);	\
-		fprintf(stderr, "Assertion failed: " #ARG "\n");				\
-		system("pause");													\
-		exit(ERROR_CODE);												\
-		}																\
+#include "timer.h"
+
+#define ASSERT_INT(ARG, ERROR_CODE)											\
+	{																		\
+	if (!(ARG))																\
+		{																	\
+			outputLocalTime();												\
+			fprintf(stderr, "File: " __FILE__ " \tline: %d\n", __LINE__);	\
+			fprintf(stderr, "Assertion failed: " #ARG "\n");				\
+			system("pause");												\
+			exit(ERROR_CODE);												\
+		}																	\
 	}
+
+//fprintf(stderr, __TIME__ "\n");
 
 #endif

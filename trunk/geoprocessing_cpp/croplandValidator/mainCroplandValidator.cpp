@@ -4,6 +4,7 @@
 //#include <Python.h>
 
 #include "raster.h"
+#include "timer.h"
 
 float preprocessCellAreas(float area, float stat)
 {
@@ -30,7 +31,11 @@ int main(int argc, char * argv[])
 	// 8 - statGrid
 	// 9 - output
 
-	printf(__TIME__ "\n");
+	printf("Start: ");
+	outputLocalTime();
+	Timer timer;
+	timer.start();
+
 	bool deleteFloats = true;
 
 	runParamsT runParams;
@@ -111,7 +116,11 @@ int main(int argc, char * argv[])
 	outCalibratedRasterLevel1.convertFloatToRaster();
 	outCalibratedRasterLevel2.convertFloatToRaster();
 	output.convertFloatToRaster();
-	
-	printf(__TIME__ "\n");
+
+	printf("End: ");
+	outputLocalTime();
+	timer.stop();
+	printf("Elapsed time: %5.2f seconds.\n", timer.elapsedSeconds());
+
 	return 0;
 }
