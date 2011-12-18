@@ -197,6 +197,10 @@
 				RelativePath=".\tableT.h"
 				>
 			</File>
+			<File
+				RelativePath=".\timer.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

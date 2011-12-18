@@ -3,7 +3,6 @@
 //   Date:          09.12.2011
 
 // TODO: introduce functions/methods accounting for nodata
-// TODO: output time
 // TODO: improve logging
 
 #ifndef raster_h_
@@ -53,6 +52,11 @@ float xdivide(float val1, float val2);
 class raster
 {
 public:
+	struct pointDataT
+	{
+		bool isData;
+		float value;
+	};
 	// Structure with statistics
 	struct statisticsStructT
 	{
