@@ -21,15 +21,16 @@ int main(int argc, char * argv[])
 	ASSERT_INT(argc == 11, INCORRECT_INPUT_PARAMS);
 
 	// Command line arguments:
-	// 1 - resultDir
-	// 2 - tmpDir
-	// 3 - areaGrid
-	// 4 - statisticsLevel0
-	// 5 - statisticsLevel1
-	// 6 - statisticsLevel2
-	// 7 - probabilityGrid
-	// 8 - statGrid
-	// 9 - output
+	// 1 - workingDir
+	// 2 - resultDir
+	// 3 - tmpDir
+	// 4 - areaGrid
+	// 5 - statisticsLevel0
+	// 6 - statisticsLevel1
+	// 7 - statisticsLevel2
+	// 8 - probabilityGrid
+	// 9 - statGrid
+	// 10 - output
 
 	printf("Start: ");
 	outputLocalTime();
@@ -41,8 +42,6 @@ int main(int argc, char * argv[])
 	runParams.resultDir = string(argv[2]) + "\\";
 	runParams.tmpDir = string(argv[3]) + "\\";
 
-	// TODO: specify if input/output and validate existance of file
-	// TODO: put float grids to temporary folder
 	raster areaRaster(argv[4], raster::INPUT);
 	raster statisticsRasterLevel0(argv[5], raster::INPUT);
 	raster statisticsRasterLevel1(argv[6], raster::INPUT);

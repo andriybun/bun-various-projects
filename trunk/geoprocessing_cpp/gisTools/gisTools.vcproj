@@ -76,6 +76,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(ProjectDir)convertFloatToRaster.py&quot; &quot;$(OutDir)\convertFloatToRaster.py&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -140,6 +141,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(ProjectDir)convertFloatToRaster.py&quot; &quot;$(OutDir)\convertFloatToRaster.py&quot;"
 			/>
 		</Configuration>
 	</Configurations>
