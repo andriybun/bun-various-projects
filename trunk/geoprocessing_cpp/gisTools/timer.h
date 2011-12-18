@@ -39,6 +39,16 @@ inline void outputLocalTime()
 	printf("%s", timeBuf);
 };
 
+inline void outputShortTime()
+{
+	struct tm newTime;
+	__time64_t longTime;
+	errno_t err;
+	_time64(&longTime);
+	err = _localtime64_s(&newTime, &longTime);
+	printf("%d:%d:%d", newTime.tm_hour, newTime.tm_min, newTime.tm_sec);
+};
+
 class Timer {
 
 public:

@@ -376,15 +376,14 @@ void calibrateCropland(raster & inCroplandRaster,
 					   const runParamsT & runParams)
 {
 	// Temporary rasters are not deleted in debug mode
-	bool debugMode = false;
-	raster sumLevelUpRaster(runParams.tmpDir + "sum_level_up", !debugMode);		// sum of cropland per administrative units for results at the above level
-	raster sumLevelRaster(runParams.tmpDir + "sum_level", !debugMode);			// sum of cropland per administrative units for results at the current level
-	raster levelResultsToUseRaster(runParams.tmpDir + "level_results_to_use", !debugMode);
-	raster levelSumToUseRaster(runParams.tmpDir + "level_sum_to_use", !debugMode);
-	raster zonesToCalibrateRaster(runParams.tmpDir + "zones_to_calibrate", !debugMode);
-	raster differenceRaster(runParams.tmpDir + "difference", !debugMode);
-	raster calibratedStatisticsLevelRaster(runParams.tmpDir + "calibrated_statistics_level", !debugMode); 	// Calibrated statistics for level 1
-	raster resultsForCalibratedZonesRaster(runParams.tmpDir + "results_for_calibrated_zones", !debugMode); 	// Calibrated statistics for level 1
+	raster sumLevelUpRaster(runParams.tmpDir + "sum_level_up", raster::TEMPORARY);		// sum of cropland per administrative units for results at the above level
+	raster sumLevelRaster(runParams.tmpDir + "sum_level", raster::TEMPORARY);			// sum of cropland per administrative units for results at the current level
+	raster levelResultsToUseRaster(runParams.tmpDir + "level_results_to_use", raster::TEMPORARY);
+	raster levelSumToUseRaster(runParams.tmpDir + "level_sum_to_use", raster::TEMPORARY);
+	raster zonesToCalibrateRaster(runParams.tmpDir + "zones_to_calibrate", raster::TEMPORARY);
+	raster differenceRaster(runParams.tmpDir + "difference", raster::TEMPORARY);
+	raster calibratedStatisticsLevelRaster(runParams.tmpDir + "calibrated_statistics_level", raster::TEMPORARY); 	// Calibrated statistics for level 1
+	raster resultsForCalibratedZonesRaster(runParams.tmpDir + "results_for_calibrated_zones", raster::TEMPORARY); 	// Calibrated statistics for level 1
 
 	resultLevelRaster.zonalStatistics(statisticsLevelRaster, sumLevelRaster, raster::SUM);
 	resultLevelUpRaster.zonalStatistics(statisticsLevelRaster, sumLevelUpRaster, raster::SUM);
