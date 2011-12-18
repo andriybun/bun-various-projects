@@ -11,7 +11,10 @@ import shutil
 import subprocess
 
 if __name__ == "__main__":
-    runFileName = os.path.dirname(sys.argv[0]) + "\\croplandValidator.exe"
+    workingDir = os.path.dirname(sys.argv[0])
+    os.chdir(workingDir)
+    # runFileName = workingDir + "\\croplandValidator.exe"
+    runFileName = "croplandValidator.exe"
     
     areaGrid         = os.path.splitext(sys.argv[1])[0]
     statisticsLevel0 = os.path.splitext(sys.argv[2])[0]
@@ -27,9 +30,10 @@ if __name__ == "__main__":
     if not os.path.exists(tmpDir):
         os.mkdir(tmpDir)
         deleteTmpDir = True
-
-    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
+    
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
         runFileName, \
+        workingDir, \
         resultDir, \
         tmpDir, \
         areaGrid, \
@@ -40,7 +44,10 @@ if __name__ == "__main__":
         statLayer, \
         output)
 
-    subprocess.call(executeCommand)
+    callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
+        
+    if not(callResult == 0):
+        raise Exception('Error! Function returned error code %d!' % str(callResult))
