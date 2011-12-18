@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="croplandValidator"
-	ProjectGUID="{95049340-1C6B-40B6-AF42-46B1DC5140AF}"
-	RootNamespace="croplandValidator"
+	Name="probabilityLayer"
+	ProjectGUID="{957D6BD8-0427-4F9B-A6E5-AE1B50656911}"
+	RootNamespace="probabilityLayer"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -87,6 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -176,7 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\mainCroplandValidator.cpp"
+				RelativePath=".\mainProbabilityLayer.cpp"
 				>
 			</File>
 		</Filter>

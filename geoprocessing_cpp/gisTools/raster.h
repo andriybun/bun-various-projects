@@ -4,6 +4,7 @@
 
 // TODO: introduce functions/methods accounting for nodata
 // TODO: improve logging
+// TODO: put float grids to temporary folder
 
 #ifndef raster_h_
 #define raster_h_
