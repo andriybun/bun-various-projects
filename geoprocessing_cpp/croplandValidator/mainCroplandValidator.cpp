@@ -36,8 +36,6 @@ int main(int argc, char * argv[])
 	Timer timer;
 	timer.start();
 
-	bool deleteFloats = true;
-
 	runParamsT runParams;
 	runParams.workingDir = string(argv[1]) + "\\";
 	runParams.resultDir = string(argv[2]) + "\\";
@@ -45,31 +43,31 @@ int main(int argc, char * argv[])
 
 	// TODO: specify if input/output and validate existance of file
 	// TODO: put float grids to temporary folder
-	raster areaRaster(argv[4]);
-	raster statisticsRasterLevel0(argv[5]);
-	raster statisticsRasterLevel1(argv[6]);
-	raster statisticsRasterLevel2(argv[7]);
-	raster probabilityRaster(argv[8]);
-	raster statRaster(argv[9]);
-	raster output(argv[10]);
+	raster areaRaster(argv[4], raster::INPUT);
+	raster statisticsRasterLevel0(argv[5], raster::INPUT);
+	raster statisticsRasterLevel1(argv[6], raster::INPUT);
+	raster statisticsRasterLevel2(argv[7], raster::INPUT);
+	raster probabilityRaster(argv[8], raster::INPUT);
+	raster statRaster(argv[9], raster::INPUT);
+	raster output(argv[10], raster::INPUT);
 
 	// Results for levels:
-	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", deleteFloats);
-	raster outCroplandRasterLevel1(runParams.resultDir + "validated_cropland_level1", deleteFloats);
-	raster outCroplandRasterLevel2(runParams.resultDir + "validated_cropland_level2", deleteFloats);
+	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", raster::OUTPUT);
+	raster outCroplandRasterLevel1(runParams.resultDir + "validated_cropland_level1", raster::OUTPUT);
+	raster outCroplandRasterLevel2(runParams.resultDir + "validated_cropland_level2", raster::OUTPUT);
 
 	// Difference between results and reported statistics:
-	raster outErrorRasterLevel0(runParams.tmpDir + "validated_cropland_error_level0", deleteFloats);
-	raster outErrorRasterLevel1(runParams.tmpDir + "validated_cropland_error_level1", deleteFloats);
-	raster outErrorRasterLevel2(runParams.tmpDir + "validated_cropland_error_level2", deleteFloats);
+	raster outErrorRasterLevel0(runParams.tmpDir + "validated_cropland_error_level0", raster::TEMPORARY);
+	raster outErrorRasterLevel1(runParams.tmpDir + "validated_cropland_error_level1", raster::TEMPORARY);
+	raster outErrorRasterLevel2(runParams.tmpDir + "validated_cropland_error_level2", raster::TEMPORARY);
 
 	// Calibrated results:
-	raster outCalibratedRasterLevel1(runParams.resultDir + "calibrated_cropland_level1", deleteFloats);
-	raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", deleteFloats);
+	raster outCalibratedRasterLevel1(runParams.resultDir + "calibrated_cropland_level1", raster::OUTPUT);
+	raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", raster::OUTPUT);
 
 	// Temporary:
 	// Product of cell area and cropland percentage
-	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", deleteFloats);
+	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", raster::TEMPORARY);
 
 	areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
 	validateCropland(
@@ -109,13 +107,6 @@ int main(int argc, char * argv[])
 		outCalibratedRasterLevel2,
 		runParams);
 	outCalibratedRasterLevel2.rasterArithmetics(&postprocessResults, statRaster, output);
-
-	outCroplandRasterLevel0.convertFloatToRaster();
-	outCroplandRasterLevel1.convertFloatToRaster();
-	outCroplandRasterLevel2.convertFloatToRaster();
-	outCalibratedRasterLevel1.convertFloatToRaster();
-	outCalibratedRasterLevel2.convertFloatToRaster();
-	output.convertFloatToRaster();
 
 	printf("End: ");
 	outputLocalTime();

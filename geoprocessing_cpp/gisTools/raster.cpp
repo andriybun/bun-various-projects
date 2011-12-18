@@ -1,61 +1,69 @@
 //#include <Python.h>
 #include "raster.h"
 
-raster::raster(const string & rasterName, bool isTemporary)
+raster::raster(const string & rasterName, rasterTypeT rType)
 {
 	rasterPath = rasterName;
 	isDescribed = false;
 	initializedFromImg = false;
-	isTmp = isTemporary;
+	rasterType = rType;
 	printf("Raster name: %s\n", rasterPath.c_str());
-	if (!readRasterProperties())
+	switch (rasterType)
 	{
-		ifstream f;
-		string imgFileName = rasterName + ".img";
-		f.open(imgFileName.c_str(), ios::in);
-		if (f.is_open())
+	case INPUT:
+		if (!readRasterProperties())
 		{
-			f.close();
-			convertRasterToFloat();
-			readRasterProperties();
-			initializedFromImg = true;
-			printf("Initialized float raster from img-file\n");
+			ifstream f;
+			string imgFileName = rasterName + ".img";
+			f.open(imgFileName.c_str(), ios::in);
+			if (f.is_open())
+			{
+				f.close();
+				convertRasterToFloat();
+				readRasterProperties();
+				initializedFromImg = true;
+				printf("\tInitialized float raster from img-file\n");
+			}
+			else
+			{
+				printf("Raster does not exist!\n");
+				ASSERT_INT(false, INPUT_RASTER_DOES_NOT_EXIST);
+			}
 		}
-		else
-		{
-			printf("Initialized empty raster\n");
-		}
-	}
+		break;
+	case OUTPUT:
+		// Nothing is needed to be created at this stage
+		printf("\tInitialized output raster\n");
+		break;
+	case TEMPORARY:
+		// Nothing is needed to be created at this stage
+		printf("\tInitialized temporary raster\n");
+		break;
+	case COPY:
+		// Copy can not be created using constructor
+		ASSERT_INT(false, OTHER_ERROR);
+		break;
+	};
 }
 
 // Copy constructor
 raster::raster(const raster & g)
 {
-	isTmp = false;
 	initializedFromImg = false;
+	rasterType = COPY;
 	rasterPath = g.rasterPath;
-	horResolution = g.horResolution;
-	verResolution = g.verResolution;
-	xMin = g.xMin;
-	yMin = g.yMin;
-	cellSize = g.cellSize;
-	noDataValue = g.noDataValue;
+	g.copyProperties(*this);
 }
 
 // Assignment operator overloading
 raster & raster::operator = (const raster & g)
 {
-	isTmp = false;
 	initializedFromImg = false;
 	if (this != &g)
 	{
 		rasterPath = g.rasterPath;
-		horResolution = g.horResolution;
-		verResolution = g.verResolution;
-		xMin = g.xMin;
-		yMin = g.yMin;
-		cellSize = g.cellSize;
-		noDataValue = g.noDataValue;
+		rasterType = COPY;
+		g.copyProperties(*this);
 	}
 	return *this;
 }
@@ -63,8 +71,11 @@ raster & raster::operator = (const raster & g)
 // Destructor
 raster::~raster()
 {
-	//cout << "Destructor: " << rasterPath << "(" << initializedFromImg << ", " << isTmp << ")" << endl;
-	if (initializedFromImg || isTmp)
+	if (rasterType == OUTPUT)
+	{
+		convertFloatToRaster();
+	}
+	if (initializedFromImg || rasterType == TEMPORARY || rasterType == OUTPUT)
 	{
 		removeFloatFromDisc();
 	}

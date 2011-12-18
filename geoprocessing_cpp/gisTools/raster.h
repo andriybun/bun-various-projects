@@ -66,6 +66,23 @@ public:
 		float meanVal;
 		int count;
 	};
+	// List of possible statistics to compute
+	enum statisticsTypeT
+	{
+		SUM,
+		MEAN,
+		MIN,
+		MAX,
+		COUNT
+	};
+	// Type of raster usage
+	enum rasterTypeT
+	{
+		INPUT,
+		OUTPUT,
+		TEMPORARY,
+		COPY
+	};
 	typedef map<float, statisticsStructT> zonalStatisticsTableT;
 private:
 	struct unitResultT
@@ -86,7 +103,8 @@ private:
 	bool isDescribed;
 	statisticsStructT description;
 	bool initializedFromImg;
-	bool isTmp;
+	rasterTypeT rasterType;
+	//bool isTmp;
 
 	bool readRasterProperties();
 	bool validateExtent(const raster & other) const;
@@ -97,17 +115,7 @@ private:
 	void copyProperties(raster & destination) const;
 	void incMap(zonalStatisticsTableT &mp, float key, float val);
 public:
-	// List of possible statistics to compute
-	enum statisticsTypeT
-	{
-		SUM,
-		MEAN,
-		MIN,
-		MAX,
-		COUNT
-	};
-
-	raster(const string & rasterName, bool isTemporary = false);
+	raster(const string & rasterName, rasterTypeT rType);
 	raster(const raster & g);
 	raster & operator = (const raster & g);
 	~raster();
