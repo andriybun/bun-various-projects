@@ -114,6 +114,7 @@ class config():
         self.paths.tmp.temp3      = self.paths.TMPDIR + "temp3" + extension
         self.paths.tmp.temp4      = self.paths.TMPDIR + "temp4" + extension
         self.paths.tmp.temp5      = self.paths.TMPDIR + "temp5" + extension
+        self.paths.tmp.temp6      = self.paths.TMPDIR + "temp6" + extension
         self.paths.tmp.sumRast    = self.paths.TMPDIR + "sumRast" + extension
         self.paths.tmp.sumRastOne = self.paths.TMPDIR + "sumRastOne" + extension
         self.paths.tmp.sumRastTwo = self.paths.TMPDIR + "sumRastTwo" + extension
