@@ -46,6 +46,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
 
     # Calculations:
     list_of_rasters = []
+    list_of_rasters_count = []
     list_of_rasters_weights = []
     list_of_rasters_one = []
     list_of_rasters_two = []
@@ -56,6 +57,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     temp3 = runConfig.paths.tmp.temp3
     temp4 = runConfig.paths.tmp.temp4
     temp5 = runConfig.paths.tmp.temp5
+    temp6 = runConfig.paths.tmp.temp6
 
     #===============================================================================
     # Creating table:
@@ -67,6 +69,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         TmpName = runConfig.paths.tmp.LayerList[i]
         MakeRasterOfValues(gp, InputName, 2**i, weights[i], priorityValues2[i], TmpName)
         list_of_rasters.append(InputName)
+        list_of_rasters_count.append(AddSuffixToName(TmpName, "_count"))
         list_of_rasters_weights.append(TmpName)
         list_of_rasters_one.append(AddSuffixToName(TmpName, "_one"))
         list_of_rasters_two.append(AddSuffixToName(TmpName, "_two"))
@@ -74,6 +77,8 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     interface.PrintTextTime("Computing statistics...")
     # Computing per cell sums of these rasters:
     gp.CellStatistics_sa(MakeListString(list_of_rasters), temp3, "SUM")
+    gp.CellStatistics_sa(MakeListString(list_of_rasters_count), temp6, "SUM")
+    runConfig.DeleteRasters(list_of_rasters_count)
     gp.CellStatistics_sa(MakeListString(list_of_rasters_weights), temp1, "SUM")
     runConfig.DeleteRasters(list_of_rasters_weights)
     gp.CellStatistics_sa(MakeListString(list_of_rasters_one), temp2, "SUM")
@@ -86,10 +91,11 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
 #    gp.Con_sa(temp5, temp5, runConfig.paths.resultMin, "#", "VALUE > 0")
     gp.CellStatistics_sa(MakeListString(list_of_rasters), temp5, "MAXIMUM")
     gp.Con_sa(temp5, temp5, runConfig.paths.resultMax, "#", "VALUE > 0")
-    gp.Divide_sa(temp3, temp2, runConfig.paths.resultAvg)
+    gp.Divide_sa(temp3, temp6, runConfig.paths.resultAvg)
     # Cleanup temporary rasters:
     runConfig.DeleteRasters(list_of_rasters)
     interface.PrintTextTime("Statistics computed.")
+    
     # Formatting the output:
     gp.Int_sa(temp1, runConfig.paths.tmp.sumRast)
     gp.BuildRasterAttributeTable_management(runConfig.paths.tmp.sumRast,"OVERWRITE")
