@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
 	// 1 - workingDir
 	// 2 - resultDir
 	// 3 - tmpDir
-	// 4 - 
+	// 4 - number of rasters
 
 	printf("Start: ");
 	outputLocalTime();
@@ -26,7 +26,10 @@ int main(int argc, char * argv[])
 	runParams.resultDir = string(argv[2]) + "\\";
 	runParams.tmpDir = string(argv[3]) + "\\";
 
-	
+	int numRasters = atoi(argv[4]);
+
+	raster areaRaster(argv[4], raster::INPUT);
+	raster countriesRaster(argv[5], raster::INPUT);
 
 	printf("End: ");
 	outputLocalTime();
