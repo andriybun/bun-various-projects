@@ -101,7 +101,7 @@ int main(int argc, char * argv[])
 		probabilityRaster,
 		statisticsRasterLevel1,		// TODO: validate with level 1 then change to statisticsRasterLevel0,
 		statisticsRasterLevel2,
-		outCroplandRasterLevel1,
+		outCalibratedRasterLevel1,
 		outCroplandRasterLevel2,
 		outCalibratedRasterLevel2,
 		runParams);
