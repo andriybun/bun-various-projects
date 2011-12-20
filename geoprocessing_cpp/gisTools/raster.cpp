@@ -75,7 +75,7 @@ raster::~raster()
 	{
 		convertFloatToRaster();
 	}
-	if (initializedFromImg || rasterType == TEMPORARY || rasterType == OUTPUT)
+	if (initializedFromImg || rasterType == TEMPORARY || rasterType == INPUT || rasterType == OUTPUT)
 	{
 		removeFloatFromDisc();
 	}
