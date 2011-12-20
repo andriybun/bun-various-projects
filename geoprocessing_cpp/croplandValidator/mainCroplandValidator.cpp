@@ -48,7 +48,7 @@ int main(int argc, char * argv[])
 	raster statisticsRasterLevel2(argv[7], raster::INPUT);
 	raster probabilityRaster(argv[8], raster::INPUT);
 	raster statRaster(argv[9], raster::INPUT);
-	raster output(argv[10], raster::INPUT);
+	raster output(argv[10], raster::OUTPUT);
 
 	// Results for levels:
 	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", raster::OUTPUT);
