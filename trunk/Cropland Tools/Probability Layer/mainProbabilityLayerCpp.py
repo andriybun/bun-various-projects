@@ -27,8 +27,8 @@ if __name__ == "__main__":
     # Parse command line arguments:
     num_args = len(sys.argv)
     
-    cellAreas = sys.argv[1].replace("'","")
-    countries = sys.argv[2].replace("'","")
+    cellAreas = os.path.splitext(sys.argv[1].replace("'",""))[0]
+    countries = os.path.splitext(sys.argv[2].replace("'",""))[0]
     
     croplandLayerList = (sys.argv[3].replace("'","")).split(";")
     numRasters = len(croplandLayerList)
@@ -36,7 +36,8 @@ if __name__ == "__main__":
     for i in range(numRasters):
         if (croplandLayerList[i][0] == '\''):
             croplandLayerList[i] = croplandLayerList[i][1:-1]
-        passCroplandLayerList = passCroplandLayerList + '"%s" ' % (croplandLayerList[i])
+        passCroplandLayerList = passCroplandLayerList + '"%s" ' \
+            % (os.path.splitext(croplandLayerList[i])[0])
     passCroplandLayerList = passCroplandLayerList[0:-1]
 
     # Parse priorities
@@ -58,12 +59,12 @@ if __name__ == "__main__":
             priorityValues2.append(int(priorityStr))
     
     # Parse results' names:
-    resultProb = sys.argv[6].replace("'","")
+    resultProb = os.path.splitext(sys.argv[6].replace("'",""))[0]
     resultNameTuple = os.path.splitext(resultProb)
     descriptionFileName = resultNameTuple[0] + ".txt"
-    resultAvg = resultNameTuple[0] + "_avg" + resultNameTuple[1]
-    resultMin = resultNameTuple[0] + "_min" + resultNameTuple[1]
-    resultMax = resultNameTuple[0] + "_max" + resultNameTuple[1]
+    resultAvg = resultNameTuple[0] + "_avg"
+    resultMin = resultNameTuple[0] + "_min"
+    resultMax = resultNameTuple[0] + "_max"
     
     # Process priorities:
     agreementTable = rasterAgreementTable(priorityValues, priorityValues2)
@@ -92,6 +93,8 @@ if __name__ == "__main__":
         resultMin, \
         resultMax)
 
+    print executeCommand
+
     callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:
@@ -99,3 +102,4 @@ if __name__ == "__main__":
         
     if not(callResult == 0):
         raise Exception('Error! Function returned error code %d!' % str(callResult))
+        
