@@ -80,26 +80,32 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
     
-    executeCommand = '"%s" "%s" "%s" %d %s %s %s "%s" "%s" "%s" "%s"' % ( \
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s"' % ( \
         runFileName, \
+        workingDir, \
+        resultDir, \
+        tmpDir, \
         cellAreas, \
         countries, \
         numRasters, \
         passCroplandLayerList, \
         vectorToStr(priorityValues), \
         vectorToStr(priorityValues2), \
+        vectorToStr(agreementTable.weights), \
         resultProb, \
         resultAvg, \
         resultMin, \
         resultMax)
 
+    print '==============='
     print executeCommand
+    print '==============='
 
     callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
-        
+    
     if not(callResult == 0):
-        raise Exception('Error! Function returned error code %d!' % str(callResult))
+        raise Exception('Error! Function returned error code %d!' % callResult)
         
