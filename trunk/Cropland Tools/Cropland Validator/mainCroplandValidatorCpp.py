@@ -50,4 +50,4 @@ if __name__ == "__main__":
         shutil.rmtree(tmpDir)
         
     if not(callResult == 0):
-        raise Exception('Error! Function returned error code %d!' % str(callResult))
+        raise Exception('Error! Function returned error code %d!' % callResult)
