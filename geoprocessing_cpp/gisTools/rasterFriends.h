@@ -24,6 +24,10 @@ void multipleRasterArithmetics(float (*func)(const vector<float> & ),
 void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &),
 							   const vector<raster *> & inRastersVector,
 							   vector<raster *> & outRastersVector);
+void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &, void *),
+							   const vector<raster *> & inRastersVector,
+							   vector<raster *> & outRastersVector,
+							   void * params = NULL);
 //void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
 //									  const vector<raster *> & inRastersVector, 
 //									  tableT & outTable);
