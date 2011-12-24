@@ -82,7 +82,10 @@ public:
 		INPUT,
 		OUTPUT,
 		TEMPORARY,
-		COPY
+		COPY,
+		EMPTY,
+		PASS_INPUT,
+		PASS_TEMPORARY
 	};
 	typedef map<float, statisticsStructT> zonalStatisticsTableT;
 private:
@@ -116,6 +119,7 @@ private:
 	void copyProperties(raster & destination) const;
 	void incMap(zonalStatisticsTableT &mp, float key, float val);
 public:
+	raster();
 	raster(const string & rasterName, rasterTypeT rType);
 	raster(const raster & g);
 	raster & operator = (const raster & g);

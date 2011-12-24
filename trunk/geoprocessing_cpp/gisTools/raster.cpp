@@ -1,6 +1,13 @@
 //#include <Python.h>
 #include "raster.h"
 
+raster::raster()
+{
+	isDescribed = false;
+	initializedFromImg = false;
+	rasterType = EMPTY;
+}
+
 raster::raster(const string & rasterName, rasterTypeT rType)
 {
 	rasterPath = rasterName;
@@ -62,7 +69,21 @@ raster & raster::operator = (const raster & g)
 	if (this != &g)
 	{
 		rasterPath = g.rasterPath;
-		rasterType = COPY;
+		switch (rasterType)
+		{
+		case EMPTY:
+			rasterType = g.rasterType;
+			break;
+		case PASS_INPUT:
+			rasterType = INPUT;
+			break;
+		case PASS_TEMPORARY:
+			rasterType = TEMPORARY;
+			break;
+		default:
+			rasterType = COPY;
+			break;
+		};
 		g.copyProperties(*this);
 	}
 	return *this;
@@ -225,6 +246,8 @@ void raster::copyProperties(raster & destination) const
 	destination.yMin = yMin;
 	destination.cellSize = cellSize;
 	destination.noDataValue = noDataValue;
+	destination.isDescribed = isDescribed;
+	destination.description = description;
 }
 
 void raster::incMap(zonalStatisticsTableT &mp, float key, float val)

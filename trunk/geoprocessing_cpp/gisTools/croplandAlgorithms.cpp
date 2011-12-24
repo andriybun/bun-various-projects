@@ -92,19 +92,27 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 		unitResultT rowResult;
 		rowResult.bestClass = -1;
 		rowResult.bestEstimate = rowSum;
-		//cout << maxClass-1 << "\t" << minClass-1 << endl;
-		for (int cl = (int)maxClass; cl >= (int)minClass; cl--)
+		if (targetSum == (float)0)
 		{
-			rowSum += row->second[cl-1];
-			float curDiff = fabs(targetSum - rowSum);
-			if ((curDiff <= absDiff) || (rowResult.bestEstimate == (float)0))
-			{
-				absDiff = curDiff;
-				rowResult.bestEstimate = rowSum;
-				rowResult.bestClass = cl;
-			}
+			rowResult.error = (float)0;
+			rowResult.bestEstimate = (float)0;
+			rowResult.bestClass = maxClass + 1;
 		}
-		rowResult.error = absDiff;
+		else
+		{
+			for (int cl = (int)maxClass; cl >= (int)minClass; cl--)
+			{
+				rowSum += row->second[cl-1];
+				float curDiff = fabs(targetSum - rowSum);
+				if ((curDiff <= absDiff) || (rowResult.bestEstimate == (float)0))
+				{
+					absDiff = curDiff;
+					rowResult.bestEstimate = rowSum;
+					rowResult.bestClass = cl;
+				}
+			}
+			rowResult.error = absDiff;
+		}
 		printf("%d\t%f\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.error);
 		calibratedResults.insert(make_pair<float, unitResultT>(row->first, rowResult));
 		currentCountry++;

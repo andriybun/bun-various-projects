@@ -11,7 +11,8 @@
 		char tmpName[1000];														\
 		sprintf_s(tmpName, NAME_TEMPLATE, __VA_ARGS__);							\
 		string tmpNameStr = string(tmpName);									\
-		RASTER_NAME = new raster(tmpNameStr, raster::TEMPORARY);				\
+		RASTER_NAME = new raster[1];											\
+		*(RASTER_NAME) = raster(tmpNameStr, raster::PASS_TEMPORARY);			\
 	}
 
 struct priorityDataT
@@ -120,7 +121,7 @@ int main(int argc, char * argv[])
 
 	// Vectors for list of cropland rasters
 	vector<raster *> croplandRastersVector;
-	priorityDataT * priorityData = new priorityDataT;
+	priorityDataT * priorityData = new priorityDataT[1];
 	
 	croplandRastersVector.resize(numRasters);
 	priorityData->prioritiesVector.resize(numRasters);
@@ -145,7 +146,8 @@ int main(int argc, char * argv[])
 	// Initializing vector of cropland rasters and related vectors
 	for (size_t idx = 0; idx < (size_t)numRasters; idx++)
 	{
-		croplandRastersVector[idx] = new raster(argv[startListOfRasters + idx], raster::INPUT);
+		croplandRastersVector[idx] = new raster[1];
+		*(croplandRastersVector[idx]) = raster(argv[startListOfRasters + idx], raster::PASS_INPUT);
 		priorityData->prioritiesVector[idx] = atoi(argv[startListOfPriorities + idx]);
 		priorityData->prioritiesVector2[idx] = atoi(argv[startListOfPriorities2 + idx]);
 		priorityData->weightsVector[idx] = atoi(argv[startListOfWeights + idx]);
