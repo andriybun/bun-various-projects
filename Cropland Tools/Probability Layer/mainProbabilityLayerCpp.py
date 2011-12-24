@@ -97,10 +97,10 @@ if __name__ == "__main__":
         resultMin, \
         resultMax)
 
-    print '==============='
-    print executeCommand
-    print '==============='
-
+#    print '==============='
+#    print executeCommand
+#    print '==============='
+#    raise Exception('111')
     callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:
