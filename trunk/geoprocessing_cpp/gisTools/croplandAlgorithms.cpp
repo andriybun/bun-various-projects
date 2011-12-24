@@ -92,7 +92,7 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 		unitResultT rowResult;
 		rowResult.bestClass = -1;
 		rowResult.bestEstimate = rowSum;
-		if (targetSum == (float)0)
+		if (compare_eq(targetSum, (float)0, EPSILON))
 		{
 			rowResult.error = (float)0;
 			rowResult.bestEstimate = (float)0;

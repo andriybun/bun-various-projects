@@ -99,7 +99,7 @@ int main(int argc, char * argv[])
 	calibrateCropland(
 		tmpCellAreaStat,
 		probabilityRaster,
-		statisticsRasterLevel1,		// TODO: validate with level 1 then change to statisticsRasterLevel0,
+		statisticsRasterLevel0,
 		statisticsRasterLevel2,
 		outCalibratedRasterLevel1,
 		outCroplandRasterLevel2,
