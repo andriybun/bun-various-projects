@@ -64,6 +64,10 @@ int main(int argc, char * argv[])
 	raster outCalibratedRasterLevel1(runParams.resultDir + "calibrated_cropland_level1", raster::OUTPUT);
 	raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", raster::OUTPUT);
 
+	// Error analysis:
+	raster outAbsDiffRaster(runParams.resultDir + "error_abs", raster::OUTPUT);
+	raster outRelDiffRaster(runParams.resultDir + "error_rel", raster::OUTPUT);
+
 	// Temporary:
 	// Product of cell area and cropland percentage
 	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", raster::TEMPORARY);
@@ -106,6 +110,13 @@ int main(int argc, char * argv[])
 		outCalibratedRasterLevel2,
 		runParams);
 	outCalibratedRasterLevel2.rasterArithmetics(&postprocessResults, statRaster, output);
+
+	validateResult(
+		tmpCellAreaStat,
+		statisticsRasterLevel0,
+		outAbsDiffRaster,
+		outRelDiffRaster,
+		runParams);
 
 	printf("End: ");
 	outputLocalTime();
