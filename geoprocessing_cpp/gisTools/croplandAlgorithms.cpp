@@ -430,3 +430,45 @@ void calibrateCropland(raster & inCroplandRaster,
 
 	printf(__TIME__ "\n");
 }
+
+void getValidatedResults(const vector<float> & valVector,
+						 const vector<float> & noDataValuesVector,
+						 const vector<float> & noDataValuesOutVector,
+						 vector<float> & result)
+{
+	float stat = valVector[0];
+	float computed = valVector[1];
+
+	if (compare_eq(stat, noDataValuesVector[0], EPSILON) || compare_eq(computed, noDataValuesVector[1], EPSILON))
+	{
+		result[0] = noDataValuesOutVector[0];
+		result[1] = noDataValuesOutVector[1];
+	}
+	else
+	{
+		result[0] = fabs(stat - computed);
+		result[1] = result[0] / stat * (float)100;
+	}
+}
+
+void validateResult(raster & cellAreaStatRaster,
+					raster & statisticsRaster,
+					raster & outAbsDiffRaster,
+					raster & outRelDiffRaster,
+					const runParamsT & runParams)
+{
+	//
+	raster tmpResultingAreasRaster(runParams.tmpDir + "tmp_resulting_areas", raster::TEMPORARY);
+
+	cellAreaStatRaster.zonalStatistics(statisticsRaster, tmpResultingAreasRaster, raster::SUM);
+
+	vector<raster *> passVector;
+	passVector.push_back(&statisticsRaster);
+	passVector.push_back(&tmpResultingAreasRaster);
+
+	vector<raster *> getBackVector;
+	getBackVector.push_back(&outAbsDiffRaster);
+	getBackVector.push_back(&outRelDiffRaster);
+
+	multipleRasterArithmetics(&getValidatedResults, passVector, getBackVector);	
+}

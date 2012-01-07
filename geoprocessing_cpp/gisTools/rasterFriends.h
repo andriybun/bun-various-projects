@@ -50,5 +50,10 @@ void calibrateCropland(raster & inCroplandRaster,
 					   raster & resultLevel,
 					   raster & outCalibratedRasterLevel,
 					   const runParamsT & params);
+void validateResult(raster & cellAreaStatRaster,
+					raster & statisticsRaster,
+					raster & outAbsDiffRaster,
+					raster & outRelDiffRaster,
+					const runParamsT & runParams);
 
 #endif

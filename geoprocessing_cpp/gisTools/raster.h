@@ -179,6 +179,12 @@ public:
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
 		const runParamsT & params);
+	friend void validateResult(raster & cellAreaStatRaster,
+		raster & statisticsRaster,
+		raster & outAbsDiffRaster,
+		raster & outRelDiffRaster,
+		const runParamsT & runParams);
+
 };
 
 #endif
