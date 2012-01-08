@@ -19,7 +19,7 @@ def AddSuffixToName( name, suffix ):
 #===============================================================================
 def MakeRasterOfValues( gp, rast, order, weight, weight2, out ):
     onesRast = AddSuffixToName(out, "_count")
-    gp.Con_sa(rast, 1, onesRast, 0, "VALUE > 0")
+    gp.Con_sa(rast, 1, onesRast, 0, "VALUE > 1e-6")
     gp.BuildRasterAttributeTable_management(onesRast, "OVERWRITE")
     gp.Times_sa(onesRast, order, out)
     gp.Times_sa(onesRast, weight, AddSuffixToName(out, "_one"))

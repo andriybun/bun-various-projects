@@ -43,7 +43,8 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     descriptionFile.close()
 
     weights = agreementTable.weights
-
+    interface.PrintText(str(weights))
+    
     # Calculations:
     list_of_rasters = []
     list_of_rasters_count = []
@@ -67,7 +68,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     for i in range(0, runConfig.num_rasters):
         InputName = runConfig.paths.inputs.LayerList[i]
         TmpName = runConfig.paths.tmp.LayerList[i]
-        MakeRasterOfValues(gp, InputName, 2**i, weights[i], priorityValues2[i], TmpName)
+        MakeRasterOfValues(gp, InputName, 2**(i+1), weights[i], priorityValues2[i], TmpName)
         list_of_rasters.append(InputName)
         list_of_rasters_count.append(AddSuffixToName(TmpName, "_count"))
         list_of_rasters_weights.append(TmpName)
@@ -93,6 +94,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     gp.Con_sa(temp5, temp5, runConfig.paths.resultMax, "#", "VALUE > 0")
     gp.Divide_sa(temp3, temp6, runConfig.paths.resultAvg)
     # Cleanup temporary rasters:
+
     runConfig.DeleteRasters(list_of_rasters)
     interface.PrintTextTime("Statistics computed.")
     
@@ -128,10 +130,12 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     interface.PrintText("started processing table")
     gp.addfield(temp1, "LAND_CLASS","LONG", "#", "#", "#", "#", "NULLABLE", "REQUIRED", "#")
     # Creating cursor:
+    # interface.PrintText(unitsFieldName + "; " + sumRastOneFieldName + "; "  + sumRastTwoFieldName + "; " + areaByUnitsFieldName + " DESC")
     rows = gp.UpdateCursor(temp1, "", "", "", unitsFieldName + "; " + sumRastOneFieldName + "; "  + sumRastTwoFieldName + "; " + areaByUnitsFieldName + " DESC")
     x = 0
     # Getting number of records in the table:
     num = gp.getCount(temp1)
+    interface.PrintText(str(num))
     # Processing the first row:
     row = rows.next()
     currCountry = row.getValue(unitsFieldName)
@@ -140,12 +144,14 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
     prevCountry = currCountry
     prevRastAgree = currRastAgree
     prevRastAgree2 = currRastAgree2
+    # interface.PrintText('==> %d %d' % (currRastAgree, currRastAgree2))
     row.setValue("LAND_CLASS", agreementTable.FindFirst(currRastAgree, currRastAgree2))
     rows.UpdateRow(row)
     x = x + 1;
-    #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
+    # interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
     # Processing rows:
     while x < num:
+        # interface.PrintText(x)
         row = rows.next()
         currCountry = row.getValue(unitsFieldName)
         currRastAgree = row.getValue(sumRastOneFieldName)
@@ -160,7 +166,7 @@ def RunAll(interface, inputPaths = None, coords = None, priorityValues = None, p
         prevCountry = currCountry
         prevRastAgree = currRastAgree
         prevRastAgree2 = currRastAgree2
-        #interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
+        # interface.PrintText(str(x) + ":\t" + str(currCountry) + "\t" + str(currRastAgree) + "\t" + str(currRastAgree2) + "\t" + str(row.getValue(areaByUnitsFieldName)) + "\t" + str(row.getValue("LAND_CLASS")))
     #===============================================================================
     # Writing results to the output raster
     #===============================================================================
