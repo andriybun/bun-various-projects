@@ -4,6 +4,7 @@
 //#include <Python.h>
 
 #include "raster.h"
+#include "agreementTable.h"
 #include "timer.h"
 
 #define GENERATE_RASTER_WITH_NAME_TEMPLATE(RASTER_NAME, NAME_TEMPLATE, ...)		\
@@ -20,6 +21,7 @@ struct priorityDataT
 	vector<int> prioritiesVector;
 	vector<int> prioritiesVector2;
 	vector<int> weightsVector;
+	agreementTableT * agTable;
 };
 
 void processListOfRasters(const vector<float> & croplandVector,
@@ -161,7 +163,8 @@ int main(int argc, char * argv[])
 		getBackVector[idx + numRasters * 1] = croplandWeightsVector[idx];
 		getBackVector[idx + numRasters * 2] = croplandWeightsVector2[idx];
 	}
-
+	
+	priorityData->agTable = new agreementTableT(priorityData->prioritiesVector, priorityData->prioritiesVector2);
 	multipleRasterArithmetics(&processListOfRasters, croplandRastersVector, getBackVector, (void *)priorityData);
 
 	// Free up memory
@@ -179,5 +182,6 @@ int main(int argc, char * argv[])
 	timer.stop();
 	printf("Elapsed time: %5.2f seconds.\n", timer.elapsedSeconds());
 
+	delete [] priorityData->agTable;
 	return 0;
 }
