@@ -73,6 +73,25 @@ void processListOfRasters(const vector<float> & croplandVector,
 
 int main(int argc, char * argv[])
 {
+	vector <int> p1, p2;
+	p1.resize(5);
+	p2.resize(5);
+	p1[0] = 3;
+	p1[1] = 2;
+	p1[2] = 1;
+	p1[3] = 1;
+	p1[4] = 1;
+
+	p2[0] = 1;
+	p2[1] = 1;
+	p2[2] = 1;
+	p2[3] = 2;
+	p2[4] = 4;
+
+	agreementTableT at(p1, p2);
+
+	return 1;
+
 	//ASSERT_INT(argc == 11, INCORRECT_INPUT_PARAMS);
 
 	// Command line arguments:
