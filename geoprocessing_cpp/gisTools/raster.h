@@ -165,19 +165,34 @@ public:
 	friend void validateCropland(raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
-		raster & outCroplandRaster,
-		raster & errorRaster);
+		raster & outCroplandRaster);
 	friend void validateCropland(raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
-		raster & outCroplandRaster);
+		raster & outCroplandRaster,
+		raster & outMinClassRaster);
+	friend void validateCropland(raster & inCroplandRaster,
+		raster & inZoneRaster,
+		raster & inClassRaster,
+		raster & outCroplandRaster,
+		raster & outMinClassRaster,
+		raster & errorRaster);
 	friend void calibrateCropland(raster & inCroplandRaster,
 		raster & inClassRaster,
-		const raster & statisticsLevelUp,
-		const raster & statisticsLevel,
+		raster & statisticsLevelUp,
+		raster & statisticsLevel,
 		raster & resultLevelUp,
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
+		const runParamsT & params);
+	friend void calibrateCropland(raster & inCroplandRaster,
+		raster & inClassRaster,
+		raster & statisticsLevelUp,
+		raster & statisticsLevel,
+		raster & resultLevelUp,
+		raster & resultLevel,
+		raster & outCalibratedRasterLevel,
+		raster & outMinClassRaster,
 		const runParamsT & params);
 	friend void validateResult(raster & cellAreaStatRaster,
 		raster & statisticsRaster,

@@ -124,7 +124,7 @@ void validateCropland(raster & inCroplandRaster,
 					  raster & inZoneRaster,
 					  raster & inClassRaster,
 					  raster & outCroplandRaster,
-					  raster & outErrorRaster)
+					  raster & outMinClassRaster)
 {
 	// Compute statistics
 	raster::summaryTableT calibratedResults;
@@ -139,13 +139,13 @@ void validateCropland(raster & inCroplandRaster,
 	string inClassHdrPath = inClassRaster.rasterPath + ".hdr";
 	string outCroplandHdrPath = outCroplandRaster.rasterPath + ".hdr";
 	string outCroplandFltPath = outCroplandRaster.rasterPath + ".flt";
-	string outErrorHdrPath = outErrorRaster.rasterPath + ".hdr";
-	string outErrorFltPath = outErrorRaster.rasterPath + ".flt";
+	string outMinClassHdrPath = outMinClassRaster.rasterPath + ".hdr";
+	string outMinClassFltPath = outMinClassRaster.rasterPath + ".flt";
 
 	inCroplandRaster.copyFile(inZoneHdrPath, outCroplandHdrPath);
-	inCroplandRaster.copyFile(inZoneHdrPath, outErrorHdrPath);
+	inCroplandRaster.copyFile(inZoneHdrPath, outMinClassHdrPath);
 	inCroplandRaster.copyProperties(outCroplandRaster);
-	inCroplandRaster.copyProperties(outErrorRaster);
+	inCroplandRaster.copyProperties(outMinClassRaster);
 
 	ifstream inCroplandFile;
 	inCroplandFile.open(inCroplandFltPath.c_str(), ios::out | ios::binary);
@@ -155,8 +155,8 @@ void validateCropland(raster & inCroplandRaster,
 	inClassFile.open(inClassFltPath.c_str(), ios::out | ios::binary);
 	ofstream outCroplandFile;
 	outCroplandFile.open(outCroplandFltPath.c_str(), ios::out | ios::binary);
-	ofstream outErrorFile;
-	outErrorFile.open(outErrorFltPath.c_str(), ios::out | ios::binary);
+	ofstream outMinClassFile;
+	outMinClassFile.open(outMinClassFltPath.c_str(), ios::out | ios::binary);
 
 	int numCells = inCroplandRaster.horResolution * inCroplandRaster.verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
@@ -165,7 +165,7 @@ void validateCropland(raster & inCroplandRaster,
 	float * inBufZone = new float[bufSize];
 	float * inBufClass = new float[bufSize];
 	float * outBufCropland = new float[bufSize];
-	float * outBufError = new float[bufSize];
+	float * outBufMinClass = new float[bufSize];
 
 	printf("Writing results to files\n");
 	int numCellsProcessed = 0;
@@ -183,7 +183,122 @@ void validateCropland(raster & inCroplandRaster,
 				&& (inBufClass[i] != inClassRaster.noDataValue))
 			{
 				raster::unitResultT unitResult = calibratedResults[inBufZone[i]];
-				outBufCropland[i] = (unitResult.bestClass <= inBufClass[i]) ? inBufCropland[i] : inZoneRaster.noDataValue;
+				outBufCropland[i] = (unitResult.bestClass <= inBufClass[i]) ? inBufCropland[i] : outCroplandRaster.noDataValue;
+				outBufMinClass[i] = (unitResult.bestClass <= inBufClass[i]) ? unitResult.bestClass : outMinClassRaster.noDataValue;
+			}
+			else
+			{
+				if (inBufZone[i] != inZoneRaster.noDataValue)
+				{
+					raster::summaryTableT::iterator unitResultIter = calibratedResults.find(inBufZone[i]);
+					if (unitResultIter != calibratedResults.end())
+					{
+						raster::unitResultT unitResult = unitResultIter->second;
+						outBufMinClass[i] = (float)unitResultIter->second.bestClass;
+					}
+					else
+					{
+						outBufMinClass[i] = outMinClassRaster.noDataValue;
+					}
+				}
+				else
+				{
+					outBufMinClass[i] = outMinClassRaster.noDataValue;
+				}
+				outBufCropland[i] = outCroplandRaster.noDataValue;
+			}
+		}
+		outCroplandFile.write(reinterpret_cast<char *>(outBufCropland), sizeof(float) * bufSize);
+		outMinClassFile.write(reinterpret_cast<char *>(outBufMinClass), sizeof(float) * bufSize);
+		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
+	}
+
+	inCroplandFile.close();
+	inZoneFile.close();
+	inClassFile.close();
+	outCroplandFile.close();
+	outMinClassFile.close();
+
+	delete [] inBufCropland;
+	delete [] inBufZone;
+	delete [] inBufClass;
+	delete [] outBufCropland;
+	delete [] outBufMinClass;
+}
+
+void validateCropland(raster & inCroplandRaster,
+					  raster & inZoneRaster,
+					  raster & inClassRaster,
+					  raster & outCroplandRaster,
+					  raster & outMinClassRaster,
+					  raster & outErrorRaster)
+{
+	// Compute statistics
+	raster::summaryTableT calibratedResults;
+	inCroplandRaster.zonalSumByClassAsTable(inZoneRaster, inClassRaster, calibratedResults);
+
+	// Write statistics to resulting files
+	string inCroplandHdrPath = inCroplandRaster.rasterPath + ".hdr";
+	string inCroplandFltPath = inCroplandRaster.rasterPath + ".flt";
+	string inZoneHdrPath = inZoneRaster.rasterPath + ".hdr";
+	string inZoneFltPath = inZoneRaster.rasterPath + ".flt";
+	string inClassFltPath = inClassRaster.rasterPath + ".flt";
+	string inClassHdrPath = inClassRaster.rasterPath + ".hdr";
+	string outCroplandHdrPath = outCroplandRaster.rasterPath + ".hdr";
+	string outCroplandFltPath = outCroplandRaster.rasterPath + ".flt";
+	string outMinClassHdrPath = outMinClassRaster.rasterPath + ".hdr";
+	string outMinClassFltPath = outMinClassRaster.rasterPath + ".flt";
+	string outErrorHdrPath = outErrorRaster.rasterPath + ".hdr";
+	string outErrorFltPath = outErrorRaster.rasterPath + ".flt";
+
+	inCroplandRaster.copyFile(inZoneHdrPath, outCroplandHdrPath);
+	inCroplandRaster.copyFile(inZoneHdrPath, outErrorHdrPath);
+	inCroplandRaster.copyFile(inZoneHdrPath, outMinClassHdrPath);
+	inCroplandRaster.copyProperties(outCroplandRaster);
+	inCroplandRaster.copyProperties(outErrorRaster);
+	inCroplandRaster.copyProperties(outMinClassRaster);
+
+	ifstream inCroplandFile;
+	inCroplandFile.open(inCroplandFltPath.c_str(), ios::out | ios::binary);
+	ifstream inZoneFile;
+	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
+	ifstream inClassFile;
+	inClassFile.open(inClassFltPath.c_str(), ios::out | ios::binary);
+	ofstream outCroplandFile;
+	outCroplandFile.open(outCroplandFltPath.c_str(), ios::out | ios::binary);
+	ofstream outErrorFile;
+	outErrorFile.open(outErrorFltPath.c_str(), ios::out | ios::binary);
+	ofstream outMinClassFile;
+	outMinClassFile.open(outMinClassFltPath.c_str(), ios::out | ios::binary);
+
+	int numCells = inCroplandRaster.horResolution * inCroplandRaster.verResolution;
+	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
+
+	float * inBufCropland = new float[bufSize];
+	float * inBufZone = new float[bufSize];
+	float * inBufClass = new float[bufSize];
+	float * outBufCropland = new float[bufSize];
+	float * outBufError = new float[bufSize];
+	float * outBufMinClass = new float[bufSize];
+
+	printf("Writing results to files\n");
+	int numCellsProcessed = 0;
+	while(numCellsProcessed < numCells)
+	{
+		bufSize = min(bufSize, numCells - numCellsProcessed);
+		numCellsProcessed += bufSize;
+		inCroplandFile.read(reinterpret_cast<char*>(inBufCropland), sizeof(float) * bufSize);
+		inZoneFile.read(reinterpret_cast<char*>(inBufZone), sizeof(float) * bufSize);
+		inClassFile.read(reinterpret_cast<char*>(inBufClass), sizeof(float) * bufSize);
+		for (int i = 0; i < bufSize; i++)
+		{
+			if ((inBufCropland[i] != inCroplandRaster.noDataValue)
+				&& (inBufZone[i] != inZoneRaster.noDataValue)
+				&& (inBufClass[i] != inClassRaster.noDataValue))
+			{
+				raster::unitResultT unitResult = calibratedResults[inBufZone[i]];
+				outBufCropland[i] = (unitResult.bestClass <= inBufClass[i]) ? inBufCropland[i] : outCroplandRaster.noDataValue;
+				outBufMinClass[i] = (unitResult.bestClass <= inBufClass[i]) ? unitResult.bestClass : outMinClassRaster.noDataValue;
 				outBufError[i] = unitResult.error;
 			}
 			else
@@ -195,21 +310,25 @@ void validateCropland(raster & inCroplandRaster,
 					{
 						raster::unitResultT unitResult = unitResultIter->second;
 						outBufError[i] = unitResultIter->second.error;
+						outBufMinClass[i] = (float)unitResultIter->second.bestClass;
 					}
 					else
 					{
 						outBufError[i] = outErrorRaster.noDataValue;
+						outBufMinClass[i] = outMinClassRaster.noDataValue;
 					}
 				}
 				else
 				{
 					outBufError[i] = outErrorRaster.noDataValue;
+					outBufMinClass[i] = outMinClassRaster.noDataValue;
 				}
 				outBufCropland[i] = outCroplandRaster.noDataValue;
 			}
 		}
 		outCroplandFile.write(reinterpret_cast<char *>(outBufCropland), sizeof(float) * bufSize);
 		outErrorFile.write(reinterpret_cast<char *>(outBufError), sizeof(float) * bufSize);
+		outMinClassFile.write(reinterpret_cast<char *>(outBufMinClass), sizeof(float) * bufSize);
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
 	}
 
@@ -218,12 +337,14 @@ void validateCropland(raster & inCroplandRaster,
 	inClassFile.close();
 	outCroplandFile.close();
 	outErrorFile.close();
+	outMinClassFile.close();
 
 	delete [] inBufCropland;
 	delete [] inBufZone;
 	delete [] inBufClass;
 	delete [] outBufCropland;
 	delete [] outBufError;
+	delete [] outBufMinClass;
 }
 
 void validateCropland(raster & inCroplandRaster,
@@ -409,7 +530,11 @@ void calibrateCropland(raster & inCroplandRaster,
 	levelResultsToUseRaster.zonalStatistics(statisticsLevelUpRaster, levelSumToUseRaster, raster::SUM);
 	statisticsLevelUpRaster.rasterArithmetics(&xminus, levelSumToUseRaster, differenceRaster);
 	differenceRaster.rasterArithmetics(&selectAreaByMask, zonesToCalibrateRaster, calibratedStatisticsLevelRaster);
-	validateCropland(inCroplandRaster, calibratedStatisticsLevelRaster, inClassRaster, resultsForCalibratedZonesRaster);
+
+	validateCropland(inCroplandRaster,
+		calibratedStatisticsLevelRaster,
+		inClassRaster,
+		resultsForCalibratedZonesRaster);
 
 	passVector.clear();
 	passVector.push_back(&zonesToCalibrateRaster);
@@ -421,12 +546,61 @@ void calibrateCropland(raster & inCroplandRaster,
 
 	multipleRasterArithmetics(&combineLevels, passVector, getBackVector);
 
-	//levelResultsToUseRaster.convertFloatToRaster();
-	//levelSumToUseRaster.convertFloatToRaster();
-	//zonesToCalibrateRaster.convertFloatToRaster();
-	//differenceRaster.convertFloatToRaster();
-	//resultsForCalibratedZonesRaster.convertFloatToRaster();
-	//calibratedStatisticsLevelRaster.convertFloatToRaster();
+	printf(__TIME__ "\n");
+}
+
+void calibrateCropland(raster & inCroplandRaster,
+					   raster & inClassRaster,
+					   raster & statisticsLevelUpRaster,
+					   raster & statisticsLevelRaster,
+					   raster & resultLevelUpRaster,
+					   raster & resultLevelRaster,
+					   raster & outCalibratedRasterLevel,
+					   raster & outMinClassRaster,
+					   const runParamsT & runParams)
+{
+	// Temporary rasters are not deleted in debug mode
+	raster sumLevelUpRaster(runParams.tmpDir + "sum_level_up", raster::TEMPORARY);		// sum of cropland per administrative units for results at the above level
+	raster sumLevelRaster(runParams.tmpDir + "sum_level", raster::TEMPORARY);			// sum of cropland per administrative units for results at the current level
+	raster levelResultsToUseRaster(runParams.tmpDir + "level_results_to_use", raster::TEMPORARY);
+	raster levelSumToUseRaster(runParams.tmpDir + "level_sum_to_use", raster::TEMPORARY);
+	raster zonesToCalibrateRaster(runParams.tmpDir + "zones_to_calibrate", raster::TEMPORARY);
+	raster differenceRaster(runParams.tmpDir + "difference", raster::TEMPORARY);
+	raster calibratedStatisticsLevelRaster(runParams.tmpDir + "calibrated_statistics_level", raster::TEMPORARY); 	// Calibrated statistics for level 1
+	raster resultsForCalibratedZonesRaster(runParams.tmpDir + "results_for_calibrated_zones", raster::TEMPORARY); 	// Calibrated statistics for level 1
+
+	resultLevelRaster.zonalStatistics(statisticsLevelRaster, sumLevelRaster, raster::SUM);
+	resultLevelUpRaster.zonalStatistics(statisticsLevelRaster, sumLevelUpRaster, raster::SUM);
+
+	vector<raster *> passVector;
+	passVector.push_back(&resultLevelRaster);
+	passVector.push_back(&sumLevelRaster);
+	passVector.push_back(&sumLevelUpRaster);
+
+	vector<raster *> getBackVector;
+	getBackVector.push_back(&levelResultsToUseRaster);
+	getBackVector.push_back(&zonesToCalibrateRaster);
+
+	multipleRasterArithmetics(&getCalibratedZones, passVector, getBackVector);
+	levelResultsToUseRaster.zonalStatistics(statisticsLevelUpRaster, levelSumToUseRaster, raster::SUM);
+	statisticsLevelUpRaster.rasterArithmetics(&xminus, levelSumToUseRaster, differenceRaster);
+	differenceRaster.rasterArithmetics(&selectAreaByMask, zonesToCalibrateRaster, calibratedStatisticsLevelRaster);
+
+	validateCropland(inCroplandRaster,
+		calibratedStatisticsLevelRaster,
+		inClassRaster,
+		resultsForCalibratedZonesRaster,
+		outMinClassRaster);
+
+	passVector.clear();
+	passVector.push_back(&zonesToCalibrateRaster);
+	passVector.push_back(&resultsForCalibratedZonesRaster);
+	passVector.push_back(&resultLevelRaster);
+
+	getBackVector.clear();
+	getBackVector.push_back(&outCalibratedRasterLevel);
+
+	multipleRasterArithmetics(&combineLevels, passVector, getBackVector);
 
 	printf(__TIME__ "\n");
 }
