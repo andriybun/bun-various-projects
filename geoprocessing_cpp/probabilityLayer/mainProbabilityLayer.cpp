@@ -72,30 +72,6 @@ void processListOfRasters(const vector<float> & croplandVector,
 
 int main(int argc, char * argv[])
 {
-	//vector <int> p1, p2;
-	//p1.resize(5);
-	//p2.resize(5);
-	//p1[0] = 3;
-	//p1[1] = 2;
-	//p1[2] = 1;
-	//p1[3] = 1;
-	//p1[4] = 1;
-
-	//p2[0] = 1;
-	//p2[1] = 1;
-	//p2[2] = 1;
-	//p2[3] = 2;
-	//p2[4] = 4;
-
-	//agreementTableT at(p1, p2);
-	//
-	//for (int i = 0; i < 32; i++)
-	//{
-	//	printf("[%d] = %d\n", i, at.getClass(i));
-	//}
-
-	//return 1;
-
 	// Command line arguments:
 	// 1 - workingDir
 	// 2 - resultDir
@@ -182,6 +158,11 @@ int main(int argc, char * argv[])
 		GENERATE_RASTER_WITH_NAME_TEMPLATE(croplandWeightsVector2[idx], "%s%s%02d", runParams.tmpDir.c_str(), "tmp_weights2_", idx);
 	}
 	
+	//for (size_t idx = 0; idx < (size_t)numRasters; idx++)
+	//{
+	//	printf("-> %s\n", croplandRastersVector[idx]->rasterPath);
+	//}
+
 	priorityData->agTable = new agreementTableT(priorityData->prioritiesVector, priorityData->prioritiesVector2);
 	multipleRasterArithmetics(&processListOfRasters, croplandRastersVector, getBackVector, (void *)priorityData);
 
