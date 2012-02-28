@@ -245,6 +245,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 
 	inRasterFileVector[0] = new ifstream;
 	inRasterFileVector[0]->open(fltPathsVector[0].c_str(), ios::in | ios::binary);
+	printf("%s\n", fltPathsVector[0].c_str());
 	ASSERT_INT(inRasterFileVector[0]->is_open(), FILE_NOT_OPEN);
 
 	int numCells = inRastersVector[0]->horResolution * inRastersVector[0]->verResolution;
@@ -261,6 +262,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 		hdrPathsVector[idx] = inRastersVector[idx]->rasterPath + ".hdr";
 		fltPathsVector[idx] = inRastersVector[idx]->rasterPath + ".flt";
 		inRasterFileVector[idx] = new ifstream;
+		printf("%s\n", fltPathsVector[idx].c_str());
 		inRasterFileVector[idx]->open(fltPathsVector[idx].c_str(), ios::in | ios::binary);
 		ASSERT_INT(inRasterFileVector[idx]->is_open(), FILE_NOT_OPEN);
 		bufVector[idx] = new float[bufSize];
