@@ -17,7 +17,7 @@ raster::raster(const string & rasterName, rasterTypeT rType)
 	printf("Raster name: %s\n", rasterPath.c_str());
 	switch (rasterType)
 	{
-	case INPUT:
+	case INPUT | PASS_INPUT:
 		if (!readRasterProperties())
 		{
 			ifstream f;
