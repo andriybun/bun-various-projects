@@ -6,31 +6,21 @@
 
 #include "agreementTable.h"
 
-agreementTableT::agreementTableT(vector<int> & priorityVec1, vector<int> & priorityVec2)
+agreementTableT::agreementTableT(const vector<int> & priorityVec1, const vector<int> & priorityVec2)
 {
 	computePriorities(priorityVec1, prior1);
 	computePriorities(priorityVec2, prior2);
-	priorityVec1 = prior1;
-	priorityVec2 = prior2;
 	numRasters = prior1.size();
 	int * vec = new int[numRasters];
 	numClasses = (size_t)(2 << (numRasters - 1)); // pow((double)2, (double)numRasters);
-	priorMap = new int * [numClasses];
-	for (size_t idx = 0; idx < numClasses; idx++)
-	{
-		priorMap[idx] = new int[numClasses];
-		for (size_t idx2 = 0; idx2 < numClasses; idx2++)
-		{
-			priorMap[idx][idx2] = 0;
-		}
-	}
+	priorMap = new int[numClasses];
 	recursive(numRasters, 0, vec);
 	// Process preliminary agreement table
 	map<int, vector<int> >::iterator it = tmpAgreementTable.begin();
-	int cl = 1;
+	int cl = 0;
 	while (it != tmpAgreementTable.end())
 	{
-		priorMap[it->second[1]][it->second[2]] = cl++;
+		priorMap[it->second[3]] = cl++;
 		it++;
 	}
 	delete [] vec;
@@ -38,18 +28,6 @@ agreementTableT::agreementTableT(vector<int> & priorityVec1, vector<int> & prior
 
 agreementTableT::~agreementTableT()
 {
-	for (size_t idx = 0; idx < numClasses; idx++)
-	{
-		for (size_t idx2 = 0; idx2 < numClasses; idx2++)
-		{
-			printf("%d\t", priorMap[idx][idx2]);
-		}
-		printf("\n");
-	}
-	for (size_t idx = 0; idx < numClasses; idx++)
-	{
-		delete [] priorMap[idx];
-	}
 	delete [] priorMap;
 }
 
@@ -66,17 +44,19 @@ void agreementTableT::recursive(size_t n, size_t idx, int * vec)
 	else
 	{
 		vector<int> sum;
-		sum.resize(3);
+		sum.resize(4);
 		sum[0] = 0; // number of rasters agree
 		sum[1] = 0; // sum of 1st priorities
 		sum[2] = 0; // sum of 2nd priorities
+		sum[3] = 0; // sum of 2 to the power of raster's index. Needed to identify the unique sum
 		for (size_t i = 0; i < n; i++)		
 		{
 			sum[0] += vec[i];
 			sum[1] += vec[i] * prior1[i];
 			sum[2] += vec[i] * prior2[i];
+			sum[3] += vec[i] * (2 << i) / 2;
 		}
-		tmpAgreementTable.insert(pair<int, vector<int> >(sum[1] * numClasses + sum[2], sum));
+		tmpAgreementTable.insert(pair<int, vector<int> >((sum[1] * numClasses + sum[2]) * numClasses + sum[3], sum));
 	}
 }
 
@@ -118,4 +98,9 @@ int agreementTableT::getPriority2(size_t idx)
 {
 	ASSERT_INT((idx >= 0) && (idx < numRasters), ARRAY_INDEX_OUT_OF_BOUNDS);
 	return prior2[idx];
+}
+
+int agreementTableT::getClass(int sumPowers)
+{
+	return priorMap[sumPowers];
 }
