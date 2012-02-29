@@ -5,6 +5,7 @@
 
 #include "raster.h"
 #include "agreementTable.h"
+#include "commonTools.h"
 #include "timer.h"
 
 #define GENERATE_RASTER_WITH_NAME_TEMPLATE(RASTER_NAME, NAME_TEMPLATE, ...)		\
@@ -52,13 +53,13 @@ void processListOfRasters(const vector<float> & croplandVector,
 			sumPowers += (int)order;
 			isData = true;
 		}
-		else
-		{
-			result[numRasters + 0 * idx] = (float)0;
-			result[numRasters + 1 * idx] = (float)0;
-			result[numRasters + 2 * idx] = (float)0;
-
-		}
+		//else
+		//{
+		//	result[0] = (float)0;
+		//	result[1] = (float)0;
+		//	result[2] = (float)0;
+		//	result[3] = (float)0;
+		//}
 		order *= 2;
 	}
 
@@ -67,11 +68,29 @@ void processListOfRasters(const vector<float> & croplandVector,
 	result[2] = isData ? percentMax : noDataOutVector[2];				// max
 	result[3] = isData																	// probability
 		? (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers))
-		: noDataOutVector[4];
+		: noDataOutVector[3];
 }
 
 int main(int argc, char * argv[])
 {
+	//runParamsT runParams1;
+	//runParams1.workingDir = string(argv[1]) + "\\";
+	//runParams1.resultDir = string(argv[2]) + "\\";
+	//runParams1.tmpDir = string(argv[3]) + "\\";
+	//
+	//string outRasterPath = runParams1.resultDir + "check_threshold";
+
+	//raster croplandRaster(argv[7], raster::INPUT);
+	//raster countriesRaster1(argv[5], raster::INPUT);
+	//raster isDataRaster(outRasterPath, raster::OUTPUT);
+
+	//printf("%s\n", argv[7]);
+	//printf("%s\n", argv[5]);
+
+	//getAreasWithCropland(countriesRaster1, croplandRaster, isDataRaster, runParams1);
+	//
+	//return 999;
+
 	// Command line arguments:
 	// 1 - workingDir
 	// 2 - resultDir
@@ -127,15 +146,6 @@ int main(int argc, char * argv[])
 	priorityData->prioritiesVector2.resize(numRasters);
 	priorityData->weightsVector.resize(numRasters);
 
-	// Temporary raster vectors
-	vector<raster *> croplandOrdersVector;
-	vector<raster *> croplandWeightsVector;
-	vector<raster *> croplandWeightsVector2;
-
-	croplandOrdersVector.resize(numRasters);
-	croplandWeightsVector.resize(numRasters);
-	croplandWeightsVector2.resize(numRasters);
-
 	vector<raster *> getBackVector;
 	getBackVector.resize(4);
 	getBackVector[0] = &resultAvg;
@@ -151,36 +161,24 @@ int main(int argc, char * argv[])
 		priorityData->prioritiesVector[idx] = atoi(argv[startListOfPriorities + idx]);
 		priorityData->prioritiesVector2[idx] = atoi(argv[startListOfPriorities2 + idx]);
 		priorityData->weightsVector[idx] = atoi(argv[startListOfWeights + idx]);
-
-		// Temporary rasters
-		GENERATE_RASTER_WITH_NAME_TEMPLATE(croplandOrdersVector[idx], "%s%s%02d", runParams.tmpDir.c_str(), "tmp_orders_", idx);
-		GENERATE_RASTER_WITH_NAME_TEMPLATE(croplandWeightsVector[idx], "%s%s%02d", runParams.tmpDir.c_str(), "tmp_weights_", idx);
-		GENERATE_RASTER_WITH_NAME_TEMPLATE(croplandWeightsVector2[idx], "%s%s%02d", runParams.tmpDir.c_str(), "tmp_weights2_", idx);
 	}
-	
-	//for (size_t idx = 0; idx < (size_t)numRasters; idx++)
-	//{
-	//	printf("-> %s\n", croplandRastersVector[idx]->rasterPath);
-	//}
 
 	priorityData->agTable = new agreementTableT(priorityData->prioritiesVector, priorityData->prioritiesVector2);
 	multipleRasterArithmetics(&processListOfRasters, croplandRastersVector, getBackVector, (void *)priorityData);
 
 	// Free up memory
+	delete priorityData->agTable;
+	delete priorityData;
+
 	for (size_t idx = 0; idx < (size_t)numRasters; idx++)
 	{
 		delete [] croplandRastersVector[idx];
-		delete [] croplandOrdersVector[idx];
-		delete [] croplandWeightsVector[idx];
-		delete [] croplandWeightsVector2[idx];
 	}
-	delete [] priorityData;
 
 	printf("End: ");
 	outputLocalTime();
 	timer.stop();
 	printf("Elapsed time: %5.2f seconds.\n", timer.elapsedSeconds());
 
-	delete [] priorityData->agTable;
 	return 0;
 }

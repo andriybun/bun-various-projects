@@ -66,6 +66,7 @@ public:
 		float maxVal;
 		float meanVal;
 		int count;
+		int countNonZero;
 	};
 	// List of possible statistics to compute
 	enum statisticsTypeT
@@ -74,7 +75,8 @@ public:
 		MEAN,
 		MIN,
 		MAX,
-		COUNT
+		COUNT,
+		COUNT_NON_ZERO
 	};
 	// Type of raster usage
 	enum rasterTypeT
@@ -158,10 +160,6 @@ public:
 		const vector<raster *> & inRastersVector,
 		vector<raster *> & outRastersVector,
 		void * params);
-	//friend void multipleRasterArithmeticsAsTable(
-	//	float (*func)(const vector<float> & , vector<float> & ), 
-	//	const vector<raster *> & inRastersVector, 
-	//	tableT & outTable);
 	friend void validateCropland(raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,

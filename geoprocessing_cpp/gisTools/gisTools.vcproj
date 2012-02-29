@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="gisTools"
 	ProjectGUID="{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}"
 	RootNamespace="gisTools"
@@ -154,6 +154,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\commonTools.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\croplandAlgorithms.cpp"
 				>
 			</File>
@@ -177,6 +181,10 @@
 			>
 			<File
 				RelativePath=".\assertInt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\commonTools.h"
 				>
 			</File>
 			<File
