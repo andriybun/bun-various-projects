@@ -102,7 +102,8 @@ if __name__ == "__main__":
 #    print executeCommand
 #    print '==============='
 #    raise Exception('111')
-#    callResult = subprocess.call(executeCommand)
+
+    callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
