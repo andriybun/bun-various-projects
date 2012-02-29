@@ -4,7 +4,10 @@ import time
 import arcgisscripting
 
 def GetTmpDir():
-    return "%s\\Local Settings\\Temp\\" % (os.getenv('USERPROFILE'))
+    result = "%s\\Temp\\" % (os.getenv('USERPROFILE'))
+    if not os.path.exists(result):
+        os.mkdir(result)
+    return result
 
 #===============================================================================
 # Common handy functions

@@ -168,24 +168,33 @@ class rasterAgreementTable():
         headerSeparator = '-------------------------------'
         for val in self.data[0]['agreementTable']:
             headerSeparator += '------'
-        header = '%-12s| SumW1 | SumW2 |  Rasters' % (' Cell class')
+        header0 = '%-12s|       |       || ' % (' ')
+        header1 = '%-12s| SumW1 | SumW2 ||  Rasters' % (' Cell class')
+        header2 = '%-12s|       |       || ' % (' ')
+        for i in range(0, self.numRasters):
+            header2 += '%2d  | ' % (i + 1)
+        header2 = header2[0:-2]
         if gui is None:
             print '\n'
             print tableCaption
             print headerSeparator
-            print header
+            print header0
+            print header1
+            print header2
             print headerSeparator
         else:
             gui.PrintText('\n')
             gui.PrintText(tableCaption)
             gui.PrintText(headerSeparator)
-            gui.PrintText(header)
+            gui.PrintText(header0)
+            gui.PrintText(header1)
+            gui.PrintText(header2)
             gui.PrintText(headerSeparator)
         for row in self.data:
-            outString = '      %4d  |  %3d  |  %3d' % (i, row['classes1'], row['classes2'])
-#            outString = '      %4d  |  %3d  |  %3d' % (row['resultingClass'], row['classes1'], row['classes2'])
+            outString = '      %4d  |  %3d  |  %3d  ||  ' % (i, row['classes1'], row['classes2'])
             for val in row['agreementTable']:
-                outString += '  |  ' + str(val)
+                outString += str(val) + '  |  '
+            outString = outString[0:-3]
             i = i + 1
             if gui is None:
                 print outString
@@ -225,18 +234,25 @@ class rasterAgreementTable():
         headerSeparator = '-------------------------------'
         for val in self.data[0]['agreementTable']:
             headerSeparator += '------'
-        headerSeparator += '\n'
-        header = '%-12s| SumW1 | SumW2 |  Rasters\n' % (' Cell class')
+        header0 = '%-12s|       |       ||  Rasters' % (' ')
+        header1 = '%-12s| SumW1 | SumW2 || ' % (' Cell class')
+        header2 = '%-12s|       |       || ' % (' ')
+        for i in range(0, self.numRasters):
+            header2 += '%2d  | ' % (i + 1)
+        header2 = header2[0:-2]
         file.write('\n')
         file.write(tableCaption + '\n')
         file.write(headerSeparator + '\n')
-        file.write(header + '\n')
+        file.write(header0 + '\n')
+        file.write(header1 + '\n')
+        file.write(header2 + '\n')
         file.write(headerSeparator + '\n')
 
         for row in self.data:
-            outString = '      %4d  |  %3d  |  %3d' % (i, row['classes1'], row['classes2'])
+            outString = '      %4d  |  %3d  |  %3d  ||  ' % (i, row['classes1'], row['classes2'])
             for val in row['agreementTable']:
-                outString += '  |  ' + str(val)
+                outString += str(val) + '  |  '
+            outString = outString[0:-3]
             i = i + 1
             file.write(outString + '\n')
         file.write(headerSeparator + '\n')

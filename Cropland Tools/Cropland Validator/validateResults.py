@@ -45,9 +45,9 @@ def ValidateRaster(rasterToValidate, areaGrid, nationalStatistics):
         gp.AddMessage(outString)
         row = rows.next()
 
-#    gp.delete_management(tmpRaster)
-#    gp.delete_management(tmpCombined)
-#    gp.delete_management(nationalStatisticsInt)
+    gp.delete_management(tmpRaster)
+    gp.delete_management(tmpCombined)
+    gp.delete_management(nationalStatisticsInt)
     os.removedirs(TMPDIR)
 
 if __name__ == '__main__':
