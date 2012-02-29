@@ -26,6 +26,37 @@ agreementTableT::agreementTableT(const vector<int> & priorityVec1, const vector<
 	delete [] vec;
 }
 
+agreementTableT::agreementTableT(const agreementTableT & g)
+{
+	prior1 = g.prior1;
+	prior2 = g.prior2;
+	numRasters = g.numRasters;
+	numClasses = g.numClasses;
+	tmpAgreementTable = g.tmpAgreementTable;
+	priorMap = new int[numClasses];
+	for (int i = 0; i < numClasses; i++)
+	{
+		priorMap[i] = g.priorMap[i];
+	}
+}
+
+agreementTableT & agreementTableT::operator = (const agreementTableT & g)
+{
+	if (this != &g)
+	{
+		prior1 = g.prior1;
+		prior2 = g.prior2;
+		numRasters = g.numRasters;
+		numClasses = g.numClasses;
+		tmpAgreementTable = g.tmpAgreementTable;
+		priorMap = new int[numClasses];
+		for (int i = 0; i < numClasses; i++)
+		{
+			priorMap[i] = g.priorMap[i];
+		}
+	}
+}
+
 agreementTableT::~agreementTableT()
 {
 	delete [] priorMap;

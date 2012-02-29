@@ -15,9 +15,8 @@ raster::raster(const string & rasterName, rasterTypeT rType)
 	initializedFromImg = false;
 	rasterType = rType;
 	printf("Raster name: %s\n", rasterPath.c_str());
-	switch (rasterType)
+	if ((rasterType == INPUT) || (rasterType == PASS_INPUT))
 	{
-	case INPUT | PASS_INPUT:
 		if (!readRasterProperties())
 		{
 			ifstream f;
@@ -37,20 +36,25 @@ raster::raster(const string & rasterName, rasterTypeT rType)
 				ASSERT_INT(false, INPUT_RASTER_DOES_NOT_EXIST);
 			}
 		}
-		break;
-	case OUTPUT:
-		// Nothing is needed to be created at this stage
-		printf("\tInitialized output raster\n");
-		break;
-	case TEMPORARY:
-		// Nothing is needed to be created at this stage
-		printf("\tInitialized temporary raster\n");
-		break;
-	case COPY:
-		// Copy can not be created using constructor
-		ASSERT_INT(false, OTHER_ERROR);
-		break;
-	};
+	}
+	else
+	{
+		switch (rasterType)
+		{
+		case OUTPUT:
+			// Nothing is needed to be created at this stage
+			printf("\tInitialized output raster\n");
+			break;
+		case TEMPORARY:
+			// Nothing is needed to be created at this stage
+			printf("\tInitialized temporary raster\n");
+			break;
+		case COPY:
+			// Copy can not be created using constructor
+			ASSERT_INT(false, OTHER_ERROR);
+			break;
+		};
+	}
 }
 
 // Copy constructor
@@ -96,9 +100,12 @@ raster::~raster()
 	{
 		convertFloatToRaster();
 	}
-	if (initializedFromImg || rasterType == TEMPORARY || rasterType == INPUT || rasterType == OUTPUT)
+	if ((initializedFromImg && (rasterType != PASS_INPUT)) 
+		|| (rasterType == TEMPORARY)
+		|| (rasterType == INPUT)
+		|| (rasterType == OUTPUT))
 	{
-		removeFloatFromDisc();
+		//removeFloatFromDisc();
 	}
 }
 
@@ -259,6 +266,7 @@ void raster::incMap(zonalStatisticsTableT &mp, float key, float val)
 		tmp.maxVal = val;
 		tmp.minVal = val;
 		tmp.count = 1;
+		tmp.countNonZero = 1;
 	}
 	else
 	{
@@ -266,6 +274,7 @@ void raster::incMap(zonalStatisticsTableT &mp, float key, float val)
 		tmp.maxVal = xmax(tmp.maxVal, val);
 		tmp.minVal = xmin(tmp.minVal, val);
 		tmp.count++;
+		tmp.countNonZero += (val > 0) ? 1 : 0;
 	}
 	mp.erase(key);
 	mp.insert(make_pair<float, statisticsStructT>(key, tmp));
@@ -574,6 +583,9 @@ void raster::zonalStatistics(const raster & inZoneRaster,
 					break;
 				case COUNT:
 					outBuf[i] = (float)tmp.count;
+					break;
+				case COUNT_NON_ZERO:
+					outBuf[i] = (float)tmp.countNonZero;
 					break;
 				}
 			}
