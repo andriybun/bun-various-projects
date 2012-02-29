@@ -19,6 +19,7 @@ def vectorToStr(vec):
     return str(vec).replace('[', '').replace(']', '').replace(',', '')
 
 if __name__ == "__main__":
+    
     workingDir = os.path.dirname(sys.argv[0])
     os.chdir(workingDir)
 
@@ -59,7 +60,7 @@ if __name__ == "__main__":
             priorityValues2.append(int(priorityStr))
     
     # Parse results' names:
-    resultProb = os.path.splitext(sys.argv[6].replace("'",""))[0]
+    resultProb = os.path.splitext(sys.argv[7].replace("'",""))[0]
     resultNameTuple = os.path.splitext(resultProb)
     descriptionFileName = resultNameTuple[0] + ".txt"
     resultAvg = resultNameTuple[0] + "_avg"
@@ -67,8 +68,8 @@ if __name__ == "__main__":
     resultMax = resultNameTuple[0] + "_max"
     
     # Process priorities:
+    print descriptionFileName
     agreementTable = rasterAgreementTable(priorityValues, priorityValues2)
-    
     descriptionFile = open(descriptionFileName, 'w')
     agreementTable.PrintToFile(descriptionFile, croplandLayerList)
     descriptionFile.close()
@@ -101,7 +102,7 @@ if __name__ == "__main__":
 #    print executeCommand
 #    print '==============='
 #    raise Exception('111')
-    callResult = subprocess.call(executeCommand)
+#    callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
