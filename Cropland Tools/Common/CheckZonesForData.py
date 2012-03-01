@@ -9,7 +9,7 @@ from ctypes import *
 if __name__ == "__main__":
     
     # Load DLL
-    testDll = cdll.LoadLibrary("C:\\ProgramFiles\\GeoProcessing\\Release\\gisToolsInterface.dll")
+    testDll = cdll.LoadLibrary("gisToolsInterface.dll")
 
     # Identify the in / out parameters of the function from DLL we will use
     testDll.checkZonesForData.restype = c_int
