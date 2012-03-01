@@ -53,13 +53,6 @@ void processListOfRasters(const vector<float> & croplandVector,
 			sumPowers += (int)order;
 			isData = true;
 		}
-		//else
-		//{
-		//	result[0] = (float)0;
-		//	result[1] = (float)0;
-		//	result[2] = (float)0;
-		//	result[3] = (float)0;
-		//}
 		order *= 2;
 	}
 
@@ -73,24 +66,6 @@ void processListOfRasters(const vector<float> & croplandVector,
 
 int main(int argc, char * argv[])
 {
-	//runParamsT runParams1;
-	//runParams1.workingDir = string(argv[1]) + "\\";
-	//runParams1.resultDir = string(argv[2]) + "\\";
-	//runParams1.tmpDir = string(argv[3]) + "\\";
-	//
-	//string outRasterPath = runParams1.resultDir + "check_threshold";
-
-	//raster croplandRaster(argv[7], raster::INPUT);
-	//raster countriesRaster1(argv[5], raster::INPUT);
-	//raster isDataRaster(outRasterPath, raster::OUTPUT);
-
-	//printf("%s\n", argv[7]);
-	//printf("%s\n", argv[5]);
-
-	//getAreasWithCropland(countriesRaster1, croplandRaster, isDataRaster, runParams1);
-	//
-	//return 999;
-
 	// Command line arguments:
 	// 1 - workingDir
 	// 2 - resultDir
