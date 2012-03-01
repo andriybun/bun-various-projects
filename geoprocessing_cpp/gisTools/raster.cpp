@@ -105,7 +105,7 @@ raster::~raster()
 		|| (rasterType == INPUT)
 		|| (rasterType == OUTPUT))
 	{
-		//removeFloatFromDisc();
+		removeFloatFromDisc();
 	}
 }
 
