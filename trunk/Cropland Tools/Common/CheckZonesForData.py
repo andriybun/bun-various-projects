@@ -2,11 +2,20 @@ import sys
 import os
 import shutil
 
+import arcgisscripting
+
 from ctypes import *
 
 # TODO: accept and parse command line params
 
 if __name__ == "__main__":
+    
+#    gp = arcgisscripting.create()
+#    gp.addmessage(str(sys.argv))
+#    raise Exception('111')
+    
+    workingDir = os.path.dirname(sys.argv[0])
+    os.chdir(workingDir)
     
     # Load DLL
     testDll = cdll.LoadLibrary("gisToolsInterface.dll")
@@ -29,9 +38,9 @@ if __name__ == "__main__":
         (c_char_p * numRasters), \
         c_char_p, \
         c_char_p, \
-        c_int]
+        c_float]
 
-    selectionThreshold = int(sys.argv[3])
+    selectionThreshold = float(sys.argv[3])
     
     resultDir = os.path.dirname(croplandLayerList[0])
     tmpDir    = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
