@@ -15,13 +15,12 @@ int checkZonesForData(
 	const char * zoneRasterPath,
 	//const char * resultDir,
 	const char * tmpDir,
-	int selectionThreshold
+	float selectionThreshold
 	)
 {
 	runParamsT runParams;
 	//runParams.resultDir = string(resultDir) + "\\";
 	runParams.tmpDir = string(tmpDir) + "\\";
-
 	raster zoneRaster(zoneRasterPath, raster::INPUT);
 	
 	for (int idx = 0; idx < numRasters; idx++)
@@ -29,7 +28,7 @@ int checkZonesForData(
 		raster croplandRaster(listOfRasterPaths[idx], raster::INPUT);
 		string tmpName = string(listOfRasterPaths[idx]) + "_is_data";
 		raster isDataRaster(tmpName, raster::OUTPUT);
-		getAreasWithCropland(zoneRaster, croplandRaster, isDataRaster, runParams);
+		getAreasWithCropland(zoneRaster, croplandRaster, isDataRaster, selectionThreshold, runParams);
 	}
 
 	return 0;

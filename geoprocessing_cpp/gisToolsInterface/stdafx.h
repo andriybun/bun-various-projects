@@ -21,6 +21,6 @@ extern "C" __declspec(dllexport) int checkZonesForData(
 	const char * zoneRasterPath,
 	//const char * resultDir,
 	const char * tmpDir,
-	int selectionThreshold
+	float selectionThreshold
 	);
 
