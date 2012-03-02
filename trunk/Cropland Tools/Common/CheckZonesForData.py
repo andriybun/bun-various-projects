@@ -18,7 +18,7 @@ if __name__ == "__main__":
     os.chdir(workingDir)
     
     # Load DLL
-    testDll = cdll.LoadLibrary("gisToolsInterface.dll")
+    testDll = cdll.LoadLibrary("C:\\ProgramFiles\\GeoProcessing\\Release\\gisToolsInterface.dll")
 
     # Parse input params
     zoneRasterPath = os.path.splitext(sys.argv[1].replace("'",""))[0]
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
     
-    testDll.checkZonesForData( \
+    callResult = testDll.checkZonesForData( \
         numRasters, \
         passCroplandLayerList, \
         zoneRasterPath, \
@@ -59,3 +59,6 @@ if __name__ == "__main__":
 
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
+
+    if not(callResult == 0):
+        raise Exception('Error! Function returned error code %d!' % callResult)
