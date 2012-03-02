@@ -18,7 +18,7 @@ if __name__ == "__main__":
     os.chdir(workingDir)
     
     # Load DLL
-    testDll = cdll.LoadLibrary("C:\\ProgramFiles\\GeoProcessing\\Release\\gisToolsInterface.dll")
+    testDll = cdll.LoadLibrary("gisToolsInterface.dll")
 
     # Parse input params
     zoneRasterPath = os.path.splitext(sys.argv[1].replace("'",""))[0]
