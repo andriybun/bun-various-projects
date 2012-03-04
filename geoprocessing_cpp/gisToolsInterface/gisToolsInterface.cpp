@@ -7,6 +7,8 @@
 #include "assertInt.h"
 #include "errorCodes.h"
 
+#include "gisToolsInterface.h"
+
 using namespace std;
 
 int checkZonesForData(
