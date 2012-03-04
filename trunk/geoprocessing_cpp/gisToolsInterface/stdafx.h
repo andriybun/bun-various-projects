@@ -14,13 +14,3 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-extern "C" __declspec(dllexport) int checkZonesForData(
-	int numRasters,
-	const char * listOfRasterPaths [],
-	const char * zoneRasterPath,
-	//const char * resultDir,
-	const char * tmpDir,
-	float selectionThreshold
-	);
-
