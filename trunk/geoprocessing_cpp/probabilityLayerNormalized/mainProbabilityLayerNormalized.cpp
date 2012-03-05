@@ -66,10 +66,6 @@ void processListOfRasters(const vector<float> & croplandVector,
 
 int main(int argc, char * argv[])
 {
-	// TODO: load dll with function
-
-	return 1;
-
 	// Command line arguments:
 	// 1 - workingDir
 	// 2 - resultDir
