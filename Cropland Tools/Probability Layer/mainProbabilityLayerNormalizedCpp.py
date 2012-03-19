@@ -23,7 +23,7 @@ if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
     os.chdir(workingDir)
 
-    runFileName = "probabilityLayer.exe"
+    runFileName = "probabilityLayerNormalized.exe"
 
     # Parse command line arguments:
     num_args = len(sys.argv)
@@ -59,8 +59,10 @@ if __name__ == "__main__":
         for priorityStr in priorityList2:
             priorityValues2.append(int(priorityStr))
     
+    selectionThreshold = sys.argv[6]
+    
     # Parse results' names:
-    resultProb = os.path.splitext(sys.argv[6].replace("'",""))[0]
+    resultProb = os.path.splitext(sys.argv[7].replace("'",""))[0]
     resultNameTuple = os.path.splitext(resultProb)
     descriptionFileName = resultNameTuple[0] + ".txt"
     resultAvg = resultNameTuple[0] + "_avg"
@@ -81,7 +83,7 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
     
-    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s"' % ( \
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" %s' % ( \
         runFileName, \
         workingDir, \
         resultDir, \
@@ -96,7 +98,8 @@ if __name__ == "__main__":
         resultProb, \
         resultAvg, \
         resultMin, \
-        resultMax)
+        resultMax, \
+        selectionThreshold)
 
 #    print '==============='
 #    print executeCommand
