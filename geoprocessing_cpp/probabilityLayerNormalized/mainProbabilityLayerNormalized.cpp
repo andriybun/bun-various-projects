@@ -10,8 +10,6 @@
 
 #include "gisToolsInterface.h"
 
-const float selectionThreshold = (float)0.01;
-
 #define GENERATE_RASTER_WITH_NAME_TEMPLATE(RASTER_NAME, NAME_TEMPLATE, ...)		\
 	{																			\
 		char tmpName[1000];														\
@@ -65,15 +63,27 @@ void processListOfRasters(const vector<float> & croplandVector,
 		order *= 2;
 	}
 
-	result[0] = isData ? sumData / countData : noDataOutVector[0];		// avg
-	result[1] = isData ? percentMin : noDataOutVector[1];				// min
-	result[2] = isData ? percentMax : noDataOutVector[2];				// max
-	result[3] = isData																	// probability
-		? floor(
-			(float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers)) /
-			(float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers)) * 
-			100)
-		: noDataOutVector[3];
+	if (isData)
+	{
+		float factor = ((float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers)) != (float)0)
+			? (float)order / (float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers))
+			: (float)1;
+		result[0] = sumData / countData;				// avg
+		result[1] = percentMin;							// min
+		result[2] = percentMax;							// max
+		result[3] = floor((float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers)) * factor);	// probability
+		//result[4] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers));
+		//result[5] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers));
+	}
+	else
+	{
+		result[0] = noDataOutVector[0];
+		result[1] = noDataOutVector[1];
+		result[2] = noDataOutVector[2];
+		result[3] = noDataOutVector[3];
+		//result[4] = noDataOutVector[4];
+		//result[5] = noDataOutVector[5];
+	}
 }
 
 int main(int argc, char * argv[])
@@ -109,7 +119,7 @@ int main(int argc, char * argv[])
 
 	int numRasters = atoi(argv[6]);
 	
-	ASSERT_INT(argc == (11 + numRasters * 4), INCORRECT_INPUT_PARAMS);
+	ASSERT_INT(argc == (12 + numRasters * 4), INCORRECT_INPUT_PARAMS);
 
 	// Further arguments' offsets
 	size_t startListOfRasters = 7 + 0 * numRasters;
@@ -124,6 +134,12 @@ int main(int argc, char * argv[])
 	raster resultMin(argv[startResults+2], raster::OUTPUT);
 	raster resultMax(argv[startResults+3], raster::OUTPUT);
 
+	// TODO float to raster...
+	float selectionThreshold = atof(argv[startResults+4]);
+
+	//raster resultProbOld((runParams.resultDir + "xxx_prob_old.img").c_str(), raster::OUTPUT);
+	//raster resultProbIsData((runParams.resultDir + "xxx_prob_is_data.img").c_str(), raster::OUTPUT);
+
 	// Vectors for list of cropland rasters
 	vector<raster *> croplandRastersVector;
 	croplandRastersVector.resize(2 * numRasters); // first half - cropland rasters; second half - cropland is data rasters;
@@ -134,11 +150,19 @@ int main(int argc, char * argv[])
 	priorityData->weightsVector.resize(numRasters);
 
 	vector<raster *> getBackVector;
+	//getBackVector.resize(4);
+	//getBackVector[0] = &resultAvg;
+	//getBackVector[1] = &resultMin;
+	//getBackVector[2] = &resultMax;
+	//getBackVector[3] = &resultProb;
+
 	getBackVector.resize(4);
 	getBackVector[0] = &resultAvg;
 	getBackVector[1] = &resultMin;
 	getBackVector[2] = &resultMax;
 	getBackVector[3] = &resultProb;
+	//getBackVector[4] = &resultProbOld;
+	//getBackVector[5] = &resultProbIsData;
 
 	// Initializing vector of cropland rasters and related vectors
 	for (size_t idx = 0; idx < (size_t)numRasters; idx++)
@@ -149,14 +173,14 @@ int main(int argc, char * argv[])
 		priorityData->prioritiesVector2[idx] = atoi(argv[startListOfPriorities2 + idx]);
 		priorityData->weightsVector[idx] = atoi(argv[startListOfWeights + idx]);
 		string tmpName = string(argv[startListOfRasters + idx]) + "_is_data";
-		raster isDataRaster(tmpName, raster::OUTPUT);
 		croplandRastersVector[numRasters + idx] = new raster[1];
 		*(croplandRastersVector[numRasters + idx]) = raster(tmpName, raster::PASS_TEMPORARY);
-		getAreasWithCropland(areaRaster,
+		getAreasWithCropland(countriesRaster,
 			*(croplandRastersVector[idx]),
 			*(croplandRastersVector[numRasters + idx]),
 			selectionThreshold,
 			runParams);
+		//croplandRastersVector[numRasters + idx]->convertFloatToRaster();
 	}
 
 	priorityData->agTable = new agreementTableT(priorityData->prioritiesVector, priorityData->prioritiesVector2);
@@ -166,7 +190,7 @@ int main(int argc, char * argv[])
 	delete priorityData->agTable;
 	delete priorityData;
 
-	for (size_t idx = 0; idx < (size_t)numRasters; idx++)
+	for (size_t idx = 0; idx < 2 * (size_t)numRasters; idx++)
 	{
 		delete [] croplandRastersVector[idx];
 	}
