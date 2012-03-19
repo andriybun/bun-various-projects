@@ -14,7 +14,14 @@ def ones(size):
     for xIdx in range(size):
         xRes.append(1)
     return xRes
-    
+
+def invertPriorities(priorityVector):
+    maxVal = max(priorityVector) + 1
+    res = []
+    for val in priorityVector:
+        res.append(maxVal - val)
+    return res    
+
 def vectorToStr(vec):
     return str(vec).replace('[', '').replace(']', '').replace(',', '')
 
@@ -58,6 +65,10 @@ if __name__ == "__main__":
         priorityValues2 = []
         for priorityStr in priorityList2:
             priorityValues2.append(int(priorityStr))
+
+    # Invert priority vectors    
+    priorityValues = invertPriorities(priorityValues)
+    priorityValues2 = invertPriorities(priorityValues2)
     
     selectionThreshold = sys.argv[6]
     

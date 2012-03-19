@@ -13,6 +13,13 @@ from RunAll import RunAll
 from iterableStruct import iterableStruct
 from GeoprocessingInfo import GeoprocessingInfo
 
+def invertPriorities(priorityVector):
+    maxVal = max(priorityVector) + 1
+    res = []
+    for val in priorityVector:
+        res.append(maxVal - val)
+    return res    
+
 # Parse command line arguments
 inputPaths = iterableStruct()
 
@@ -55,6 +62,10 @@ else:
     for priorityStr in priorityList2:
         priorityValues2.append(int(priorityStr))
 
+# Invert priority vectors    
+priorityValues = invertPriorities(priorityValues)
+priorityValues2 = invertPriorities(priorityValues2)
+    
 inputPaths.result = sys.argv[7]
 
 interface = GeoprocessingInfo()
