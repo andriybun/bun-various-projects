@@ -49,6 +49,10 @@ raster::raster(const string & rasterName, rasterTypeT rType)
 			// Nothing is needed to be created at this stage
 			printf("\tInitialized temporary raster\n");
 			break;
+		case PASS_TEMPORARY:
+			// Nothing is needed to be created at this stage
+			printf("\tInitialized temporary raster\n");
+			break;
 		case COPY:
 			// Copy can not be created using constructor
 			ASSERT_INT(false, OTHER_ERROR);
@@ -73,7 +77,7 @@ raster & raster::operator = (const raster & g)
 	if (this != &g)
 	{
 		rasterPath = g.rasterPath;
-		switch (rasterType)
+		switch (g.rasterType)
 		{
 		case EMPTY:
 			rasterType = g.rasterType;
@@ -100,7 +104,7 @@ raster::~raster()
 	{
 		convertFloatToRaster();
 	}
-	if ((initializedFromImg && (rasterType != PASS_INPUT)) 
+	if ((initializedFromImg && (rasterType != PASS_INPUT) && (rasterType != PASS_TEMPORARY)) 
 		|| (rasterType == TEMPORARY)
 		|| (rasterType == INPUT)
 		|| (rasterType == OUTPUT))
