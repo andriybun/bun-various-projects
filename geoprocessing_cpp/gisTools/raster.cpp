@@ -720,6 +720,135 @@ void raster::convertFloatToRaster()
 	//Py_Finalize();
 }
 
+string raster::getHdrPath()
+{
+	return rasterPath + ".hdr";
+}
+
+string raster::getFltPath()
+{
+	return rasterPath + ".flt";
+}
+
+void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
+									raster & inClassRaster,
+									summaryTableT & calibratedResults)
+{
+	printf("Executing zonal sum by class (as table)\n");
+
+	validateExtent(inZoneRaster);
+	validateExtent(inClassRaster);
+	ASSERT_INT(calibratedResults.size() == 0, OTHER_ERROR);
+
+	string thisHdrPath = (*this).rasterPath + ".hdr";
+	string thisFltPath = (*this).rasterPath + ".flt";
+	string inZoneHdrPath = inZoneRaster.rasterPath + ".hdr";
+	string inZoneFltPath = inZoneRaster.rasterPath + ".flt";
+	string inClassHdrPath = inClassRaster.rasterPath + ".hdr";
+	string inClassFltPath = inClassRaster.rasterPath + ".flt";
+
+	// First run: computing statistics for probability raster
+	statisticsStructT probabilityStatistics = inClassRaster.describe();
+	size_t maxClass = (size_t)probabilityStatistics.maxVal;
+	size_t minClass = (size_t)probabilityStatistics.minVal;
+	tableT outTable;
+	outTable.setNumCols(maxClass);
+	printf("\tmin class: %d\n", minClass);
+	printf("\tmax class: %d\n", maxClass);
+
+	ifstream thisFile;
+	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
+	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
+	ifstream inZoneFile;
+	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
+	ASSERT_INT(inZoneFile.is_open(), FILE_NOT_OPEN);
+	ifstream inClassFile;
+	inClassFile.open(inClassFltPath.c_str(), ios::out | ios::binary);
+	ASSERT_INT(inClassFile.is_open(), FILE_NOT_OPEN);
+
+	int numCells = (*this).horResolution * (*this).verResolution;
+	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
+
+	float * bufArea = new float[bufSize];
+	float * bufZone = new float[bufSize];
+	float * bufClass = new float[bufSize];
+
+	int numCellsProcessed = 0;
+
+	// Second run: compute statistics for classes per country
+	printf("Computing statistics for classes per country\n");
+	numCellsProcessed = 0;
+	while(numCellsProcessed < numCells)
+	{
+		bufSize = min(bufSize, numCells - numCellsProcessed);
+		numCellsProcessed += bufSize;
+		thisFile.read(reinterpret_cast<char*>(bufArea), sizeof(float) * bufSize);
+		inZoneFile.read(reinterpret_cast<char*>(bufZone), sizeof(float) * bufSize);
+		inClassFile.read(reinterpret_cast<char*>(bufClass), sizeof(float) * bufSize);
+		for (int i = 0; i < bufSize; i++)
+		{
+			if ((bufArea[i] != (*this).noDataValue) &&
+				(bufZone[i] != inZoneRaster.noDataValue) &&
+				(bufClass[i] != inClassRaster.noDataValue))
+			{
+				outTable.inc(bufZone[i], (size_t)bufClass[i], bufArea[i]);
+			}
+		}
+		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
+	}
+
+	thisFile.close();
+	inZoneFile.close();
+	inClassFile.close();
+
+	delete [] bufArea;
+	delete [] bufZone;
+	delete [] bufClass;
+
+	// Processing table with computed on previous step statistics
+	printf("Analyzing collected statistics\n");
+
+	tableT::dataT::iterator row = outTable.data.begin();
+	size_t currentCountry = 0;
+	printf("Zone ID\tZone stats\tBest estimate\tBest class\tError\n");
+	while (row != outTable.data.end())
+	{
+		float targetSum = row->first;
+		//cout << "target sum = " << targetSum << endl;
+		float rowSum = (float)0;
+		float resultingSum = (float)0;
+		float absDiff = targetSum;
+		unitResultT rowResult;
+		rowResult.bestClass = -1;
+		rowResult.bestEstimate = rowSum;
+		if (compare_eq(targetSum, (float)0, EPSILON))
+		{
+			rowResult.error = (float)0;
+			rowResult.bestEstimate = (float)0;
+			rowResult.bestClass = maxClass + 1;
+		}
+		else
+		{
+			for (int cl = (int)maxClass; cl >= (int)minClass; cl--)
+			{
+				rowSum += row->second[cl-1];
+				float curDiff = fabs(targetSum - rowSum);
+				if ((curDiff <= absDiff) || (rowResult.bestEstimate == (float)0))
+				{
+					absDiff = curDiff;
+					rowResult.bestEstimate = rowSum;
+					rowResult.bestClass = cl;
+				}
+			}
+			rowResult.error = absDiff;
+		}
+		printf("%d\t%f\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.error);
+		calibratedResults.insert(make_pair<float, unitResultT>(row->first, rowResult));
+		currentCountry++;
+		row++;
+	}
+}
+
 float xplus(float val1, float val2)
 {
 	return val1 + val2;

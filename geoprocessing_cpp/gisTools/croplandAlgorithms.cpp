@@ -1,123 +1,163 @@
 //#include <Python.h>
 #include "raster.h"
+#include "rasterFriends.h"
 
-void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
+void adjustCroplandProbabilityLayer(raster & inAreaRaster,
+									raster & inCountriesRaster,
 									raster & inClassRaster,
-									summaryTableT & calibratedResults)
+									raster & outClassRaster,
+									const runParamsT & params,
+									agreementTableT & agTable
+									)
 {
-	printf("Executing zonal sum by class (as table)\n");
+	printf("Adjusting cropland probability classes\n");
 
-	validateExtent(inZoneRaster);
-	validateExtent(inClassRaster);
-	ASSERT_INT(calibratedResults.size() == 0, OTHER_ERROR);
+	map< float, float * > classesByCountryTable;	// key - country ID, value - vector of areas for all classes
+	map< float, vector<int> > oldToNewClassesMap;	// key - country ID, value - vector of new (adjusted) classes
 
-	string thisHdrPath = (*this).rasterPath + ".hdr";
-	string thisFltPath = (*this).rasterPath + ".flt";
-	string inZoneHdrPath = inZoneRaster.rasterPath + ".hdr";
-	string inZoneFltPath = inZoneRaster.rasterPath + ".flt";
-	string inClassHdrPath = inClassRaster.rasterPath + ".hdr";
-	string inClassFltPath = inClassRaster.rasterPath + ".flt";
+	inAreaRaster.validateExtent(inCountriesRaster);
+	inAreaRaster.validateExtent(inClassRaster);
 
-	// First run: computing statistics for probability raster
-	statisticsStructT probabilityStatistics = inClassRaster.describe();
+	raster::statisticsStructT probabilityStatistics = inClassRaster.describe();
 	size_t maxClass = (size_t)probabilityStatistics.maxVal;
 	size_t minClass = (size_t)probabilityStatistics.minVal;
-	tableT outTable;
-	outTable.setNumCols(maxClass);
-	printf("\tmin class: %d\n", minClass);
-	printf("\tmax class: %d\n", maxClass);
 
-	ifstream thisFile;
-	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
-	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
-	ifstream inZoneFile;
-	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
-	ASSERT_INT(inZoneFile.is_open(), FILE_NOT_OPEN);
+	vector<int> dummyVector(maxClass+1, -999);
+
+	ifstream inAreaFile;
+	inAreaFile.open(inAreaRaster.getFltPath().c_str(), ios::in | ios::binary);
+	ASSERT_INT(inAreaFile.is_open(), FILE_NOT_OPEN);
+	ifstream inCountriesFile;
+	inCountriesFile.open(inCountriesRaster.getFltPath().c_str(), ios::in | ios::binary);
+	ASSERT_INT(inCountriesFile.is_open(), FILE_NOT_OPEN);
 	ifstream inClassFile;
-	inClassFile.open(inClassFltPath.c_str(), ios::out | ios::binary);
+	inClassFile.open(inClassRaster.getFltPath().c_str(), ios::in | ios::binary);
 	ASSERT_INT(inClassFile.is_open(), FILE_NOT_OPEN);
+	ofstream outClassFile;
+	outClassFile.open(outClassRaster.getFltPath().c_str(), ios::out | ios::binary);
 
-	int numCells = (*this).horResolution * (*this).verResolution;
+	long countriesBegin = inCountriesFile.tellg();
+	long classBegin = inClassFile.tellg();
+
+	int numCells = inAreaRaster.horResolution * inAreaRaster.verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
 
 	float * bufArea = new float[bufSize];
-	float * bufZone = new float[bufSize];
+	float * bufCountries = new float[bufSize];
 	float * bufClass = new float[bufSize];
+	float * outBufClass = new float[bufSize];
 
+	printf("Computing statistics for classes per country\n");
 	int numCellsProcessed = 0;
 
-	// Second run: compute statistics for classes per country
-	printf("Computing statistics for classes per country\n");
-	numCellsProcessed = 0;
+	// First run - collecting statistics
 	while(numCellsProcessed < numCells)
 	{
 		bufSize = min(bufSize, numCells - numCellsProcessed);
 		numCellsProcessed += bufSize;
-		thisFile.read(reinterpret_cast<char*>(bufArea), sizeof(float) * bufSize);
-		inZoneFile.read(reinterpret_cast<char*>(bufZone), sizeof(float) * bufSize);
+
+		inAreaFile.read(reinterpret_cast<char*>(bufArea), sizeof(float) * bufSize);
+		inCountriesFile.read(reinterpret_cast<char*>(bufCountries), sizeof(float) * bufSize);
 		inClassFile.read(reinterpret_cast<char*>(bufClass), sizeof(float) * bufSize);
+
 		for (int i = 0; i < bufSize; i++)
 		{
-			if ((bufArea[i] != (*this).noDataValue) &&
-				(bufZone[i] != inZoneRaster.noDataValue) &&
-				(bufClass[i] != inClassRaster.noDataValue))
+			if ((bufClass[i] != inClassRaster.noDataValue) &&
+				(bufCountries[i] != inCountriesRaster.noDataValue) &&
+				(bufArea[i] != inAreaRaster.noDataValue))
 			{
-				outTable.inc(bufZone[i], (size_t)bufClass[i], bufArea[i]);
+				map< float, float * >::iterator it = classesByCountryTable.find(bufCountries[i]);
+				if (it == classesByCountryTable.end())
+				{
+					float * tmp = new float[maxClass];
+					memset(tmp, 0, sizeof(float) * maxClass);
+					classesByCountryTable.insert(make_pair<float, float *>(bufCountries[i], tmp));
+					oldToNewClassesMap.insert(make_pair<float, vector<int> >(bufCountries[i], dummyVector));
+					map< float, float * >::iterator it = classesByCountryTable.find(bufCountries[i]);
+				}
+				it->second[(int)bufClass[i]] += bufArea[i];
 			}
 		}
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
 	}
-
-	thisFile.close();
-	inZoneFile.close();
-	inClassFile.close();
-
-	delete [] bufArea;
-	delete [] bufZone;
-	delete [] bufClass;
-
-	// Processing table with computed on previous step statistics
-	printf("Analyzing collected statistics\n");
-
-	tableT::dataT::iterator row = outTable.data.begin();
-	size_t currentCountry = 0;
-	printf("Zone ID\tZone stats\tBest estimate\tBest class\tError\n");
-	while (row != outTable.data.end())
+	
+	// Second run through the table - rearrange classes
+	map< float, float * >::iterator it = classesByCountryTable.begin();
+	while (it != classesByCountryTable.end())
 	{
-		float targetSum = row->first;
-		//cout << "target sum = " << targetSum << endl;
-		float rowSum = (float)0;
-		float resultingSum = (float)0;
-		float absDiff = targetSum;
-		unitResultT rowResult;
-		rowResult.bestClass = -1;
-		rowResult.bestEstimate = rowSum;
-		if (compare_eq(targetSum, (float)0, EPSILON))
+		for (size_t i = minClass; i < maxClass; i++)
 		{
-			rowResult.error = (float)0;
-			rowResult.bestEstimate = (float)0;
-			rowResult.bestClass = maxClass + 1;
-		}
-		else
-		{
-			for (int cl = (int)maxClass; cl >= (int)minClass; cl--)
+			// it->first - current country ID
+			// i - investigated class
+			// it->second[i] - area of this class
+			// agTable.similarClassesMatrix[i][:] - vector saying true for classes similar to 
+			size_t j = i + 1;
+			while ((j <= maxClass) && agTable.checkSimilarity(i, j))
 			{
-				rowSum += row->second[cl-1];
-				float curDiff = fabs(targetSum - rowSum);
-				if ((curDiff <= absDiff) || (rowResult.bestEstimate == (float)0))
+				if (it->second[i] > it->second[j])
 				{
-					absDiff = curDiff;
-					rowResult.bestEstimate = rowSum;
-					rowResult.bestClass = cl;
+					float swp = it->second[i];
+					it->second[i] = it->second[j];
+					it->second[j] = swp;
+					oldToNewClassesMap[it->first][i] = (int)j;
 				}
+				else
+				{
+					oldToNewClassesMap[it->first][i] = (int)i;
+				}
+				j++;
 			}
-			rowResult.error = absDiff;
 		}
-		printf("%d\t%f\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.error);
-		calibratedResults.insert(make_pair<float, unitResultT>(row->first, rowResult));
-		currentCountry++;
-		row++;
+		
 	}
+
+	// Third run - write adjusted classes into the resulting raster
+	inCountriesFile.seekg(countriesBegin);
+	inClassFile.seekg(classBegin);
+	
+	printf("Writing results to the output file\n");
+	numCellsProcessed = 0;
+
+	while(numCellsProcessed < numCells)
+	{
+		bufSize = min(bufSize, numCells - numCellsProcessed);
+		numCellsProcessed += bufSize;
+
+		inCountriesFile.read(reinterpret_cast<char*>(bufCountries), sizeof(float) * bufSize);
+		inClassFile.read(reinterpret_cast<char*>(bufClass), sizeof(float) * bufSize);
+
+		for (int i = 0; i < bufSize; i++)
+		{
+			if ((bufClass[i] != inClassRaster.noDataValue) &&
+				(bufCountries[i] != inCountriesRaster.noDataValue))
+			{
+				outBufClass[i] = (float)oldToNewClassesMap[bufCountries[i]][(int)bufClass[i]];
+			}
+			else
+			{
+				outBufClass[i] = outClassRaster.noDataValue;
+			}
+		}
+		outClassFile.write(reinterpret_cast<char *>(outBufClass), sizeof(float) * bufSize);
+		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
+	}	
+
+	// Free up memory
+	delete [] bufArea;
+	delete [] bufCountries;
+	delete [] bufClass;
+	delete [] outBufClass;
+
+	it = classesByCountryTable.begin();
+	while (it != classesByCountryTable.end())
+	{
+		delete [] it->second;
+	}
+	classesByCountryTable.clear();
+
+	inAreaFile.close();
+	inCountriesFile.close();
+	inClassFile.close();
 }
 
 void validateCropland(raster & inCroplandRaster,

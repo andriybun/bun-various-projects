@@ -14,9 +14,13 @@ private:
 	size_t numRasters;
 	size_t numClasses;
 	
-	// Map defining the relation between the sum of powers of two 
-	// for the rasters present and the probability class
+	// Map defining the relation between the sum of powers of two
+	// for the rasters present (key) and the probability class
 	int * priorMap;
+
+	// Matrix numClasses x numClasses defining which classes are similar
+	// (i.e. have same sums of priorities for used rasters) to the selected one
+	bool ** similarClassesMatrix;
 
 	map<int, vector<int> > tmpAgreementTable;
 
@@ -32,6 +36,7 @@ public:
 	int getPriority2(size_t idx);
 
 	int getClass(int sumPowers);
+	bool checkSimilarity(size_t class1, size_t class2);
 };
 
 #endif
