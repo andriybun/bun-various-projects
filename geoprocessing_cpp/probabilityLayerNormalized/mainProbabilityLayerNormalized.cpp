@@ -194,7 +194,7 @@ int main(int argc, char * argv[])
 		*(getBackVector[3]),
 		outClassRaster,
 		runParams,
-		priorityData->agTable
+		*(priorityData->agTable)
 		);
 	// END TEST
 
