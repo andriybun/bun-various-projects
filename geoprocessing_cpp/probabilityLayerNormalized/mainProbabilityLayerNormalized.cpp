@@ -136,7 +136,7 @@ int main(int argc, char * argv[])
 	raster resultMax(argv[startResults+3], raster::OUTPUT);
 
 	// TODO float to raster...
-	float selectionThreshold = atof(argv[startResults+4]);
+	float selectionThreshold = (float)atof(argv[startResults+4]);
 
 	//raster resultProbOld((runParams.resultDir + "xxx_prob_old.img").c_str(), raster::OUTPUT);
 	//raster resultProbIsData((runParams.resultDir + "xxx_prob_is_data.img").c_str(), raster::OUTPUT);
@@ -191,11 +191,11 @@ int main(int argc, char * argv[])
 	raster outClassRaster((runParams.resultDir + "adjusted_probability"), raster::OUTPUT);
 	adjustCroplandProbabilityLayer(areaRaster,
 		countriesRaster,
-		getBackVector[3],
+		*(getBackVector[3]),
 		outClassRaster,
 		runParams,
 		priorityData->agTable
-		)
+		);
 	// END TEST
 
 	// Free up memory
