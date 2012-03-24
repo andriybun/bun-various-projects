@@ -72,8 +72,9 @@ void processListOfRasters(const vector<float> & croplandVector,
 		result[1] = percentMin;							// min
 		result[2] = percentMax;							// max
 		result[3] = floor((float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers)) * factor);	// probability
-		//result[4] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers));
-		//result[5] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers));
+		// TEST:
+		result[3] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers));
+		// END TEST
 	}
 	else
 	{
@@ -185,6 +186,17 @@ int main(int argc, char * argv[])
 
 	priorityData->agTable = new agreementTableT(priorityData->prioritiesVector, priorityData->prioritiesVector2);
 	multipleRasterArithmetics(&processListOfRasters, croplandRastersVector, getBackVector, (void *)priorityData);
+
+	// TEST:
+	raster outClassRaster((runParams.resultDir + "adjusted_probability"), raster::OUTPUT);
+	adjustCroplandProbabilityLayer(areaRaster,
+		countriesRaster,
+		getBackVector[3],
+		outClassRaster,
+		runParams,
+		priorityData->agTable
+		)
+	// END TEST
 
 	// Free up memory
 	delete priorityData->agTable;
