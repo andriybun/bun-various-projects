@@ -8,6 +8,8 @@ using namespace std;
 #include "assertInt.h"
 #include "errorCodes.h"
 
+#include "agreementTable.h"
+
 class raster;
 class tableT;
 
@@ -28,11 +30,15 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 							   const vector<raster *> & inRastersVector,
 							   vector<raster *> & outRastersVector,
 							   void * params = NULL);
-//void multipleRasterArithmeticsAsTable(float (*func)(const vector<float> & , vector<float> & ), 
-//									  const vector<raster *> & inRastersVector, 
-//									  tableT & outTable);
 
 // Cropland algorithms:
+void adjustCroplandProbabilityLayer(raster & inAreaRaster,
+									raster & inCountriesRaster,
+									raster & inClassRaster,
+									raster & outClassRaster,
+									const runParamsT & params,
+									agreementTableT & agTable
+									);
 void validateCropland(raster & inCroplandRaster,
 					  raster & inZoneRaster,
 					  raster & inClassRaster,

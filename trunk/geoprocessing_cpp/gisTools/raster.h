@@ -25,7 +25,7 @@
 #include "assertInt.h"
 #include "errorCodes.h"
 #include "tableT.h"
-#include "rasterFriends.h"
+//#include "rasterFriends.h"
 
 
 // Using python.h in raster.cpp requires setting system variable:
@@ -147,6 +147,10 @@ public:
 	void convertRasterToFloat();
 	void convertFloatToRaster();
 
+	// Paths to raster files
+	string getHdrPath();
+	string getFltPath();
+
 	friend void multipleRasterArithmetics(
 		float (*func)(const vector<float> & ), 
 		const vector<raster *> & inRastersVector, 
@@ -160,6 +164,13 @@ public:
 		const vector<raster *> & inRastersVector,
 		vector<raster *> & outRastersVector,
 		void * params);
+	friend void adjustCroplandProbabilityLayer(raster & inAreaRaster,
+		raster & inCountriesRaster,
+		raster & inClassRaster,
+		raster & outClassRaster,
+		const runParamsT & params,
+		agreementTableT & agTable
+		);
 	friend void validateCropland(raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,

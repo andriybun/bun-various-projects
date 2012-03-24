@@ -14,13 +14,36 @@ agreementTableT::agreementTableT(const vector<int> & priorityVec1, const vector<
 	int * vec = new int[numRasters];
 	numClasses = (size_t)(2 << (numRasters - 1)); // pow((double)2, (double)numRasters);
 	priorMap = new int[numClasses];
+	similarClassesMatrix = new bool * [numClasses];
+	for (size_t idx = 0; idx < numClasses; idx++)
+	{
+		similarClassesMatrix[idx] = new bool[numClasses];
+		for (size_t j = 0; j < numClasses; j++)
+		{
+			similarClassesMatrix[idx][j] = false;
+		}
+	}
 	recursive(numRasters, 0, vec);
 	// Process preliminary agreement table
 	map<int, vector<int> >::iterator it = tmpAgreementTable.begin();
 	int cl = 0;
 	while (it != tmpAgreementTable.end())
 	{
-		priorMap[it->second[3]] = cl++;
+		priorMap[it->second[3]] = cl;
+		map<int, vector<int> >::iterator itFwd = it;
+		itFwd++;
+		int clFwd = cl + 1;
+		similarClassesMatrix[cl][cl] = true;
+		while (itFwd != tmpAgreementTable.end())
+		{
+			if ((it->second[1] == itFwd->second[1]) && (it->second[2] == itFwd->second[2]))
+			{
+				similarClassesMatrix[cl][clFwd] = similarClassesMatrix[clFwd][cl] = true;
+			}
+			clFwd++;
+			itFwd++;
+		}
+		cl++;
 		it++;
 	}
 	delete [] vec;
@@ -38,6 +61,15 @@ agreementTableT::agreementTableT(const agreementTableT & g)
 	{
 		priorMap[i] = g.priorMap[i];
 	}
+	similarClassesMatrix = new bool * [numClasses];
+	for (size_t idx = 0; idx < numClasses; idx++)
+	{
+		similarClassesMatrix[idx] = new bool[numClasses];
+		for (size_t j = 0; j < numClasses; j++)
+		{
+			similarClassesMatrix[idx][j] = g.similarClassesMatrix[idx][j];
+		}
+	}
 }
 
 agreementTableT & agreementTableT::operator = (const agreementTableT & g)
@@ -54,12 +86,26 @@ agreementTableT & agreementTableT::operator = (const agreementTableT & g)
 		{
 			priorMap[i] = g.priorMap[i];
 		}
+		similarClassesMatrix = new bool * [numClasses];
+		for (size_t idx = 0; idx < numClasses; idx++)
+		{
+			similarClassesMatrix[idx] = new bool[numClasses];
+			for (size_t j = 0; j < numClasses; j++)
+			{
+				similarClassesMatrix[idx][j] = g.similarClassesMatrix[idx][j];
+			}
+		}
 	}
 }
 
 agreementTableT::~agreementTableT()
 {
 	delete [] priorMap;
+	for (size_t idx = 0; idx < numClasses; idx++)
+	{
+		delete [] similarClassesMatrix[idx];
+	}
+	delete [] similarClassesMatrix;
 }
 
 void agreementTableT::recursive(size_t n, size_t idx, int * vec)
@@ -134,4 +180,9 @@ int agreementTableT::getPriority2(size_t idx)
 int agreementTableT::getClass(int sumPowers)
 {
 	return priorMap[sumPowers];
+}
+
+bool agreementTableT::checkSimilarity(size_t class1, size_t class2)
+{
+	return similarClassesMatrix[class1][class2];
 }
