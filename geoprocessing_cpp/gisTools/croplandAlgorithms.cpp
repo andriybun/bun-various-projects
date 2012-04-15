@@ -73,7 +73,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 					memset(tmp, 0, sizeof(float) * maxClass);
 					classesByCountryTable.insert(make_pair<float, float *>(bufCountries[i], tmp));
 					oldToNewClassesMap.insert(make_pair<float, vector<int> >(bufCountries[i], dummyVector));
-					map< float, float * >::iterator it = classesByCountryTable.find(bufCountries[i]);
+					/*map< float, float * >::iterator */it = classesByCountryTable.find(bufCountries[i]);
 				}
 				it->second[(int)bufClass[i]] += bufArea[i];
 			}
@@ -85,6 +85,17 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	map< float, float * >::iterator it = classesByCountryTable.begin();
 	while (it != classesByCountryTable.end())
 	{
+		for (int x = 0; x < maxClass; x++)
+		{
+			printf("%f  ", it->second[x]);
+		}
+		printf("\n");
+		
+		for (size_t i = minClass; i < maxClass; i++)
+		{
+			oldToNewClassesMap[it->first][i] = -1;
+		}
+
 		for (size_t i = minClass; i < maxClass; i++)
 		{
 			// it->first - current country ID
@@ -92,22 +103,31 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 			// it->second[i] - area of this class
 			// agTable.similarClassesMatrix[i][:] - vector saying true for classes similar to 
 			size_t j = i + 1;
+			
+			oldToNewClassesMap[it->first][i] = (int)i;
+
 			while ((j <= maxClass) && agTable.checkSimilarity(i, j))
 			{
-				if (it->second[i] > it->second[j])
+				if (it->second[j] > it->second[i])
 				{
 					float swp = it->second[i];
 					it->second[i] = it->second[j];
 					it->second[j] = swp;
-					oldToNewClassesMap[it->first][i] = (int)j;
-				}
-				else
-				{
-					oldToNewClassesMap[it->first][i] = (int)i;
+					oldToNewClassesMap[it->first][i] = (oldToNewClassesMap[it->first][j] >= 0) 
+						? oldToNewClassesMap[it->first][j] 
+						: (int)j;
+					oldToNewClassesMap[it->first][j] = (int)i;
 				}
 				j++;
 			}
 		}
+
+		for (int x = 0; x < maxClass; x++)
+		{
+			printf("%d  ", oldToNewClassesMap[it->first][x]);
+		}
+		printf("\n");
+		system("pause");
 		
 	}
 
