@@ -91,7 +91,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 		}
 		printf("\n");
 		
-		for (size_t i = minClass; i < maxClass; i++)
+		for (size_t i = 0; i < maxClass; i++)
 		{
 			oldToNewClassesMap[it->first][i] = -1;
 		}
@@ -102,24 +102,27 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 			// i - investigated class
 			// it->second[i] - area of this class
 			// agTable.similarClassesMatrix[i][:] - vector saying true for classes similar to 
-			size_t j = i + 1;
-			
 			oldToNewClassesMap[it->first][i] = (int)i;
 
+			float swp = (float)-1;
+			int swpClass = -1;
+
+			size_t j = i;
 			while ((j <= maxClass) && agTable.checkSimilarity(i, j))
 			{
-				if (it->second[j] > it->second[i])
+				if (it->second[j] > swp)
 				{
-					float swp = it->second[i];
-					it->second[i] = it->second[j];
-					it->second[j] = swp;
-					oldToNewClassesMap[it->first][i] = (oldToNewClassesMap[it->first][j] >= 0) 
-						? oldToNewClassesMap[it->first][j] 
-						: (int)j;
-					oldToNewClassesMap[it->first][j] = (int)i;
+					swp = it->second[j];
+					swpClass = j;
 				}
 				j++;
 			}
+			it->second[swpClass] = it->second[i];
+			it->second[i] = swp;
+			
+			oldToNewClassesMap[it->first][i] = swpClass;
+			oldToNewClassesMap[it->first][swpClass] = (int)i;
+
 		}
 
 		for (int x = 0; x < maxClass; x++)
