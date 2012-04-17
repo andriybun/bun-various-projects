@@ -35,6 +35,9 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	ASSERT_INT(inClassFile.is_open(), FILE_NOT_OPEN);
 	ofstream outClassFile;
 	outClassFile.open(outClassRaster.getFltPath().c_str(), ios::out | ios::binary);
+	
+	inAreaRaster.copyFile(inAreaRaster.getHdrPath(), outClassRaster.getHdrPath());
+	inAreaRaster.copyProperties(outClassRaster);
 
 	long countriesBegin = inCountriesFile.tellg();
 	long classBegin = inClassFile.tellg();
@@ -69,8 +72,9 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 				map< float, float * >::iterator it = classesByCountryTable.find(bufCountries[i]);
 				if (it == classesByCountryTable.end())
 				{
-					float * tmp = new float[maxClass];
-					memset(tmp, 0, sizeof(float) * maxClass);
+					printf("  > adding: c = %d\n", (int)bufCountries[i]);
+					float * tmp = new float[maxClass + 1];
+					memset(tmp, 0, sizeof(float) * (maxClass + 1));
 					classesByCountryTable.insert(make_pair<float, float *>(bufCountries[i], tmp));
 					oldToNewClassesMap.insert(make_pair<float, vector<int> >(bufCountries[i], dummyVector));
 					/*map< float, float * >::iterator */it = classesByCountryTable.find(bufCountries[i]);
@@ -132,6 +136,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 		printf("\n");
 		system("pause");
 		
+		it++;
 	}
 
 	// Third run - write adjusted classes into the resulting raster
@@ -140,6 +145,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	
 	printf("Writing results to the output file\n");
 	numCellsProcessed = 0;
+	bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
 
 	while(numCellsProcessed < numCells)
 	{
@@ -175,6 +181,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	while (it != classesByCountryTable.end())
 	{
 		delete [] it->second;
+		it++;
 	}
 	classesByCountryTable.clear();
 
@@ -684,7 +691,7 @@ void getValidatedResults(const vector<float> & valVector,
 	else
 	{
 		result[0] = fabs(stat - computed);
-		result[1] = result[0] / stat * (float)100;
+		result[1] = (stat != 0) ? result[0] / stat * (float)100 : (float)0;
 	}
 }
 
