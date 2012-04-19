@@ -89,11 +89,11 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	map< float, float * >::iterator it = classesByCountryTable.begin();
 	while (it != classesByCountryTable.end())
 	{
-		for (int x = 0; x < maxClass; x++)
-		{
-			printf("%f  ", it->second[x]);
-		}
-		printf("\n");
+		//for (int x = 0; x < maxClass; x++)
+		//{
+		//	printf("%f  ", it->second[x]);
+		//}
+		//printf("\n");
 		
 		for (size_t i = 0; i < maxClass; i++)
 		{
@@ -106,35 +106,54 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 			// i - investigated class
 			// it->second[i] - area of this class
 			// agTable.similarClassesMatrix[i][:] - vector saying true for classes similar to 
-			oldToNewClassesMap[it->first][i] = (int)i;
+			oldToNewClassesMap[it->first][i] = (oldToNewClassesMap[it->first][i] < 0) ? (int)i : oldToNewClassesMap[it->first][i];
 
-			float swp = (float)-1;
-			int swpClass = -1;
+			float swp = it->second[i];
+			int swpClass = i;
+			bool swpFl = false;
 
-			size_t j = i;
+			size_t j = i + 1;
 			while ((j <= maxClass) && agTable.checkSimilarity(i, j))
 			{
 				if (it->second[j] > swp)
 				{
 					swp = it->second[j];
 					swpClass = j;
+					swpFl = true;
 				}
 				j++;
 			}
-			it->second[swpClass] = it->second[i];
-			it->second[i] = swp;
 			
-			oldToNewClassesMap[it->first][i] = swpClass;
-			oldToNewClassesMap[it->first][swpClass] = (int)i;
+			if (swpFl)
+			{
+				it->second[swpClass] = it->second[i];
+				it->second[i] = swp;
+				int subs = oldToNewClassesMap[it->first][i];
+				oldToNewClassesMap[it->first][i] = (oldToNewClassesMap[it->first][swpClass] < 0)
+					? (int)swpClass
+					: oldToNewClassesMap[it->first][swpClass];
+				oldToNewClassesMap[it->first][swpClass] = subs;
+			}
 
+			//printf(" > (%d) ", i);
+			//for (int x = 0; x < maxClass; x++)
+			//{
+			//	printf("%d  ", oldToNewClassesMap[it->first][x]);
+			//}
+			//printf("\n");
 		}
-
-		for (int x = 0; x < maxClass; x++)
-		{
-			printf("%d  ", oldToNewClassesMap[it->first][x]);
-		}
-		printf("\n");
-		system("pause");
+		//printf("==========\n");
+		//for (int x = 0; x < maxClass; x++)
+		//{
+		//	printf("%d  ", oldToNewClassesMap[it->first][x]);
+		//}
+		//printf("\n");
+		//for (int x = 0; x < maxClass; x++)
+		//{
+		//	printf("%f  ", it->second[x]);
+		//}
+		//printf("\n");
+		//system("pause");
 		
 		it++;
 	}
