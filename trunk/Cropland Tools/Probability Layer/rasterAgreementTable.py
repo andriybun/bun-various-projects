@@ -8,6 +8,13 @@ Created on Wed Dec 08 22:16:02 2010
 
 from utils import *
 
+def invertPriorities(priorityVector):
+    maxVal = max(priorityVector) + 1
+    res = []
+    for val in priorityVector:
+        res.append(maxVal - val)
+    return res  
+
 class rasterAgreementTable():
     
     def __init__(self, priorityValues1, priorityValues2 = []):
@@ -226,9 +233,9 @@ class rasterAgreementTable():
     def PrintToFile(self, file, listOfRasters = None):
         import os
         file.write('Priority values 1:\n')
-        file.write(str(self.priorityValues1) + '\n')
+        file.write(str(invertPriorities(self.priorityValues1)) + '\n')
         file.write('Priority values 2:\n')
-        file.write(str(self.priorityValues2) + '\n')
+        file.write(str(invertPriorities(self.priorityValues2)) + '\n')
         i = 0;
         tableCaption = 'Raster agreement table\n'
         headerSeparator = '-------------------------------'

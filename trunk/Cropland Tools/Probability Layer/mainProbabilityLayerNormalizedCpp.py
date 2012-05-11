@@ -7,7 +7,7 @@ import os
 import subprocess
 import shutil
 
-from rasterAgreementTable import rasterAgreementTable
+from rasterAgreementTable import invertPriorities, rasterAgreementTable
 
 def ones(size):
     xRes = []
@@ -15,12 +15,12 @@ def ones(size):
         xRes.append(1)
     return xRes
 
-def invertPriorities(priorityVector):
-    maxVal = max(priorityVector) + 1
-    res = []
-    for val in priorityVector:
-        res.append(maxVal - val)
-    return res    
+#def invertPriorities(priorityVector):
+#    maxVal = max(priorityVector) + 1
+#    res = []
+#    for val in priorityVector:
+#        res.append(maxVal - val)
+#    return res    
 
 def vectorToStr(vec):
     return str(vec).replace('[', '').replace(']', '').replace(',', '')
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     if not os.path.exists(tmpDir):
         os.mkdir(tmpDir)
         deleteTmpDir = True
-    
+
     executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" %s' % ( \
         runFileName, \
         workingDir, \
