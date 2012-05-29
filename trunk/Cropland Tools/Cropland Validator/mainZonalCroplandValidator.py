@@ -1,57 +1,83 @@
 '''
-# Name:     ArcGIS interface for smth
-# Created:  30/09/2010
+# Name:     Python launcher for cropland validator C++ code
+# Created:  10/12/2011
 # Author:   Andriy Bun, andr.bun@gmail.com
 # Modified: 
 '''
 
 import sys
 import os
+import shutil
+import subprocess
+import arcgisscripting
+
 commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
 sys.path.append(commonDir)
 
 from common import *
-from iterableStruct import iterableStruct
-from runAll import runAll
-import arcgisscripting
-from GeoprocessingInfo import GeoprocessingInfo, GeoprocessingInfo_debug
 
-# pass GUI arguments to variables
-inputsNotClipped = iterableStruct()
+if __name__ == "__main__":
+    workingDir = os.path.dirname(sys.argv[0])
+    os.chdir(workingDir)
+    # runFileName = workingDir + "\\croplandValidator.exe"
+    runFileName = "croplandValidator.exe"
+    
+    areaGrid         = sys.argv[1]
+    statisticsLevel0 = sys.argv[2]
+    statisticsLevel1 = sys.argv[3]
+    statisticsLevel2 = sys.argv[4]
+    probabilityGrid  = sys.argv[5]
+    statLayer        = sys.argv[6]
+    output           = os.path.splitext(sys.argv[9])[0]
+    
+    resultDir        = os.path.dirname(output)
+    tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
+    deleteTmpDir = False
+	
+    if not os.path.exists(tmpDir):
+        os.mkdir(tmpDir)
+        deleteTmpDir = True
 
-inputsNotClipped.cell_area        = sys.argv[1]
-inputsNotClipped.countries        = sys.argv[2]
-inputsNotClipped.subnationalUnits = sys.argv[3]
-inputsNotClipped.subregionalUnits = sys.argv[4]
-inputsNotClipped.mark_high_32     = sys.argv[5]
-inputsNotClipped.statLayer        = sys.argv[6]
+    clippedAreaGrid         = tmpDir + "\\area"
+    clippedStatisticsLevel0 = tmpDir + "\\stat0"
+    clippedStatisticsLevel1 = tmpDir + "\\stat1"
+    clippedStatisticsLevel2 = tmpDir + "\\stat2"
+    clippedProbabilityGrid  = tmpDir + "\\prob"
+    clippedStatLayer        = tmpDir + "\\minavgmax"
 
-# Clipping a particular region
-conditionalRaster = sys.argv[7]
-zonalCondition = sys.argv[8]
-if (conditionalRaster == '#') or (zonalCondition == '#'):
-    coords = None
-else:
-    gp = arcgisscripting.create ()
-    gp.AddMessage('Started clipping input rasters')
-    clippedLevel0 = GetTmpDir() + "clippedLevel0.img"
-    clippedLevel1 = GetTmpDir() + "clippedLevel1.img"
-    clippedLevel2 = GetTmpDir() + "clippedLevel2.img"
-    ConClip(conditionalRaster, inputsNotClipped.countries, zonalCondition, clippedLevel0)
-    ConClip(conditionalRaster, inputsNotClipped.subnationalUnits, zonalCondition, clippedLevel1)
-    ConClip(conditionalRaster, inputsNotClipped.subregionalUnits, zonalCondition, clippedLevel2)
-    inputsNotClipped.countries = clippedLevel0
-    inputsNotClipped.subnationalUnits = clippedLevel1
-    inputsNotClipped.subregionalUnits = clippedLevel2
-    desc = gp.Describe(inputsNotClipped.countries)
+    gp = arcgisscripting.create()
+    conditionalRaster = sys.argv[7]
+    zonalCondition = sys.argv[8]
+    ConClip(conditionalRaster, areaGrid, zonalCondition, clippedAreaGrid + ".img")
+    desc = gp.Describe(clippedAreaGrid)
     coords = desc.Extent
-    gp.AddMessage('Clipped maps. The resulting extent will be:')
-    gp.AddMessage(coords)
+	
+    ConClip(conditionalRaster, statisticsLevel0, zonalCondition, clippedStatisticsLevel0 + ".img")
+    ConClip(conditionalRaster, statisticsLevel1, zonalCondition, clippedStatisticsLevel1 + ".img")
+    ConClip(conditionalRaster, statisticsLevel2, zonalCondition, clippedStatisticsLevel2 + ".img")
+    gp.Clip_management(probabilityGrid, coords, clippedProbabilityGrid + ".img")
+    gp.Clip_management(statLayer, coords, clippedStatLayer + ".img")
+#    ConClip(conditionalRaster, probabilityGrid, zonalCondition, clippedProbabilityGrid + ".img")
+#    ConClip(conditionalRaster, statLayer, zonalCondition, clippedStatLayer + ".img")
+	
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
+        runFileName, \
+        workingDir, \
+        resultDir, \
+        tmpDir, \
+        clippedAreaGrid, \
+        clippedStatisticsLevel0, \
+        clippedStatisticsLevel1, \
+        clippedStatisticsLevel2, \
+        clippedProbabilityGrid, \
+        clippedStatLayer, \
+        output)
 
-# End clipping
+    os.chdir(workingDir)
+    callResult = subprocess.call(executeCommand)
 
-output = sys.argv[9]
-
-interface = GeoprocessingInfo()
-
-runAll(interface, coords, inputsNotClipped, output, sys.argv)
+    if deleteTmpDir:
+        shutil.rmtree(tmpDir)
+        
+    if not(callResult == 0):
+        raise Exception('Error! Function returned error code %d!' % callResult)
