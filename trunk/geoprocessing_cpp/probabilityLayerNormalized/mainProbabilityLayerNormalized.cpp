@@ -69,12 +69,14 @@ void processListOfRasters(const vector<float> & croplandVector,
 			? (float)order / (float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers))
 			: (float)1;
 		result[0] = sumData / countData;				// avg
-		result[1] = percentMin;							// min
-		result[2] = percentMax;							// max
-		result[3] = floor((float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers)) * factor);	// probability
-		// TEST:
-		result[3] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers));
-		// END TEST
+		result[2] = (percentMin + result[0]) / 2;		// min avg
+		result[2] = percentMin;							// min
+		result[4] = (percentMax + result[0]) / 2;		// max avg
+		result[4] = percentMax;							// max
+		result[5] = floor((float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers)) * factor);	// probability
+		//// TEST:
+		//result[3] = (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers));
+		//// END TEST
 	}
 	else
 	{
@@ -82,8 +84,8 @@ void processListOfRasters(const vector<float> & croplandVector,
 		result[1] = noDataOutVector[1];
 		result[2] = noDataOutVector[2];
 		result[3] = noDataOutVector[3];
-		//result[4] = noDataOutVector[4];
-		//result[5] = noDataOutVector[5];
+		result[4] = noDataOutVector[4];
+		result[5] = noDataOutVector[5];
 	}
 }
 
@@ -102,8 +104,10 @@ int main(int argc, char * argv[])
 	// 10.. - list of rasters weights
 	// 11.. - resulting probability classes raster
 	// 12.. - resulting average raster
-	// 13.. - resulting minimum raster
-	// 14.. - resulting maximum raster
+	// 13.. - resulting minimum average raster
+	// 14.. - resulting minimum raster
+	// 15.. - resulting maximum average raster
+	// 16.. - resulting maximum raster
 
 	printf("Start: ");
 	outputLocalTime();
@@ -132,8 +136,10 @@ int main(int argc, char * argv[])
 	// Resulting rasters
 	raster resultProb(argv[startResults+0], raster::OUTPUT);
 	raster resultAvg(argv[startResults+1], raster::OUTPUT);
-	raster resultMin(argv[startResults+2], raster::OUTPUT);
-	raster resultMax(argv[startResults+3], raster::OUTPUT);
+	raster resultMinAvg(argv[startResults+2], raster::OUTPUT);
+	raster resultMin(argv[startResults+3], raster::OUTPUT);
+	raster resultMaxAvg(argv[startResults+4], raster::OUTPUT);
+	raster resultMax(argv[startResults+5], raster::OUTPUT);
 
 	// TODO float to raster...
 	float selectionThreshold = (float)atof(argv[startResults+4]);
@@ -151,19 +157,14 @@ int main(int argc, char * argv[])
 	priorityData->weightsVector.resize(numRasters);
 
 	vector<raster *> getBackVector;
-	//getBackVector.resize(4);
-	//getBackVector[0] = &resultAvg;
-	//getBackVector[1] = &resultMin;
-	//getBackVector[2] = &resultMax;
-	//getBackVector[3] = &resultProb;
 
-	getBackVector.resize(4);
+	getBackVector.resize(6);
 	getBackVector[0] = &resultAvg;
-	getBackVector[1] = &resultMin;
-	getBackVector[2] = &resultMax;
-	getBackVector[3] = &resultProb;
-	//getBackVector[4] = &resultProbOld;
-	//getBackVector[5] = &resultProbIsData;
+	getBackVector[1] = &resultMinAvg;
+	getBackVector[2] = &resultMin;
+	getBackVector[3] = &resultMaxAvg;
+	getBackVector[4] = &resultMax;
+	getBackVector[5] = &resultProb;
 
 	// Initializing vector of cropland rasters and related vectors
 	for (size_t idx = 0; idx < (size_t)numRasters; idx++)
