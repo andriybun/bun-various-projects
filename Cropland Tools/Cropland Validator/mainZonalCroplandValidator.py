@@ -49,9 +49,9 @@ if __name__ == "__main__":
     conditionalRaster = sys.argv[7]
     zonalCondition = sys.argv[8]
     ConClip(conditionalRaster, areaGrid, zonalCondition, clippedAreaGrid + ".img")
-    desc = gp.Describe(clippedAreaGrid)
+    desc = gp.Describe(clippedAreaGrid + ".img")
     coords = desc.Extent
-	
+
     ConClip(conditionalRaster, statisticsLevel0, zonalCondition, clippedStatisticsLevel0 + ".img")
     ConClip(conditionalRaster, statisticsLevel1, zonalCondition, clippedStatisticsLevel1 + ".img")
     ConClip(conditionalRaster, statisticsLevel2, zonalCondition, clippedStatisticsLevel2 + ".img")
