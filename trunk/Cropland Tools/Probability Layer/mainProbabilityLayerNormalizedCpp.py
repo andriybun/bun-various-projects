@@ -76,9 +76,11 @@ if __name__ == "__main__":
     resultProb = os.path.splitext(sys.argv[7].replace("'",""))[0]
     resultNameTuple = os.path.splitext(resultProb)
     descriptionFileName = resultNameTuple[0] + ".txt"
-    resultAvg = resultNameTuple[0] + "_avg"
-    resultMin = resultNameTuple[0] + "_min"
-    resultMax = resultNameTuple[0] + "_max"
+    resultAvg       = resultNameTuple[0] + "_avg"
+    resultMinAvg    = resultNameTuple[0] + "_minavg"
+    resultMin       = resultNameTuple[0] + "_min"
+    resultMaxAvg    = resultNameTuple[0] + "_maxavg"
+    resultMax       = resultNameTuple[0] + "_max"
     
     # Process priorities:
     print descriptionFileName
@@ -94,7 +96,7 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
 
-    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" %s' % ( \
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
         runFileName, \
         workingDir, \
         resultDir, \
@@ -108,9 +110,10 @@ if __name__ == "__main__":
         vectorToStr(agreementTable.weights), \
         resultProb, \
         resultAvg, \
+        resultMinAvg, \
         resultMin, \
-        resultMax, \
-        selectionThreshold)
+        resultMaxAvg, \
+        resultMax)
 
 #    print '==============='
 #    print executeCommand
