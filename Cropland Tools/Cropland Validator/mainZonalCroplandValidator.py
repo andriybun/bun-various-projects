@@ -75,7 +75,7 @@ if __name__ == "__main__":
         outputList = [output]
 
     for idx in range(0, numStatistics):
-        gp.Clip_management(statList[idx], coords, clippedStatLayer + ".img")
+        gp.Clip_management(statList[idx] + ".img", coords, clippedStatLayer + ".img")
         
         executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
             runFileName, \
