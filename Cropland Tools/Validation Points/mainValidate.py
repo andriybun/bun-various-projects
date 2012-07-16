@@ -9,13 +9,20 @@ Author:         AndriyBun
 """
 
 from parseExcel import parseValidationPointsExcel
-#from calculateDiff import calculateDiff
+from calculateDiff import calculateDiff
+
+import arcgisscripting
 
 if __name__ == "__main__":
     
     validationPoints = parseValidationPointsExcel("..\\Data\\validation_points.xls")
     
-    numVP = len(validationPoints)
+    ## Parse path to excel with validation points
+    ## Parse list of input rasters    
     
-    print numVP
+    
+    
+    diffCalculator = calculateDiff(inRastersList)
+    diffScores = diffCalculator.calculateDiff(validationPoints)
+    
     
