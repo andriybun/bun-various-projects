@@ -25,13 +25,12 @@ if __name__ == "__main__":
     statLayer        = os.path.splitext(sys.argv[6])[0]
     output           = os.path.splitext(sys.argv[7])[0]
     
-    statTypes = ["min", "minavg", "avg", "maxavg", "max"]
-    numStatistics = len(statTypes)
-    
     statList = []
     outputList = []
     if statLayer == "#":
         # no raster specified, running for all types of statistics
+        statTypes = ["min", "minavg", "avg", "maxavg", "max"]
+        numStatistics = len(statTypes)
         for statType in statTypes:
             statList.append(probabilityGrid + "_" + statType)
             outputList.append(probabilityGrid + "_" + statType + "_cropland")
@@ -42,6 +41,7 @@ if __name__ == "__main__":
         # statistics raster specified, running only for it
         statList = [statLayer]
         outputList = [output]
+        numStatistics = 1
     
     resultDir        = os.path.dirname(output)
     tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
@@ -63,11 +63,13 @@ if __name__ == "__main__":
             probabilityGrid, \
             statList[idx], \
             outputList[idx])
-    
+
         callResult = subprocess.call(executeCommand)
+        
+        if not(callResult == 0):
+            if deleteTmpDir:
+                shutil.rmtree(tmpDir)
+            raise Exception('Error! Function returned error code %d!' % callResult)
 
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
-        
-    if not(callResult == 0):
-        raise Exception('Error! Function returned error code %d!' % callResult)
