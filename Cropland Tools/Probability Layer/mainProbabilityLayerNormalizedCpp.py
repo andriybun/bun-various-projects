@@ -83,7 +83,7 @@ if __name__ == "__main__":
     resultMax       = resultNameTuple[0] + "_max"
     
     # Process priorities:
-    print descriptionFileName
+
     agreementTable = rasterAgreementTable(priorityValues, priorityValues2)
     descriptionFile = open(descriptionFileName, 'w')
     agreementTable.PrintToFile(descriptionFile, croplandLayerList)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
 
-    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" "%s" "%s" %s' % ( \
         runFileName, \
         workingDir, \
         resultDir, \
@@ -113,12 +113,13 @@ if __name__ == "__main__":
         resultMinAvg, \
         resultMin, \
         resultMaxAvg, \
-        resultMax)
+        resultMax, \
+        selectionThreshold)
 
-#    print '==============='
-#    print executeCommand
-#    print '==============='
-#    raise Exception('111')
+#    import arcgisscripting
+#    gp = arcgisscripting.create()
+#    gp.AddMessage(executeCommand)
+#    raise Exception("======================")
 
     callResult = subprocess.call(executeCommand)
 
