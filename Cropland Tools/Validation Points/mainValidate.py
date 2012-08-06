@@ -11,18 +11,22 @@ Author:         AndriyBun
 from parseExcel import parseValidationPointsExcel
 from calculateDiff import calculateDiff
 
+import sys
+import os
 import arcgisscripting
 
 if __name__ == "__main__":
     
-    validationPoints = parseValidationPointsExcel("..\\Data\\validation_points.xls")
+    workingDir = os.path.dirname(sys.argv[0])
+    os.chdir(workingDir)    
     
-    ## Parse path to excel with validation points
-    ## Parse list of input rasters    
+    inRastersList = (sys.argv[1].replace("'","")).split(";")
     
-    
+    ## CHANGE THIS TO PASSED PATH
+    validationPoints = parseValidationPointsExcel("..\\Data\\validation_points.csv")
     
     diffCalculator = calculateDiff(inRastersList)
     diffScores = diffCalculator.calculateDiff(validationPoints)
+    diffCalculator.printScores()
     
     
