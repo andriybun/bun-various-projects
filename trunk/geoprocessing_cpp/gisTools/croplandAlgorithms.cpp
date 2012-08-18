@@ -135,26 +135,8 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 				oldToNewClassesMap[it->first][swpClass] = subs;
 			}
 
-			//printf(" > (%d) ", i);
-			//for (int x = 0; x < maxClass; x++)
-			//{
-			//	printf("%d  ", oldToNewClassesMap[it->first][x]);
-			//}
-			//printf("\n");
 		}
-		//printf("==========\n");
-		//for (int x = 0; x < maxClass; x++)
-		//{
-		//	printf("%d  ", oldToNewClassesMap[it->first][x]);
-		//}
-		//printf("\n");
-		//for (int x = 0; x < maxClass; x++)
-		//{
-		//	printf("%f  ", it->second[x]);
-		//}
-		//printf("\n");
-		//system("pause");
-		
+	
 		it++;
 	}
 
@@ -694,6 +676,11 @@ void calibrateCropland(raster & inCroplandRaster,
 	printf(__TIME__ "\n");
 }
 
+float preprocessCellAreasInt(float area, float stat)
+{
+	return (area / (float)10) * (stat / (float)100);
+}
+
 void getValidatedResults(const vector<float> & valVector,
 						 const vector<float> & noDataValuesVector,
 						 const vector<float> & noDataValuesOutVector,
@@ -702,36 +689,61 @@ void getValidatedResults(const vector<float> & valVector,
 	float stat = valVector[0];
 	float computed = valVector[1];
 
-	if (compare_eq(stat, noDataValuesVector[0], EPSILON) || compare_eq(computed, noDataValuesVector[1], EPSILON))
+	if (compare_eq(stat, noDataValuesVector[0], EPSILON) 
+		|| compare_eq(computed, noDataValuesVector[1], EPSILON))
 	{
 		result[0] = noDataValuesOutVector[0];
 		result[1] = noDataValuesOutVector[1];
+		result[2] = noDataValuesOutVector[2];
+		result[3] = noDataValuesOutVector[3];
 	}
 	else
 	{
 		result[0] = fabs(stat - computed);
 		result[1] = (stat != 0) ? result[0] / stat * (float)100 : (float)0;
+		result[3] = (computed < stat) 
+			? (float)1 + ((stat - computed) / computed)
+			: (float)1 - ((computed - stat) / computed);
+
+		if (compare_eq(valVector[2], noDataValuesVector[2], EPSILON))
+		{
+			result[2] = noDataValuesOutVector[2];
+		}
+		else
+		{
+			result[2] = xmin((float)100, (computed < stat) 
+				? valVector[2] * result[3] //((float)1 + ((stat - computed) / computed))
+				: valVector[2] * result[3] //((float)1 - ((computed - stat) / computed))
+				);
+		}
 	}
 }
 
-void validateResult(raster & cellAreaStatRaster,
+void validateResult(raster & areaRaster,
+					raster & computedResultRaster,
 					raster & statisticsRaster,
+					raster & outNormalizedRasterLevel2,
 					raster & outAbsDiffRaster,
 					raster & outRelDiffRaster,
 					const runParamsT & runParams)
 {
-	//
+	raster tmpComputedAreasRaster(runParams.tmpDir + "tmp_computed_areas", raster::TEMPORARY);
 	raster tmpResultingAreasRaster(runParams.tmpDir + "tmp_resulting_areas", raster::TEMPORARY);
+	raster tmpRatioRaster(runParams.resultDir + "tmp_ratio", raster::OUTPUT);
 
-	cellAreaStatRaster.zonalStatistics(statisticsRaster, tmpResultingAreasRaster, raster::SUM);
+	areaRaster.rasterArithmetics(&preprocessCellAreasInt, computedResultRaster, tmpComputedAreasRaster);
+	tmpComputedAreasRaster.zonalStatistics(statisticsRaster, tmpResultingAreasRaster, raster::SUM);
 
 	vector<raster *> passVector;
 	passVector.push_back(&statisticsRaster);
 	passVector.push_back(&tmpResultingAreasRaster);
+	passVector.push_back(&computedResultRaster);
 
 	vector<raster *> getBackVector;
 	getBackVector.push_back(&outAbsDiffRaster);
 	getBackVector.push_back(&outRelDiffRaster);
+	getBackVector.push_back(&outNormalizedRasterLevel2);
+	getBackVector.push_back(&tmpRatioRaster);
 
 	multipleRasterArithmetics(&getValidatedResults, passVector, getBackVector);	
 }
