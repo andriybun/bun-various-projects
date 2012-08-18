@@ -77,7 +77,7 @@ void processListOfRasters(const vector<float> & croplandVector,
 		// Show areas where an overshooting was
 		if (result[5] > order)
 		{
-			result[5] = order;
+			result[5] = (float)order;
 			result[6] = (float)1;
 		}
 		else
@@ -150,7 +150,7 @@ int main(int argc, char * argv[])
 	raster resultMaxAvg(argv[startResults+5], raster::OUTPUT);
 
 	// TODO float to raster...
-	float selectionThreshold = (float)atof(argv[startResults+4]);
+	float selectionThreshold = (float)atof(argv[startResults+6]);
 
 	raster resultOverflow((runParams.resultDir + "warning_overflow.img").c_str(), raster::OUTPUT);
 
@@ -200,7 +200,7 @@ int main(int argc, char * argv[])
 	raster outClassRaster((runParams.resultDir + "adjusted_probability"), raster::OUTPUT);
 	adjustCroplandProbabilityLayer(areaRaster,
 		countriesRaster,
-		*(getBackVector[3]),
+		*(getBackVector[5]),
 		outClassRaster,
 		runParams,
 		*(priorityData->agTable)

@@ -63,7 +63,7 @@ void processListOfRasters(const vector<float> & croplandVector,
 	result[3] = isData ? (result[0] + result[4]) / 2 : noDataOutVector[3];	// max avg
 	result[5] = isData																	// probability
 		? (float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers))
-		: noDataOutVector[3];
+		: noDataOutVector[5];
 }
 
 int main(int argc, char * argv[])
