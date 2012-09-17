@@ -13,7 +13,7 @@ import arcgisscripting
 
 class calculateDiff:
     def __init__(self, croplandLayerList):
-        gp = arcgisscripting.create()
+        self.gp = arcgisscripting.create()
         self.croplandLayerList = croplandLayerList
     
     def calculateDiff(self, validationPoints):
@@ -25,7 +25,7 @@ class calculateDiff:
         """
         diffScores = []
         self.diffScoresNormalized = []
-        
+        # Add progress bar
         for raster in self.croplandLayerList:
             diff = 0
             for vp in validationPoints:
@@ -34,19 +34,19 @@ class calculateDiff:
                 """
                 In order to change calculation method of the similarity score - change the next line
                 """
-                diff += (croplandValue - vp.crPerc)**2
+                diff += (float(croplandValue) - vp.crPerc)**2
             diffScores.append(diff)
 
         
         for score in diffScores:
-            self.diffScoresNormalized = score / max(diffScores)
+            self.diffScoresNormalized.append(score / max(diffScores))
         
         return self.diffScoresNormalized
         
     def printScores(self):
         numRasters = len(self.croplandLayerList)
         
-        self.gp.AddMessage("%30s - %s" % ("Raster name", "Score (lowest score - best agreement)"))
+        self.gp.AddMessage("%30s - %s" % ("Raster name    ", "Score (lowest score - best agreement)"))
         for idx in range(numRasters):
-            self.gp.AddMessage("%30s - %3.2f" % (os.path.basename(self.croplandLayerList[idx]), \
+            self.gp.AddMessage("%30s - %6.5f" % (os.path.basename(self.croplandLayerList[idx]), \
                 self.diffScoresNormalized[idx]))
