@@ -13,7 +13,6 @@ from calculateDiff import calculateDiff
 
 import sys
 import os
-import arcgisscripting
 
 if __name__ == "__main__":
     
