@@ -20,9 +20,10 @@ if __name__ == "__main__":
     os.chdir(workingDir)    
     
     inRastersList = (sys.argv[1].replace("'","")).split(";")
+    inExcelPath = sys.argv[2]
     
     ## CHANGE THIS TO PASSED PATH
-    validationPoints = parseValidationPointsExcel("..\\Data\\validation_points.csv")
+    validationPoints = parseValidationPointsExcel(inExcelPath) # "..\\Data\\validation_points.csv"
     
     diffCalculator = calculateDiff(inRastersList)
     diffScores = diffCalculator.calculateDiff(validationPoints)

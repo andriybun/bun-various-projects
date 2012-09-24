@@ -34,7 +34,10 @@ class calculateDiff:
                 """
                 In order to change calculation method of the similarity score - change the next line
                 """
+                if croplandValue == 'NoData':
+                    continue
                 diff += (float(croplandValue) - vp.crPerc)**2
+                #self.gp.AddMessage('%s\t|  %f\t|  %f\t|  %f' % (coords, vp.crPerc, float(croplandValue), diff))
             diffScores.append(diff)
 
         
