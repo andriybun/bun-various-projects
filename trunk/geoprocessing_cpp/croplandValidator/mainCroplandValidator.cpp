@@ -68,7 +68,7 @@ int main(int argc, char * argv[])
 	raster outAbsDiffRaster(runParams.resultDir + "error_abs", raster::OUTPUT);
 	raster outRelDiffRaster(runParams.resultDir + "error_rel", raster::OUTPUT);
 	raster outMinClassRaster(runParams.resultDir + "min_class", raster::OUTPUT);
-	raster outNormalizedRasterLevel2(runParams.resultDir + "normalized_result", raster::OUTPUT);
+	//raster outNormalizedRasterLevel2(runParams.resultDir + "normalized_result", raster::OUTPUT);
 
 	// Temporary:
 	// Product of cell area and cropland percentage
@@ -76,25 +76,19 @@ int main(int argc, char * argv[])
 
 	areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
 	validateCropland(
+		statRaster,
 		tmpCellAreaStat,
 		statisticsRasterLevel0,
 		probabilityRaster,
 		outCroplandRasterLevel0);
 	validateCropland(
+		statRaster,
 		tmpCellAreaStat,
 		statisticsRasterLevel1,
 		probabilityRaster,
 		outCroplandRasterLevel1);
 	calibrateCropland(
-		tmpCellAreaStat,
-		probabilityRaster,
-		statisticsRasterLevel0,
-		statisticsRasterLevel1,
-		outCroplandRasterLevel0,
-		outCroplandRasterLevel1,
-		outCalibratedRasterLevel1,
-		runParams);
-	calibrateCropland(
+		statRaster,
 		tmpCellAreaStat,
 		probabilityRaster,
 		statisticsRasterLevel0,
@@ -104,11 +98,13 @@ int main(int argc, char * argv[])
 		outCalibratedRasterLevel1,
 		runParams);
 	validateCropland(
+		statRaster,
 		tmpCellAreaStat,
 		statisticsRasterLevel2,
 		probabilityRaster,
 		outCroplandRasterLevel2);
 	calibrateCropland(
+		statRaster,
 		tmpCellAreaStat,
 		probabilityRaster,
 		statisticsRasterLevel0,
@@ -118,13 +114,11 @@ int main(int argc, char * argv[])
 		outCalibratedRasterLevel2,
 		outMinClassRaster,
 		runParams);
-	outCalibratedRasterLevel2.rasterArithmetics(&postprocessResults, statRaster, output);
-
 	validateResult(
 		areaRaster,
 		outCalibratedRasterLevel2,
 		statisticsRasterLevel0,
-		outNormalizedRasterLevel2,
+		output,
 		outAbsDiffRaster,
 		outRelDiffRaster,
 		runParams);

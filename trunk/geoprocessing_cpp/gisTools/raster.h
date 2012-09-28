@@ -95,6 +95,7 @@ private:
 	{
 		int bestClass;
 		float bestEstimate;
+		float bestClassMultiplier;
 		float error;
 	};
 	typedef map <float, unitResultT> summaryTableT;
@@ -171,22 +172,30 @@ public:
 		const runParamsT & params,
 		agreementTableT & agTable
 		);
-	friend void validateCropland(raster & inCroplandRaster,
+	friend void validateCropland(
+		raster & inCroplandRawRaster,
+		raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
 		raster & outCroplandRaster);
-	friend void validateCropland(raster & inCroplandRaster,
+	friend void validateCropland(
+		raster & inCroplandRawRaster,
+		raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
 		raster & outCroplandRaster,
 		raster & outMinClassRaster);
-	friend void validateCropland(raster & inCroplandRaster,
+	friend void validateCropland(
+		raster & inCroplandRawRaster,
+		raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
 		raster & outCroplandRaster,
 		raster & outMinClassRaster,
 		raster & errorRaster);
-	friend void calibrateCropland(raster & inCroplandRaster,
+	friend void calibrateCropland(
+		raster & inCroplandRawRaster,
+		raster & inCroplandRaster,
 		raster & inClassRaster,
 		raster & statisticsLevelUp,
 		raster & statisticsLevel,
@@ -194,7 +203,9 @@ public:
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
 		const runParamsT & params);
-	friend void calibrateCropland(raster & inCroplandRaster,
+	friend void calibrateCropland(
+		raster & inCroplandRawRaster,
+		raster & inCroplandRaster,
 		raster & inClassRaster,
 		raster & statisticsLevelUp,
 		raster & statisticsLevel,

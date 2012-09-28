@@ -47,12 +47,6 @@ if __name__ == "__main__":
       Note! Don't forget to modify format string as well!
     """
         
-
-#    print '==============='
-#    print executeCommand
-#    print '==============='
-#    raise Exception('111')
-
     callResult = subprocess.call(executeCommand)
 
 #    if deleteTmpDir:
