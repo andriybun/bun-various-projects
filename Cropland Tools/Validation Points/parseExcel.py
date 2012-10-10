@@ -1,7 +1,7 @@
 import csv
 import exceptions
-import string
-import arcgisscripting
+#import string
+#import arcgisscripting
 
 class vp:
     pass

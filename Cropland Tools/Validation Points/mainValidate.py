@@ -19,14 +19,16 @@ if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
     os.chdir(workingDir)    
     
-    inRastersList = (sys.argv[1].replace("'","")).split(";")
-    inExcelPath = sys.argv[2]
+    zonesRaster = sys.argv[1]
+    inRastersList = (sys.argv[2].replace("'","")).split(";")
+    inExcelPath = sys.argv[3]
     
     ## CHANGE THIS TO PASSED PATH
     validationPoints = parseValidationPointsExcel(inExcelPath) # "..\\Data\\validation_points.csv"
     
-    diffCalculator = calculateDiff(inRastersList)
+    # TODO: make generic
+    probabilityClassesList = [0, 50, 100] # lowerBound < value <= upperBound
+    
+    diffCalculator = calculateDiff(zonesRaster, inRastersList, probabilityClassesList)
     diffScores = diffCalculator.calculateDiff(validationPoints)
-    diffCalculator.printScores()
-    
-    
+    diffCalculator.printScores(sys.argv[4])
