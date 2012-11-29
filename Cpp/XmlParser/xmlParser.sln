@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testXmlParser", "testXmlParser\testXmlParser.vcproj", "{6670D52E-6204-431B-A463-A6FB49DF796C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD} = {CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmlParser", "..\..\IIASA\g4m-visual-studio\xmlParser\xmlParser.vcproj", "{CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6670D52E-6204-431B-A463-A6FB49DF796C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6670D52E-6204-431B-A463-A6FB49DF796C}.Debug|Win32.Build.0 = Debug|Win32
+		{6670D52E-6204-431B-A463-A6FB49DF796C}.Release|Win32.ActiveCfg = Release|Win32
+		{6670D52E-6204-431B-A463-A6FB49DF796C}.Release|Win32.Build.0 = Release|Win32
+		{CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD}.Debug|Win32.Build.0 = Debug|Win32
+		{CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD}.Release|Win32.ActiveCfg = Release|Win32
+		{CC9CFF52-D414-4E1E-8E44-1FADE5C0BEDD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

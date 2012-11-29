@@ -1,0 +1,18 @@
+<struct name ="inCellDataT">
+	<field>x</field>
+	<field>y</field>
+	<field>simu</field>
+	<field>countryIdx</field>
+	<field>area</field>
+</struct>
+<struct name ="inCommonDataT">
+	<field>numCells</field>
+	<field>numCountries</field>
+	<field>beginYear</field>
+	<field>endYear</field>
+	<field>year</field>
+</struct>
+<struct name ="outCellDataT">
+	<field>forestArea</field>
+	<field>forestShare</field>
+</struct>
