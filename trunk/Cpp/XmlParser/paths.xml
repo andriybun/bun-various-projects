@@ -1,0 +1,15 @@
+<input_dir>
+	data/ 
+</input_dir>
+<output_dir>
+	../GLOBIOM GUI/data/g4m/
+</output_dir>
+<simu_bin_file>
+	data/simu.bin
+</simu_bin_file>
+<out_map_name>
+	my_test_map
+</out_map_name>
+<out_table_name>
+	my_test_table
+</out_table_name>
