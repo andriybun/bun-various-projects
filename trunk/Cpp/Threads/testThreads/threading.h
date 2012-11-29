@@ -60,7 +60,7 @@ int parallelExecute(int (*execute)(inDataT &, outDataT &), inDataT * arr, outDat
 	exchangeT<inDataT, outDataT> * msgArray = new exchangeT<inDataT, outDataT>[NUM_THREADS];
 
 	// Distribute array between threads
-	int itemsPerThread = ceil((float)count / NUM_THREADS);
+	int itemsPerThread = (int)ceil((float)count / NUM_THREADS);
 	for (int i = 0; i < NUM_THREADS; i++)
 	{
 		msgArray[i].count = min(itemsPerThread, count - i * itemsPerThread);
