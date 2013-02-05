@@ -1,36 +1,24 @@
-# Date:   20/12/2011
-# Author: Andriy Bun
-# Name:   ...
+"""
+  This is a template for Python script which is called from ArcMap tool.
+  Put probabilityLayerMultiPriority.exe file to the same folder and point to this script while 
+  creating tool in ArcMap.
+"""
 
+# Some basic packages
 import sys
 import os
 import subprocess
 import shutil
 
-from rasterAgreementTable import invertPriorities, rasterAgreementTable
+from parseCsv import parseCsv
 
-def ones(size):
-    xRes = []
-    for xIdx in range(size):
-        xRes.append(1)
-    return xRes
-    
-#def invertPriorities(priorityVector):
-#    maxVal = max(priorityVector) + 1
-#    res = []
-#    for val in priorityVector:
-#        res.append(maxVal - val)
-#    return res    
-
-def vectorToStr(vec):
-    return str(vec).replace('[', '').replace(']', '').replace(',', '')
 
 if __name__ == "__main__":
-    
+    #     
     workingDir = os.path.dirname(sys.argv[0])
     os.chdir(workingDir)
 
-    runFileName = "probabilityLayer.exe"
+    runFileName = "probabilityLayerMultiPriority.exe"
 
     # Parse command line arguments:
     num_args = len(sys.argv)
@@ -49,26 +37,10 @@ if __name__ == "__main__":
     passCroplandLayerList = passCroplandLayerList[0:-1]
 
     # Parse priorities
-    prior = sys.argv[4].replace("'","")
-    if prior == '#':
-        priorityValues = ones(numRasters)
-    else:
-        priorityList = prior.split(";")
-        priorityValues = []
-        for priorityStr in priorityList:
-            priorityValues.append(int(priorityStr))
-    prior = sys.argv[5].replace("'","")
-    if prior == '#':
-        priorityValues2 = ones(numRasters)
-    else:
-        priorityList2 = prior.split(";")
-        priorityValues2 = []
-        for priorityStr in priorityList2:
-            priorityValues2.append(int(priorityStr))
-    
-    # Invert priority vectors    
-    priorityValues = invertPriorities(priorityValues)
-    priorityValues2 = invertPriorities(priorityValues2)
+    csvFileIn = sys.argv[4]    
+
+    # Selection threshold    
+    selectionThreshold = sys.argv[5]
     
     # Parse results' names:
     resultProb = os.path.splitext(sys.argv[6].replace("'",""))[0]
@@ -80,13 +52,6 @@ if __name__ == "__main__":
     resultMaxAvg    = resultNameTuple[0] + "_maxavg"
     resultMax       = resultNameTuple[0] + "_max"
     
-    # Process priorities:
-    print descriptionFileName
-    agreementTable = rasterAgreementTable(priorityValues, priorityValues2)
-    descriptionFile = open(descriptionFileName, 'w')
-    agreementTable.PrintToFile(descriptionFile, croplandLayerList)
-    descriptionFile.close()
-    
     # Directories
     resultDir        = os.path.dirname(resultProb)
     tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
@@ -95,7 +60,15 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
 
-    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s %s %s "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
+    # CSV file with parsed priorities
+    csvFileOut = tmpDir + "\\prior.csv"
+    parseCsv(csvFileIn, csvFileOut)
+    
+    """
+      It is necessary to pass to C++ program paths to working directory, directory 
+      for results and putting temporary files which will be deleted after executing script.
+    """
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" %d %s %s "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
         runFileName, \
         workingDir, \
         resultDir, \
@@ -104,21 +77,25 @@ if __name__ == "__main__":
         countries, \
         numRasters, \
         passCroplandLayerList, \
-        vectorToStr(priorityValues), \
-        vectorToStr(priorityValues2), \
-        vectorToStr(agreementTable.weights), \
+        csvFileOut, \
         resultProb, \
         resultAvg, \
         resultMinAvg, \
         resultMin, \
         resultMaxAvg, \
-        resultMax)
+        resultMax, \
+        selectionThreshold)
 
-#    print '==============='
-#    print executeCommand
-#    print '==============='
-#    raise Exception('111')
 
+    """
+      Here include other parameters you want to pass to program executable.
+      Note! Don't forget to modify format string as well!
+    """
+    
+    import arcgisscripting
+    gp = arcgisscripting.create()
+    gp.AddMessage("|||" + executeCommand + "|||")
+    
     callResult = subprocess.call(executeCommand)
 
     if deleteTmpDir:

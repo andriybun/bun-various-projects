@@ -44,13 +44,10 @@ class calculateDiff:
                     croplandValue = 0
                 elif (zoneId == 'NoData'):
                     continue
-                zoneId = int(zoneId)
+                zoneId = int(float(zoneId))
                 self.rasterAgreement[idx].addPoint(zoneId, self.getClass(float(croplandValue)), self.getClass(vp.crPerc))
                 self.gp.AddMessage('%s\t|  %f\t|  %f\t|  %f' % (coords, vp.crPerc, float(croplandValue), self.getClass(croplandValue)))
             idx += 1
-            
-        print self.rasterAgreement[0].agreementMap[33524000]
-        return self.rasterAgreement
         
     def getClass(self, val):
         cl = 0
