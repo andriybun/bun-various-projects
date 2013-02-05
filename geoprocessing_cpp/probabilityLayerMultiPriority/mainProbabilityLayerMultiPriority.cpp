@@ -1,32 +1,21 @@
 #include <iostream>
 #include <vector>
-// additional include directory: $(PYTHON_INCLUDE)
-//#include <Python.h>
+#include <string>
 
 #include "raster.h"
-#include "agreementTable.h"
 #include "commonTools.h"
 #include "timer.h"
 
-#include "gisToolsInterface.h"
+//#include "gisToolsInterface.h"
 #include "utils.h"
-
-#define GENERATE_RASTER_WITH_NAME_TEMPLATE(RASTER_NAME, NAME_TEMPLATE, ...)		\
-	{																			\
-		char tmpName[1000];														\
-		sprintf_s(tmpName, NAME_TEMPLATE, __VA_ARGS__);							\
-		string tmpNameStr = string(tmpName);									\
-		RASTER_NAME = new raster[1];											\
-		*(RASTER_NAME) = raster(tmpNameStr, raster::PASS_TEMPORARY);			\
-	}
 
 void processListOfRasters(const vector<float> & croplandVector,
 						  const vector<float> & croplandNoDataVector,
 						  const vector<float> & noDataOutVector,
 						  vector<float> & result,
-						  void * priorityData)
+						  void * priorityDataMap)
 {
-	size_t numRasters = croplandVector.size() / 2;
+	size_t numRasters = (croplandVector.size() - 1) / 2;
 
 	int countData = 0;
 	float sumData = (float)0;
@@ -58,15 +47,26 @@ void processListOfRasters(const vector<float> & croplandVector,
 
 	if (isData)
 	{
-		float factor = ((float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers)) != (float)0)
-			? (float)order / (float)(((priorityDataT *)priorityData)->agTable->getClass(sumIsDataPowers))
+		int countryId = (int)croplandVector[2 * numRasters];
+		map<int, priorityDataT * > * priorityDataMapPtr = ((map<int, priorityDataT * > *)priorityDataMap);
+		map<int, priorityDataT * >::iterator countryPriorityData = priorityDataMapPtr->find(countryId);
+
+		// If the country ID isn't found in list, use unit priorities for all rasters
+		if (countryPriorityData == priorityDataMapPtr->end())
+		{
+			countryPriorityData = priorityDataMapPtr->find(NO_VALIDATION_POINTS_COUNTRY_ID);
+		}
+		priorityDataT * priorityData = countryPriorityData->second;
+
+		float factor = ((float)(priorityData->agTable->getClass(sumIsDataPowers)) != (float)0)
+			? (float)order / (float)(priorityData->agTable->getClass(sumIsDataPowers))
 			: (float)1;
 		result[0] = sumData / countData;				// avg
 		result[1] = percentMin;							// min avg
 		result[2] = (percentMin + result[0]) / 2;		// min
 		result[3] = percentMax;							// max avg
 		result[4] = (percentMax + result[0]) / 2;		// max
-		result[5] = floor((float)(((priorityDataT *)priorityData)->agTable->getClass(sumPowers)) * factor);	// probability
+		result[5] = floor((float)(priorityData->agTable->getClass(sumPowers)) * factor);	// probability
 		// Show areas where an overshooting was
 		if (result[5] > order)
 		{
@@ -93,23 +93,21 @@ void processListOfRasters(const vector<float> & croplandVector,
 int main(int argc, char * argv[])
 {
 	// Command line arguments:
-	// 1 - workingDir
-	// 2 - resultDir
-	// 3 - tmpDir
-	// 4 - cell areas
-	// 5 - countries
-	// 6 - number of rasters
-	// 7.. - list of cropland layers
-	// 8.. - list of priorities
-	// 9.. - list of 2nd type priorities 
-	// 10.. - list of rasters weights
-	// 11.. - resulting probability classes raster
-	// 12.. - resulting average raster
-	// 13.. - resulting minimum raster
-	// 14.. - resulting minimum average raster
-	// 15.. - resulting maximum raster
-	// 16.. - resulting maximum average raster
-	// 17.. - selection threshold
+    // 1 - workingDir
+    // 2 - resultDir
+    // 3 - tmpDir
+    // 4 - cellAreas
+    // 5 - countries
+    // 6 - numRasters
+    // 7.. - list of cropland layers
+    // 8.. - csv file
+    // 9.. - resulting probability classes raster
+	// 10.. - resulting average raster
+	// 11.. - resulting minimum raster
+	// 12.. - resulting minimum average raster
+	// 13.. - resulting maximum raster
+	// 14.. - resulting maximum average raster
+	// 15.. - selection threshold
 
 	printf("Start: ");
 	outputLocalTime();
@@ -125,16 +123,13 @@ int main(int argc, char * argv[])
 	raster countriesRaster(argv[5], raster::INPUT);
 
 	int numRasters = atoi(argv[6]);
-	
-	ASSERT_INT(argc == (14 + numRasters * 4), INCORRECT_INPUT_PARAMS);
+	ASSERT_INT(argc == (15 + numRasters), INCORRECT_INPUT_PARAMS);
 
-	// Further arguments' offsets
-	const size_t paramsOffset = 7;
-	size_t startListOfRasters = paramsOffset + 0 * numRasters;
-	size_t startListOfPriorities = paramsOffset + 1 * numRasters;
-	size_t startListOfPriorities2 = paramsOffset + 2 * numRasters;
-	size_t startListOfWeights = paramsOffset + 3 * numRasters;
-	size_t startResults = paramsOffset + 4 * numRasters;
+	size_t startListOfRasters = 7;
+
+	string csvPriorityFile = argv[startListOfRasters + numRasters];
+	printf("%s\n", csvPriorityFile.c_str());
+	size_t startResults = startListOfRasters + numRasters + 1;
 
 	// Resulting rasters
 	raster resultProb(argv[startResults+0], raster::OUTPUT);
@@ -143,18 +138,18 @@ int main(int argc, char * argv[])
 	raster resultMinAvg(argv[startResults+3], raster::OUTPUT);
 	raster resultMax(argv[startResults+4], raster::OUTPUT);
 	raster resultMaxAvg(argv[startResults+5], raster::OUTPUT);
-
-	// TODO float to raster...
-	float selectionThreshold = (float)atof(argv[startResults+6]);
-
 	raster resultOverflow((runParams.resultDir + "warning_overflow.img").c_str(), raster::OUTPUT);
+
+	float selectionThreshold = (float)atof(argv[startResults + 6]);
 
 	// Vectors for list of cropland rasters
 	vector<raster *> croplandRastersVector;
-	croplandRastersVector.resize(2 * numRasters); // first half - cropland rasters; second half - cropland is data rasters;
+	croplandRastersVector.resize(2 * numRasters + 1); // first half - cropland rasters; second half - cropland is data rasters;
+													  // last one - countries raster
 
-	priorityDataT * priorityData = NULL;
-	initializePriorityData(argv + paramsOffset, numRasters, priorityData);
+	// Initialize map of priorityData objects for each country
+	map<int, priorityDataT * > priorityDataMap;
+	initializePriorityData(csvPriorityFile, numRasters, priorityDataMap);
 
 	// Initialize vector of resulting rasters
 	vector<raster *> getBackVector;
@@ -181,8 +176,9 @@ int main(int argc, char * argv[])
 			selectionThreshold,
 			runParams);
 	}
+	croplandRastersVector[2 * numRasters] = &countriesRaster;
 
-	multipleRasterArithmetics(&processListOfRasters, croplandRastersVector, getBackVector, (void *)priorityData);
+	multipleRasterArithmetics(&processListOfRasters, croplandRastersVector, getBackVector, (void *)&priorityDataMap);
 
 	raster outClassRaster((runParams.resultDir + "adjusted_probability"), raster::OUTPUT);
 	adjustCroplandProbabilityLayer(areaRaster,
@@ -190,17 +186,11 @@ int main(int argc, char * argv[])
 		*(getBackVector[5]),
 		outClassRaster,
 		runParams,
-		*(priorityData->agTable)
+		priorityDataMap
 		);
 
-	// Free up memory
-	delete priorityData->agTable;
-	delete priorityData;
-
-	for (size_t idx = 0; idx < 2 * (size_t)numRasters; idx++)
-	{
-		delete [] croplandRastersVector[idx];
-	}
+	// Destroy map of priorityData for counries
+	destroyPriorityData(priorityDataMap);
 
 	printf("End: ");
 	outputLocalTime();

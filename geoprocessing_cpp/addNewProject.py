@@ -106,6 +106,4 @@ if __name__ == "__main__":
     # Add project to solution
     addProjectToSolution(NEW_PROJECT_NAME)
     
-    
-    
     print "Project files generated successfully!"

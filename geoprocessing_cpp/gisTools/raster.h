@@ -50,6 +50,14 @@ float xminus(float val1, float val2);
 float xtimes(float val1, float val2);
 float xdivide(float val1, float val2);
 
+struct priorityDataT
+{
+	vector<int> prioritiesVector;
+	vector<int> prioritiesVector2;
+	vector<int> weightsVector;
+	agreementTableT * agTable;
+};
+
 class raster
 {
 public:
@@ -111,7 +119,6 @@ private:
 	statisticsStructT description;
 	bool initializedFromImg;
 	rasterTypeT rasterType;
-	//bool isTmp;
 
 	bool readRasterProperties();
 	bool validateExtent(const raster & other) const;
@@ -171,6 +178,13 @@ public:
 		raster & outClassRaster,
 		const runParamsT & params,
 		agreementTableT & agTable
+		);
+	friend void adjustCroplandProbabilityLayer(raster & inAreaRaster,
+		raster & inCountriesRaster,
+		raster & inClassRaster,
+		raster & outClassRaster,
+		const runParamsT & params,
+		map<int, priorityDataT * > & priorityDataMap
 		);
 	friend void validateCropland(
 		raster & inCroplandRawRaster,
