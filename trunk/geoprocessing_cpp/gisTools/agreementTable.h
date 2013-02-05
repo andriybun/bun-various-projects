@@ -25,7 +25,7 @@ private:
 	map<int, vector<int> > tmpAgreementTable;
 
 	void recursive(size_t n, size_t idx, int * vec);
-	void computePriorities(const vector<int> & vec, vector<int> & res);
+
 public:
 	agreementTableT(const vector<int> & priorityVec1, const vector<int> & priorityVec2);
 	agreementTableT(const agreementTableT & g);
@@ -37,6 +37,9 @@ public:
 
 	int getClass(int sumPowers);
 	bool checkSimilarity(size_t class1, size_t class2);
+
+	template <class T>
+	static void computePriorities(const vector<T> & vec, vector<int> & res);
 };
 
 #endif

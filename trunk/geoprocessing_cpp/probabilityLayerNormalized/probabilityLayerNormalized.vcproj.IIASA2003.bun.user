@@ -38,8 +38,8 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory=""
-				CommandArguments=""
+				WorkingDirectory="&quot;C:\Program Files\Cropland Tools\Probability Layer&quot;"
+				CommandArguments="&quot;C:\Program Files\Cropland Tools\Probability Layer&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test\tmp_PC98199&quot; &quot;m:\Andriy\new_run\1_Cropland_Validation_Inputs\area_grid&quot; &quot;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_glc&quot; 4 &quot;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_glc&quot; &quot;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_glo&quot; &quot;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_hansen&quot; &quot;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_modis&quot; 1 3 2 4 2 1 5 4 1 4 2 8 &quot;m:\Andriy\new_run\Results_Global\121019_test\xx&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test\xx_avg&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test\xx_minavg&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test\xx_min&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test\xx_maxavg&quot; &quot;m:\Andriy\new_run\Results_Global\121019_test\xx_max&quot; 0.01"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
@@ -50,7 +50,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""

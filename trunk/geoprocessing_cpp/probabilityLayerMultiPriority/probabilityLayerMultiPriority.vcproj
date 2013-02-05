@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="probabilityLayerNormalized"
-	ProjectGUID="{A93EB151-C00B-41CD-9063-E1D645B82C10}"
-	RootNamespace="probabilityLayerNormalized"
+	Name="probabilityLayerMultiPriority"
+	ProjectGUID="{0355AE68-64FB-0203-EF3F-952B2AEA2F21}"
+	RootNamespace="probabilityLayerMultiPriority"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)vendors&quot;;&quot;$(SolutionDir)gisTools&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,6 +62,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName); $(PYTHON_LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -85,7 +87,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cp $(TargetPath) &quot;C:\Program Files\Cropland Tools\Probability Layer\probabilityLayerNormalized.exe&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -115,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="$(SolutionDir)gisTools;$(SolutionDir)gisToolsInterface"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)vendors&quot;;&quot;$(SolutionDir)gisTools&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -162,15 +163,11 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cp $(TargetPath) &quot;C:\Program Files\Cropland Tools\Probability Layer\probabilityLayerNormalized.exe&quot;"
+				CommandLine="cp $(TargetPath) &quot;C:\Program Files\Cropland Tools\Probability Layer\$(ProjectName).exe&quot;"
 			/>
 		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{322DD67A-6FE5-4611-905D-912D2FB67C27}"
-			RelativePathToProject=".\gisToolsInterface\gisToolsInterface.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -179,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\mainProbabilityLayerNormalized.cpp"
+				RelativePath=".\mainProbabilityLayerMultiPriority.cpp"
 				>
 			</File>
 			<File

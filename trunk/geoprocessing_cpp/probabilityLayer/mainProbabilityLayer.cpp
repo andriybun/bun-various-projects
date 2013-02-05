@@ -17,14 +17,6 @@
 		*(RASTER_NAME) = raster(tmpNameStr, raster::PASS_TEMPORARY);			\
 	}
 
-struct priorityDataT
-{
-	vector<int> prioritiesVector;
-	vector<int> prioritiesVector2;
-	vector<int> weightsVector;
-	agreementTableT * agTable;
-};
-
 void processListOfRasters(const vector<float> & croplandVector,
 						  const vector<float> & croplandNoDataVector,
 						  const vector<float> & noDataOutVector,

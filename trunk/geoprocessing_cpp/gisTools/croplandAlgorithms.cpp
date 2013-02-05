@@ -77,7 +77,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 					memset(tmp, 0, sizeof(float) * (maxClass + 1));
 					classesByCountryTable.insert(make_pair<float, float *>(bufCountries[i], tmp));
 					oldToNewClassesMap.insert(make_pair<float, vector<int> >(bufCountries[i], dummyVector));
-					/*map< float, float * >::iterator */it = classesByCountryTable.find(bufCountries[i]);
+					it = classesByCountryTable.find(bufCountries[i]);
 				}
 				it->second[(int)bufClass[i]] += bufArea[i];
 			}
@@ -89,23 +89,13 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	map< float, float * >::iterator it = classesByCountryTable.begin();
 	while (it != classesByCountryTable.end())
 	{
-		//for (int x = 0; x < maxClass; x++)
-		//{
-		//	printf("%f  ", it->second[x]);
-		//}
-		//printf("\n");
-		
-		for (size_t i = 0; i < maxClass; i++)
+		for (size_t i = 0; i <= maxClass; i++)
 		{
 			oldToNewClassesMap[it->first][i] = -1;
 		}
 
-		for (size_t i = minClass; i < maxClass; i++)
+		for (size_t i = minClass; i <= maxClass; i++)
 		{
-			// it->first - current country ID
-			// i - investigated class
-			// it->second[i] - area of this class
-			// agTable.similarClassesMatrix[i][:] - vector saying true for classes similar to 
 			oldToNewClassesMap[it->first][i] = (oldToNewClassesMap[it->first][i] < 0) ? (int)i : oldToNewClassesMap[it->first][i];
 
 			float swp = it->second[i];

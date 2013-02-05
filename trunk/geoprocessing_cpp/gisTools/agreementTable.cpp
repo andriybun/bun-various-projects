@@ -137,18 +137,19 @@ void agreementTableT::recursive(size_t n, size_t idx, int * vec)
 	}
 }
 
-void agreementTableT::computePriorities(const vector<int> & vec, vector<int> & res)
+template <class T>
+void agreementTableT::computePriorities(const vector<T> & vec, vector<int> & res)
 {
-	vector<int> tmp = vec;
+	vector<T> tmp = vec;
 	vector<int> newTmp;
 	newTmp.resize(vec.size());
 	res.resize(vec.size());
-	map<int, int> oldNewMapping;
+	map<T, int> oldNewMapping;
 	sort(tmp.begin(), tmp.end());
 	int pr = 1;
 	int count = 1;
 	newTmp[0] = pr;
-	oldNewMapping.insert(make_pair<int, int>(tmp[0], newTmp[0]));
+	oldNewMapping.insert(make_pair<T, int>(tmp[0], newTmp[0]));
 	for (size_t idx = 1; idx < vec.size(); idx++)
 	{
 		if (tmp[idx] != tmp[idx-1])
@@ -157,13 +158,16 @@ void agreementTableT::computePriorities(const vector<int> & vec, vector<int> & r
 		}
 		newTmp[idx] = pr;
 		count += pr;
-		oldNewMapping.insert(make_pair<int, int>(tmp[idx], newTmp[idx]));
+		oldNewMapping.insert(make_pair<T, int>(tmp[idx], newTmp[idx]));
 	}
 	for (size_t idx = 0; idx < vec.size(); idx++)
 	{
 		res[idx] = oldNewMapping[vec[idx]];
 	}
 }
+
+template void agreementTableT::computePriorities<int>(const vector<int> & vec, vector<int> & res);
+template void agreementTableT::computePriorities<double>(const vector<double> & vec, vector<int> & res);
 
 int agreementTableT::getPriority1(size_t idx)
 {
