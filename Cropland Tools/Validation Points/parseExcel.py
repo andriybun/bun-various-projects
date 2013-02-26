@@ -41,4 +41,6 @@ def parseValidationPointsExcel(fileName):
     return validationPointsList
 
 if __name__ == "__main__":
+#    vp = parseValidationPointsExcel("..\\Data\\agreement_65.csv")
     vp = parseValidationPointsExcel("..\\Data\\validation_points.csv")
+#    vp = parseValidationPointsExcel("..\\Data\\Points_14022013.csv")
