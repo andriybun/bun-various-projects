@@ -92,9 +92,9 @@ if __name__ == "__main__":
       Note! Don't forget to modify format string as well!
     """
     
-    import arcgisscripting
-    gp = arcgisscripting.create()
-    gp.AddMessage("|||" + executeCommand + "|||")
+#    import arcgisscripting
+#    gp = arcgisscripting.create()
+#    gp.AddMessage("|||" + executeCommand + "|||")
     
     callResult = subprocess.call(executeCommand)
 
