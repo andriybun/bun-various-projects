@@ -10,20 +10,48 @@ Created on Mon Nov 29 15:36:20 2010
 import math
 import os
 
-def AddSuffixToName( name, suffix ):
+# Floating point operations tolerance
+EPSILON = 1e-6
+
+def AddSuffixToName(name, suffix):
     return os.path.splitext(name)[0] + suffix + os.path.splitext(name)[1]
 
 #===============================================================================
 #  Method to replace all values in a raster with 'weight', and zeros or noData
 #  with 0
 #===============================================================================
-def MakeRasterOfValues( gp, rast, order, weight, weight2, out ):
+def MakeRasterOfValues(gp, rast, order, weight, weight2, out):
     onesRast = AddSuffixToName(out, "_count")
     gp.Con_sa(rast, 1, onesRast, 0, "VALUE > 1e-6")
     gp.BuildRasterAttributeTable_management(onesRast, "OVERWRITE")
     gp.Times_sa(onesRast, order, out)
     gp.Times_sa(onesRast, weight, AddSuffixToName(out, "_one"))
     gp.Times_sa(onesRast, weight2, AddSuffixToName(out, "_two"))
+
+#==============================================================================
+# Ceck a list of rasters for having the same extent
+#==============================================================================
+def GetRasterExtent(gp, raster):
+    propertyNames = ['TOP', \
+                     'BOTTOM', \
+                     'LEFT', \
+                     'RIGHT', \
+                     'CELLSIZEX', \
+                     'CELLSIZEY']
+    numProperties = len(propertyNames);
+    extent = [0] * numProperties
+
+    for i in range(numProperties):
+        extent[i] = gp.GetRasterProperties_management(raster, propertyNames[i])
+    
+    return extent
+    
+def IsSameExtent(gp, rasterList):
+    firstRaterExtent = GetRasterExtent(gp, rasterList[1])
+    for raster in rasterList[1:]:
+        if not (max(abs(firstRaterExtent - GetRasterExtent(gp, raster))) > EPSILON):
+            return False
+    return True
 
 #===============================================================================
 # Validation function

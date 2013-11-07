@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import arcgisscripting
+from utils import IsSameExtent
 
 if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
@@ -22,6 +23,13 @@ if __name__ == "__main__":
     cropland         = os.path.splitext(sys.argv[3])[0]
     output           = os.path.splitext(sys.argv[4])[0]
     
+    # Validate for equal extent
+    allRasterList = [areaGrid, zones, cropland]
+    gp = arcgisscripting.create()
+    if not IsSameExtent(gp, allRasterList):
+        raise Exception('Error! Rasters don\'t have same extent')
+    
+    # Results
     resultDir        = os.path.dirname(output)
     tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
     deleteTmpDir = False
