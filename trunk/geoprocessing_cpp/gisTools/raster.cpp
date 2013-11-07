@@ -787,9 +787,10 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 		inClassFile.read(reinterpret_cast<char*>(bufClass), sizeof(float) * bufSize);
 		for (int i = 0; i < bufSize; i++)
 		{
-			if ((bufArea[i] != (*this).noDataValue) &&
+			if ((bufArea[i] != (*this).noDataValue) &&				// skip cells with at least one noData value
 				(bufZone[i] != inZoneRaster.noDataValue) &&
-				(bufClass[i] != inClassRaster.noDataValue))
+				(bufClass[i] != inClassRaster.noDataValue) &&
+				(bufClass[i] != 0))									// and where probability class is zero = no probability
 			{
 				outTable.inc(bufZone[i], (size_t)bufClass[i], bufArea[i]);
 			}
@@ -833,7 +834,6 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 			for (int cl = (int)maxClass; cl >= (int)minClass; cl--)
 			{
 				float nextRowSum = rowSum + row->second[cl-1];
-//printf("\t%f\t%f\n", rowSum, row->second[cl-1]);
 				rowResult.bestEstimate = rowSum;
 				rowResult.bestClass = cl;
 				if (nextRowSum > targetSum)
@@ -845,9 +845,7 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 			}
 			rowResult.error = (float)0;
 		}
-//printf("-\t%f\n", rowResult.bestClassMultiplier);
 		printf("%d\t%f\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.bestClassMultiplier);
-//system("pause");
 		calibratedResults.insert(make_pair<float, unitResultT>(row->first, rowResult));
 		currentCountry++;
 		row++;

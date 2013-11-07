@@ -779,7 +779,7 @@ void validateResult(raster & areaRaster,
 {
 	raster tmpComputedAreasRaster(runParams.tmpDir + "tmp_computed_areas", raster::TEMPORARY);
 	raster tmpResultingAreasRaster(runParams.tmpDir + "tmp_resulting_areas", raster::TEMPORARY);
-	raster tmpRatioRaster(runParams.resultDir + "tmp_ratio", raster::OUTPUT);
+	raster tmpRatioRaster(runParams.tmpDir + "tmp_ratio", raster::TEMPORARY);
 
 	areaRaster.rasterArithmetics(&preprocessCellAreasInt, computedResultRaster, tmpComputedAreasRaster);
 	tmpComputedAreasRaster.zonalStatistics(statisticsRaster, tmpResultingAreasRaster, raster::SUM);
