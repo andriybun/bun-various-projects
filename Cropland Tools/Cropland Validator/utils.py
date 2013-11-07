@@ -3,6 +3,33 @@ from iterableStruct import iterableStruct
 import os, arcgisscripting
 import shutil
 
+# Floating point operations tolerance
+EPSILON = 1e-6
+
+# Ceck a list of rasters for having the same extent
+def GetRasterExtent(gp, raster):
+    propertyNames = ['TOP', \
+                     'BOTTOM', \
+                     'LEFT', \
+                     'RIGHT', \
+                     'CELLSIZEX', \
+                     'CELLSIZEY']
+    numProperties = len(propertyNames);
+    extent = [0] * numProperties
+
+    for i in range(numProperties):
+        extent[i] = gp.GetRasterProperties_management(raster, propertyNames[i])
+    
+    return extent
+    
+def IsSameExtent(gp, rasterList):
+    firstRaterExtent = gp.GetRasterExtent(rasterList[1])
+    for raster in rasterList[1:]:
+        if not (max(abs(firstRaterExtent - gp.GetRasterExtent(raster))) > EPSILON):
+            return False
+    return True
+
+
 #-------------------------------------------------------------------------
 # utils class definition
 #-------------------------------------------------------------------------
@@ -189,6 +216,29 @@ class utils:
         else:
             self.gp.clip_management(inputRaster, coords, outputRaster)
         #self.gp.BuildRasterAttributeTable_management(outputRaster, "OVERWRITE")
+
+    # Ceck a list of rasters for having the same extent
+    def GetRasterExtent(self, raster):
+        propertyNames = ['TOP', \
+                         'BOTTOM', \
+                         'LEFT', \
+                         'RIGHT', \
+                         'CELLSIZEX', \
+                         'CELLSIZEY']
+        numProperties = len(propertyNames);
+        extent = [0] * numProperties
+    
+        for i in range(numProperties):
+            extent[i] = self.gp.GetRasterProperties_management(raster, propertyNames[i])
+        
+        return extent
+        
+    def IsSameExtent(self, gp, rasterList):
+        firstRaterExtent = self.GetRasterExtent(rasterList[1])
+        for raster in rasterList[1:]:
+            if not (max(abs(firstRaterExtent - self.GetRasterExtent(raster))) > EPSILON):
+                return False
+        return True
 
     # converting inputs to proper units
     def prepareRasters(self):

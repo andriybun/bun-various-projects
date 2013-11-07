@@ -6,6 +6,8 @@ import sys
 import os
 import subprocess
 import shutil
+import arcgisscripting
+from utils import IsSameExtent
 
 from rasterAgreementTable import invertPriorities, rasterAgreementTable
 
@@ -47,6 +49,12 @@ if __name__ == "__main__":
         passCroplandLayerList = passCroplandLayerList + '"%s" ' \
             % (os.path.splitext(croplandLayerList[i])[0])
     passCroplandLayerList = passCroplandLayerList[0:-1]
+    
+    # Validate for equal extent
+    allRasterList = [cellAreas] + [countries] + croplandLayerList
+    gp = arcgisscripting.create()
+    if not IsSameExtent(gp, allRasterList):
+        raise Exception('Error! Rasters don\'t have same extent')
 
     # Parse priorities
     prior = sys.argv[4].replace("'","")
