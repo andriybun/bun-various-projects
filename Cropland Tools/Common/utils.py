@@ -49,7 +49,7 @@ class RasterData:
         return self.name
             
 def AddSuffixToName(name, suffix):
-    return os.path.splitext(name)[0] + suffix + os.path.splitext(name)[1]
+    return path.splitext(name)[0] + suffix + os.path.splitext(name)[1]
 
 #===============================================================================
 #  Method to replace all values in a raster with 'weight', and zeros or noData
