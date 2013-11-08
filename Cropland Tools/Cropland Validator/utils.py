@@ -23,10 +23,12 @@ def GetRasterExtent(gp, raster):
     return extent
     
 def IsSameExtent(gp, rasterList):
-    firstRaterExtent = GetRasterExtent(gp, rasterList[1])
+    firstRasterExtent = GetRasterExtent(gp, rasterList[1])
     for raster in rasterList[1:]:
-        if not (max(abs(firstRaterExtent - GetRasterExtent(gp, raster))) > EPSILON):
-            return False
+		thisRasterExtent = GetRasterExtent(gp, raster)
+		for i in range(len(firstRasterExtent)):
+			if (abs(firstRasterExtent[i] - thisRasterExtent[i]) > EPSILON):
+				return False
     return True
 
 
