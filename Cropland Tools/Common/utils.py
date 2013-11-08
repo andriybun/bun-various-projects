@@ -2,28 +2,33 @@ from os import path
 
 # Floating point operations tolerance
 EPSILON = 1e-6
-
+propertyNames = ['TOP', \
+                 'BOTTOM', \
+                 'LEFT', \
+                 'RIGHT', \
+                 'CELLSIZEX', \
+                 'CELLSIZEY']
+					 
 # Ceck a list of rasters for having the same extent
 def GetRasterExtent(gp, raster):
-    propertyNames = ['TOP', \
-                     'BOTTOM', \
-                     'LEFT', \
-                     'RIGHT', \
-                     'CELLSIZEX', \
-                     'CELLSIZEY']
     numProperties = len(propertyNames);
     extent = [0] * numProperties
-
     for i in range(numProperties):
         extent[i] = gp.GetRasterProperties_management(raster.getFullPath(), propertyNames[i])
     
     return extent
     
 def IsSameExtent(gp, rasterList):
-    firstRaterExtent = GetRasterExtent(gp, rasterList[1])
+    firstRaterExtent = GetRasterExtent(gp, rasterList[0])    
+    numProperties = len(firstRaterExtent)
     for raster in rasterList[1:]:
-        if not (max(abs(firstRaterExtent - GetRasterExtent(gp, raster))) > EPSILON):
-            return False
+        for i in range(numProperties):
+            currentRasterExtent = GetRasterExtent(gp, raster)
+            if (abs(firstRaterExtent[i] - currentRasterExtent[i]) > EPSILON):
+                gp.AddMessage("Rasters '%s' and '%s' have different extents: %s %f vs %f" % (\
+                    rasterList[0].getName(), raster.getName(), propertyNames[i], \
+                    firstRaterExtent[i], currentRasterExtent[i]))
+                return False
     return True
     
 class RasterData:
@@ -34,7 +39,7 @@ class RasterData:
     def __init__(self, rasterPath):
         self.dirName = path.dirname(path.splitext(rasterPath)[0])
         self.name = path.basename(path.splitext(rasterPath)[0])
-        self.ext = path.splitext(rasterPath)[1]
+        self.ext = path.splitext(rasterPath)[1][1:]
     
     def getFullPath(self):
         return self.getPath() + "." + self.ext
@@ -43,7 +48,7 @@ class RasterData:
         return self.getDirPath() + "\\" + self.getName()
         
     def getDirPath(self):
-        return self.getName
+        return self.dirName
         
     def getName(self):
         return self.name
