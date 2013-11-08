@@ -7,10 +7,13 @@
 
 import sys
 import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
+
 import shutil
 import subprocess
 import arcgisscripting
-from utils import IsSameExtent
+from utils import IsSameExtent, RasterData
 
 if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
@@ -18,19 +21,18 @@ if __name__ == "__main__":
     # runFileName = workingDir + "\\croplandValidator.exe"
     runFileName = "nationalStatisticsCalculator.exe"
     
-    areaGrid         = os.path.splitext(sys.argv[1])[0]
-    zones            = os.path.splitext(sys.argv[2])[0]
-    cropland         = os.path.splitext(sys.argv[3])[0]
-    output           = os.path.splitext(sys.argv[4])[0]
+    areaGrid         = RasterData(sys.argv[1])
+    zones            = RasterData(sys.argv[2])
+    cropland         = RasterData(sys.argv[3])
+    output           = RasterData(sys.argv[4])
     
     # Validate for equal extent
-    allRasterList = [areaGrid, zones, cropland]
     gp = arcgisscripting.create()
-    if not IsSameExtent(gp, allRasterList):
+    if not IsSameExtent(gp, [areaGrid, zones, cropland]):
         raise Exception('Error! Rasters don\'t have same extent')
     
     # Results
-    resultDir        = os.path.dirname(output)
+    resultDir        = output.getDirPath()
     tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
     deleteTmpDir = False
     if not os.path.exists(tmpDir):
@@ -43,10 +45,10 @@ if __name__ == "__main__":
         workingDir, \
         resultDir, \
         tmpDir, \
-        areaGrid, \
-        zones, \
-        cropland, \
-        output)
+        areaGrid.getPath(), \
+        zones.getPath(), \
+        cropland.getPath(), \
+        output.getPath())
 
     callResult = subprocess.call(executeCommand)
         

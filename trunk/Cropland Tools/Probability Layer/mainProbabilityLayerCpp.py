@@ -4,10 +4,13 @@
 
 import sys
 import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
+
 import subprocess
 import shutil
 import arcgisscripting
-from utils import IsSameExtent
+from utils import  IsSameExtent, RasterData
 
 from rasterAgreementTable import invertPriorities, rasterAgreementTable
 
@@ -37,17 +40,19 @@ if __name__ == "__main__":
     # Parse command line arguments:
     num_args = len(sys.argv)
     
-    cellAreas = os.path.splitext(sys.argv[1].replace("'",""))[0]
-    countries = os.path.splitext(sys.argv[2].replace("'",""))[0]
+    cellAreas = RasterData(sys.argv[1])
+    countries = RasterData(sys.argv[2])
     
-    croplandLayerList = (sys.argv[3].replace("'","")).split(";")
+    croplandLayerStrList = (sys.argv[3].replace("'","")).split(";")
+    croplandLayerList = []
     numRasters = len(croplandLayerList)
     passCroplandLayerList = ''
     for i in range(numRasters):
-        if (croplandLayerList[i][0] == '\''):
-            croplandLayerList[i] = croplandLayerList[i][1:-1]
+        if (croplandLayerStrList[i][0] == '\''):
+            croplandLayerStrList[i] = croplandLayerStrList[i][1:-1]
+        croplandLayerList = croplandLayerList + RasterData(croplandLayerStrList[i])
         passCroplandLayerList = passCroplandLayerList + '"%s" ' \
-            % (os.path.splitext(croplandLayerList[i])[0])
+            % (croplandLayerStrList[i].getPath())
     passCroplandLayerList = passCroplandLayerList[0:-1]
 
     # Validate for equal extent
@@ -108,8 +113,8 @@ if __name__ == "__main__":
         workingDir, \
         resultDir, \
         tmpDir, \
-        cellAreas, \
-        countries, \
+        cellAreas.getPath(), \
+        countries.getPath(), \
         numRasters, \
         passCroplandLayerList, \
         vectorToStr(priorityValues), \
