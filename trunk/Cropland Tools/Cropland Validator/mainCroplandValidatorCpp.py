@@ -45,8 +45,9 @@ if __name__ == "__main__":
         numStatistics = 1
     
     # Validate for equal extent
-    allRasterList = [areaGrid, statisticsLevel0, statisticsLevel1, \
-                     statisticsLevel2, probabilityGrid, statLayer]
+    allRasterList = sys.argv[1:7]
+#					[areaGrid, statisticsLevel0, statisticsLevel1, \
+#                     statisticsLevel2, probabilityGrid, statLayer]
     gp = arcgisscripting.create()
     if not IsSameExtent(gp, allRasterList):
         raise Exception('Error! Rasters don\'t have same extent')
