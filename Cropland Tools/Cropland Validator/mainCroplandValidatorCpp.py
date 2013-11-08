@@ -52,7 +52,7 @@ if __name__ == "__main__":
     gp = arcgisscripting.create()
     if not IsSameExtent(gp, allRasterList):
         raise Exception('Error! Rasters don\'t have same extent')
-    gp.AddMessage("5")
+    
     # Results
     resultDir        = output.getDirPath()
     tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
