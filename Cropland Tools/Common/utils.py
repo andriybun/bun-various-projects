@@ -1,7 +1,4 @@
-# Some classes and functions used in script
-#from iterableStruct import iterableStruct
-#import os, arcgisscripting
-#import shutil
+from os import path
 
 # Floating point operations tolerance
 EPSILON = 1e-6
@@ -18,20 +15,73 @@ def GetRasterExtent(gp, raster):
     extent = [0] * numProperties
 
     for i in range(numProperties):
-        extent[i] = gp.GetRasterProperties_management(raster, propertyNames[i])
+        extent[i] = gp.GetRasterProperties_management(raster.getFullPath(), propertyNames[i])
     
     return extent
     
 def IsSameExtent(gp, rasterList):
-    firstRasterExtent = GetRasterExtent(gp, rasterList[1])
+    firstRaterExtent = GetRasterExtent(gp, rasterList[1])
     for raster in rasterList[1:]:
-		thisRasterExtent = GetRasterExtent(gp, raster)
-		for i in range(len(firstRasterExtent)):
-			if (abs(firstRasterExtent[i] - thisRasterExtent[i]) > EPSILON):
-				return False
+        if not (max(abs(firstRaterExtent - GetRasterExtent(gp, raster))) > EPSILON):
+            return False
     return True
+    
+class RasterData:
+    dirName = ""
+    name = ""
+    ext = ""
+    
+    def __init__(self, rasterPath):
+        self.dirName = path.dirname(path.splitext(rasterPath)[0])
+        self.name = path.basename(path.splitext(rasterPath)[0])
+        self.ext = path.splitext(rasterPath)[1]
+    
+    def getFullPath(self):
+        return self.getPath() + "." + self.ext
+        
+    def getPath(self):
+        return self.getDirPath() + "\\" + self.getName()
+        
+    def getDirPath(self):
+        return self.getName
+        
+    def getName(self):
+        return self.name
+            
+def AddSuffixToName(name, suffix):
+    return os.path.splitext(name)[0] + suffix + os.path.splitext(name)[1]
 
+#===============================================================================
+#  Method to replace all values in a raster with 'weight', and zeros or noData
+#  with 0
+#===============================================================================
+def MakeRasterOfValues(gp, rast, order, weight, weight2, out):
+    onesRast = AddSuffixToName(out, "_count")
+    gp.Con_sa(rast, 1, onesRast, 0, "VALUE > 1e-6")
+    gp.BuildRasterAttributeTable_management(onesRast, "OVERWRITE")
+    gp.Times_sa(onesRast, order, out)
+    gp.Times_sa(onesRast, weight, AddSuffixToName(out, "_one"))
+    gp.Times_sa(onesRast, weight2, AddSuffixToName(out, "_two"))
 
+#===============================================================================
+# Find a value in a sorted list
+#===============================================================================
+def findFirst(lst, val):
+    lo = 0
+    hi = len(lst)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        midval = lst[mid]
+        if midval < val:
+            lo = mid+1
+        elif midval > val: 
+            hi = mid
+        else:
+            while mid > 0 and lst[mid-1] == val:
+                mid = mid - 1
+            return mid
+    return -1            
+            
 ##-------------------------------------------------------------------------
 ## utils class definition
 ##-------------------------------------------------------------------------

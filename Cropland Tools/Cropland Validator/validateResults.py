@@ -7,51 +7,49 @@ name:   Validator of cropland
 
 """
 
-import os
 import sys
+import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
+
+import shutil
+import subprocess
 import arcgisscripting
-
-def ValidateRaster(rasterToValidate, areaGrid, nationalStatistics):
-    gp = arcgisscripting.create()
-    gp.CheckOutExtension("Spatial")
-    gp.OverWriteOutput = 1
-
-    TMPDIR = os.path.dirname(rasterToValidate) + "\\validation_tmp\\"
-    if not os.path.isdir(TMPDIR):
-        os.mkdir(TMPDIR)
-    tmpRaster = TMPDIR + "tmpRaster.img"
-    tmpCombined = TMPDIR + "tmpCombined.img"
-    nationalStatisticsInt = TMPDIR + "natStatInt.img"
-
-    gp.Times_sa(rasterToValidate, areaGrid, tmpRaster)
-    gp.Divide_sa(tmpRaster, 1000, tmpCombined)
-    gp.Int_sa(nationalStatistics, nationalStatisticsInt)
-    gp.ZonalStatistics_sa(nationalStatisticsInt, "Value", tmpCombined, tmpRaster, "SUM", "DATA")
-    gp.Combine_sa("'" + nationalStatisticsInt + "';'" + tmpRaster + "'", tmpCombined)
-
-    nationalStatisticsName = os.path.splitext(os.path.basename(nationalStatisticsInt))[0]
-    tmpRasterName = os.path.splitext(os.path.basename(tmpRaster))[0]
-
-    gp.AddMessage("\nnat. stat.\t|  computed\t|  error")
-    gp.AddMessage("---------------------------------------")
-
-    rows = gp.searchcursor(tmpCombined)
-    row = rows.next()
-    while row:
-        natStat = row.getValue(nationalStatisticsName)
-        computed = row.getValue(tmpRasterName)
-        diff = (float(computed) - natStat) / computed * 100
-        outString = "%d\t|  %d\t|  %5.2f" % (natStat, computed, diff)
-        gp.AddMessage(outString)
-        row = rows.next()
-
-    gp.delete_management(tmpRaster)
-    gp.delete_management(tmpCombined)
-    gp.delete_management(nationalStatisticsInt)
-    os.removedirs(TMPDIR)
+from utils import IsSameExtent, RasterData
 
 if __name__ == '__main__':
-    rasterToValidate = sys.argv[1]
-    areaGrid = sys.argv[2]
-    nationalStatistics = sys.argv[3]
-    ValidateRaster(rasterToValidate, areaGrid, nationalStatistics)
+    workingDir = os.path.dirname(sys.argv[0])
+    os.chdir(workingDir)
+    runFileName = "validateResults.exe"    
+
+    rasterToValidate    = RasterData(sys.argv[1])
+    areaGrid            = RasterData(sys.argv[2])
+    nationalStatistics  = RasterData(sys.argv[3])
+
+    # Validate for equal extent
+    gp = arcgisscripting.create()
+    if not IsSameExtent(gp, [rasterToValidate, areaGrid, nationalStatistics]):
+        raise Exception('Error! Rasters don\'t have same extent')
+
+    # Results
+    resultDir        = rasterToValidate.getDirPath()
+    tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
+    deleteTmpDir = False
+    if not os.path.exists(tmpDir):
+        os.mkdir(tmpDir)
+        deleteTmpDir = True
+    
+    executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
+            runFileName, \
+            workingDir, \
+            resultDir, \
+            tmpDir, \
+            rasterToValidate.getPath(), \
+            areaGrid.getPath(), \
+            nationalStatistics.getPath())
+    
+    callResult = subprocess.call(executeCommand)
+    if not(callResult == 0):
+        if deleteTmpDir:
+            shutil.rmtree(tmpDir)
+        raise Exception('Error! Function returned error code %d!' % callResult)    

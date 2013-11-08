@@ -7,14 +7,15 @@
 
 import sys
 import os
+commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
+sys.path.append(commonDir)
+
 import shutil
 import subprocess
 import arcgisscripting
 
-commonDir = os.path.dirname(sys.argv[0]) + '\\..\\Common'
-sys.path.append(commonDir)
-
 from common import *
+from utils import IsSameExtent, RasterData
 
 if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
@@ -38,24 +39,24 @@ if __name__ == "__main__":
         os.mkdir(tmpDir)
         deleteTmpDir = True
 
-    clippedAreaGrid         = tmpDir + "\\area"
-    clippedStatisticsLevel0 = tmpDir + "\\stat0"
-    clippedStatisticsLevel1 = tmpDir + "\\stat1"
-    clippedStatisticsLevel2 = tmpDir + "\\stat2"
-    clippedProbabilityGrid  = tmpDir + "\\prob"
-    clippedStatLayer        = tmpDir + "\\minavgmax"
+    clippedAreaGrid         = RasterData(tmpDir + "\\area" + ".img")
+    clippedStatisticsLevel0 = RasterData(tmpDir + "\\stat0" + ".img")
+    clippedStatisticsLevel1 = RasterData(tmpDir + "\\stat1" + ".img")
+    clippedStatisticsLevel2 = RasterData(tmpDir + "\\stat2" + ".img")
+    clippedProbabilityGrid  = RasterData(tmpDir + "\\prob" + ".img")
+    clippedStatLayer        = RasterData(tmpDir + "\\minavgmax" + ".img")
 
     gp = arcgisscripting.create()
     conditionalRaster = sys.argv[7]
     zonalCondition = sys.argv[8]
-    ConClip(conditionalRaster, areaGrid, zonalCondition, clippedAreaGrid + ".img")
-    desc = gp.Describe(clippedAreaGrid + ".img")
+    ConClip(conditionalRaster, areaGrid, zonalCondition, RasterData(clippedAreaGrid.getFullPath()))
+    desc = gp.Describe(clippedAreaGrid.getFullPath())
     coords = desc.Extent
 
-    ConClip(conditionalRaster, statisticsLevel0, zonalCondition, clippedStatisticsLevel0 + ".img")
-    ConClip(conditionalRaster, statisticsLevel1, zonalCondition, clippedStatisticsLevel1 + ".img")
-    ConClip(conditionalRaster, statisticsLevel2, zonalCondition, clippedStatisticsLevel2 + ".img")
-    gp.Clip_management(probabilityGrid, coords, clippedProbabilityGrid + ".img")
+    ConClip(conditionalRaster, statisticsLevel0, zonalCondition, clippedStatisticsLevel0.getFullPath())
+    ConClip(conditionalRaster, statisticsLevel1, zonalCondition, clippedStatisticsLevel1.getFullPath())
+    ConClip(conditionalRaster, statisticsLevel2, zonalCondition, clippedStatisticsLevel2.getFullPath())
+    gp.Clip_management(probabilityGrid, coords, clippedProbabilityGrid.getFullPath())
 
     statTypes = ["min", "minavg", "avg", "maxavg", "max"]
     numStatistics = len(statTypes)
@@ -75,19 +76,19 @@ if __name__ == "__main__":
         outputList = [output]
 
     for idx in range(0, numStatistics):
-        gp.Clip_management(statList[idx] + ".img", coords, clippedStatLayer + ".img")
+        gp.Clip_management(statList[idx] + ".img", coords, clippedStatLayer.getFullPath())
         
         executeCommand = '"%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % ( \
             runFileName, \
             workingDir, \
             resultDir, \
             tmpDir, \
-            clippedAreaGrid, \
-            clippedStatisticsLevel0, \
-            clippedStatisticsLevel1, \
-            clippedStatisticsLevel2, \
-            clippedProbabilityGrid, \
-            clippedStatLayer, \
+            clippedAreaGrid.getFullPath(), \
+            clippedStatisticsLevel0.getFullPath(), \
+            clippedStatisticsLevel1.getFullPath(), \
+            clippedStatisticsLevel2.getFullPath(), \
+            clippedProbabilityGrid.getFullPath(), \
+            clippedStatLayer.getFullPath(), \
             outputList)
     
         os.chdir(workingDir)
