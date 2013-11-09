@@ -751,7 +751,7 @@ void getValidatedResults(const vector<float> & valVector,
 	{
 		result[0] = fabs(stat - computed);
 		result[1] = (stat != 0) ? result[0] / stat * (float)100 : (float)0;
-		result[3] = (computed < stat) 
+		result[2] = (computed < stat) 
 			? (float)1 + ((stat - computed) / computed)
 			: (float)1 - ((computed - stat) / computed);
 
