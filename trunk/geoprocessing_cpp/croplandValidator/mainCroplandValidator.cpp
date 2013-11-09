@@ -67,8 +67,7 @@ int main(int argc, char * argv[])
 	// Error analysis:
 	raster outAbsDiffRaster(runParams.resultDir + "error_abs", raster::OUTPUT);
 	raster outRelDiffRaster(runParams.resultDir + "error_rel", raster::OUTPUT);
-	raster outMinClassRaster(runParams.resultDir + "min_class", raster::OUTPUT);
-	//raster outNormalizedRasterLevel2(runParams.resultDir + "normalized_result", raster::OUTPUT);
+	raster outMinClassRaster(runParams.resultDir + "min_class", raster::TEMPORARY);
 
 	// Temporary:
 	// Product of cell area and cropland percentage
@@ -118,10 +117,12 @@ int main(int argc, char * argv[])
 		areaRaster,
 		outCalibratedRasterLevel2,
 		statisticsRasterLevel0,
-		output,
+		//output,
 		outAbsDiffRaster,
 		outRelDiffRaster,
 		runParams);
+
+	outCalibratedRasterLevel2.copy(output);
 
 	printf("End: ");
 	outputLocalTime();

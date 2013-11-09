@@ -44,6 +44,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "probabilityLayerMultiPriori
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vendors", "vendors\vendors.vcproj", "{B6582166-CF21-4ABE-9A64-674C1411018F}"
 EndProject
+
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "validateResults", "validateResults\validateResults.vcproj", "{903B2BB1-BB15-90E2-794D-0D06C300B521}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7} = {E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}
+	EndProjectSection
+EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

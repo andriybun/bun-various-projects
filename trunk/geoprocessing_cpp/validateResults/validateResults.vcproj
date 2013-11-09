@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="croplandValidator"
-	ProjectGUID="{95049340-1C6B-40B6-AF42-46B1DC5140AF}"
-	RootNamespace="croplandValidator"
+	Name="validateResults"
+	ProjectGUID="{903B2BB1-BB15-90E2-794D-0D06C300B521}"
+	RootNamespace="validateResults"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\mainCroplandValidator.cpp"
+				RelativePath=".\mainValidateResults.cpp"
 				>
 			</File>
 		</Filter>

@@ -745,7 +745,7 @@ void getValidatedResults(const vector<float> & valVector,
 		result[0] = noDataValuesOutVector[0];
 		result[1] = noDataValuesOutVector[1];
 		result[2] = noDataValuesOutVector[2];
-		result[3] = noDataValuesOutVector[3];
+		//result[3] = noDataValuesOutVector[3];
 	}
 	else
 	{
@@ -755,24 +755,25 @@ void getValidatedResults(const vector<float> & valVector,
 			? (float)1 + ((stat - computed) / computed)
 			: (float)1 - ((computed - stat) / computed);
 
-		if (compare_eq(valVector[2], noDataValuesVector[2], EPSILON))
-		{
-			result[2] = noDataValuesOutVector[2];
-		}
-		else
-		{
-			result[2] = xmin((float)100, (computed < stat) 
-				? valVector[2] * result[3] //((float)1 + ((stat - computed) / computed))
-				: valVector[2] * result[3] //((float)1 - ((computed - stat) / computed))
-				);
-		}
+		//if (compare_eq(valVector[2], noDataValuesVector[2], EPSILON))
+		//{
+		//	result[2] = noDataValuesOutVector[2];
+		//}
+		//else
+		//{
+		//	result[2] = valVector[2];
+			//result[2] = xmin((float)100, (computed < stat) 
+			//	? valVector[2] * result[3] //((float)1 + ((stat - computed) / computed))
+			//	: valVector[2] * result[3] //((float)1 - ((computed - stat) / computed))
+			//	);
+		//}
 	}
 }
 
 void validateResult(raster & areaRaster,
 					raster & computedResultRaster,
 					raster & statisticsRaster,
-					raster & outNormalizedRasterLevel2,
+					//raster & outNormalizedRasterLevel2,
 					raster & outAbsDiffRaster,
 					raster & outRelDiffRaster,
 					const runParamsT & runParams)
@@ -781,7 +782,9 @@ void validateResult(raster & areaRaster,
 	raster tmpResultingAreasRaster(runParams.tmpDir + "tmp_resulting_areas", raster::TEMPORARY);
 	raster tmpRatioRaster(runParams.tmpDir + "tmp_ratio", raster::TEMPORARY);
 
+	// Do some arithmetic transformations of input rasters
 	areaRaster.rasterArithmetics(&preprocessCellAreasInt, computedResultRaster, tmpComputedAreasRaster);
+	// Calculate zonal sum per countries (specified zones)
 	tmpComputedAreasRaster.zonalStatistics(statisticsRaster, tmpResultingAreasRaster, raster::SUM);
 
 	vector<raster *> passVector;
@@ -792,7 +795,7 @@ void validateResult(raster & areaRaster,
 	vector<raster *> getBackVector;
 	getBackVector.push_back(&outAbsDiffRaster);
 	getBackVector.push_back(&outRelDiffRaster);
-	getBackVector.push_back(&outNormalizedRasterLevel2);
+	//getBackVector.push_back(&outNormalizedRasterLevel2);
 	getBackVector.push_back(&tmpRatioRaster);
 
 	multipleRasterArithmetics(&getValidatedResults, passVector, getBackVector);	

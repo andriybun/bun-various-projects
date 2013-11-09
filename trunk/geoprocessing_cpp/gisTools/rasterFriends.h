@@ -79,7 +79,7 @@ void calibrateCropland(raster & inCroplandRawRaster,
 void validateResult(raster & areaRaster,
 					raster & computedResultRaster,
 					raster & statisticsRaster,
-					raster & outNormalizedRasterLevel2,
+					//raster & outNormalizedRasterLevel2,
 					raster & outAbsDiffRaster,
 					raster & outRelDiffRaster,
 					const runParamsT & runParams);
