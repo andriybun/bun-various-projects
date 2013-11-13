@@ -119,8 +119,8 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 {
 	printf("Adjusting cropland probability classes\n");
 
-	map< float, float * > classesByCountryTable;	// key - country ID, value - vector of areas for all classes
-	map< float, vector<int> > oldToNewClassesMap;	// key - country ID, value - vector of new (adjusted) classes
+	map< int, float * > classesByCountryTable;	// key - country ID, value - vector of areas for all classes
+	map< int, vector<int> > oldToNewClassesMap;	// key - country ID, value - vector of new (adjusted) classes
 
 	inAreaRaster.validateExtent(inCountriesRaster);
 	inAreaRaster.validateExtent(inClassRaster);
@@ -176,15 +176,15 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 				(bufCountries[i] != inCountriesRaster.noDataValue) &&
 				(bufArea[i] != inAreaRaster.noDataValue))
 			{
-				map< float, float * >::iterator it = classesByCountryTable.find(bufCountries[i]);
+				map< int, float * >::iterator it = classesByCountryTable.find((int)bufCountries[i]);
 				if (it == classesByCountryTable.end())
 				{
 					printf("  > adding: c = %d\n", (int)bufCountries[i]);
 					float * tmp = new float[maxClass + 1];
 					memset(tmp, 0, sizeof(float) * (maxClass + 1));
-					classesByCountryTable.insert(make_pair<float, float *>(bufCountries[i], tmp));
-					oldToNewClassesMap.insert(make_pair<float, vector<int> >(bufCountries[i], dummyVector));
-					it = classesByCountryTable.find(bufCountries[i]);
+					classesByCountryTable.insert(make_pair<int, float *>((int)bufCountries[i], tmp));
+					oldToNewClassesMap.insert(make_pair<int, vector<int> >((int)bufCountries[i], dummyVector));
+					it = classesByCountryTable.find((int)bufCountries[i]);
 				}
 				it->second[(int)bufClass[i]] += bufArea[i];
 			}
@@ -193,10 +193,10 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 	}
 	
 	// Second run through the table - rearrange classes
-	map< float, float * >::iterator it = classesByCountryTable.begin();
+	map< int, float * >::iterator it = classesByCountryTable.begin();
 	while (it != classesByCountryTable.end())
 	{
-		float countryId = it->first;
+		int countryId = it->first;
 
 		for (size_t i = 0; i <= maxClass; i++)
 		{
@@ -270,7 +270,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 			if ((bufClass[i] != inClassRaster.noDataValue) &&
 				(bufCountries[i] != inCountriesRaster.noDataValue))
 			{
-				outBufClass[i] = (float)oldToNewClassesMap[bufCountries[i]][(int)bufClass[i]];
+				outBufClass[i] = (float)oldToNewClassesMap[(int)bufCountries[i]][(int)bufClass[i]];
 			}
 			else
 			{

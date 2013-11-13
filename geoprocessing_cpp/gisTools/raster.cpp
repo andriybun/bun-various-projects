@@ -261,7 +261,7 @@ void raster::copyProperties(raster & destination) const
 	destination.description = description;
 }
 
-void raster::incMap(zonalStatisticsTableT &mp, float key, float val)
+void raster::incMap(zonalStatisticsTableT &mp, int key, float val)
 {
 	statisticsStructT tmp = mp[key];
 	if (tmp.count == 0)
@@ -281,7 +281,7 @@ void raster::incMap(zonalStatisticsTableT &mp, float key, float val)
 		tmp.countNonZero += (val > 0) ? 1 : 0;
 	}
 	mp.erase(key);
-	mp.insert(make_pair<float, statisticsStructT>(key, tmp));
+	mp.insert(make_pair<int, statisticsStructT>(key, tmp));
 }
 
 raster::statisticsStructT raster::describe()
@@ -515,7 +515,7 @@ void raster::zonalStatisticsAsTable(const raster & inZoneRaster,
 		{
 			if ((buf[i] != (*this).noDataValue) && (bufZone[i] != inZoneRaster.noDataValue))
 			{
-				incMap(zonalStatisticsTable, bufZone[i], buf[i]);
+				incMap(zonalStatisticsTable, (int)bufZone[i], buf[i]);
 			}
 		}
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
@@ -570,7 +570,7 @@ void raster::zonalStatistics(const raster & inZoneRaster,
 		{
 			if (bufZone[i] != inZoneRaster.noDataValue)
 			{
-				statisticsStructT tmp = zonalStatisticsTable[bufZone[i]];
+				statisticsStructT tmp = zonalStatisticsTable[(int)bufZone[i]];
 				switch (statisticsType)
 				{
 				case SUM:
@@ -675,7 +675,7 @@ void raster::combineAsTable(const vector<raster *> & inRastersVector, tableT & o
 			}
 			if (isData && !outTable.exists(passArg))
 			{
-				outTable.insert((float)tableRowIdx++, passArg);
+				outTable.insert(tableRowIdx++, passArg);
 			}
 		}
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
@@ -756,6 +756,11 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 	printf("\tmin class: %d\n", minClass);
 	printf("\tmax class: %d\n", maxClass);
 
+	// If minimum class is less than zero, the probability class file is corrupt
+	ASSERT_INT(minClass >= 0, WRONG_PROPERTIES_OF_RASTER);
+	// If zero probability class exists, it is ignored
+	minClass = xmax(minClass, 1);
+
 	ifstream thisFile;
 	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
 	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
@@ -792,7 +797,7 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 				(bufClass[i] != inClassRaster.noDataValue) &&
 				(bufClass[i] != 0))									// and where probability class is zero = no probability
 			{
-				outTable.inc(bufZone[i], (size_t)bufClass[i], bufArea[i]);
+				outTable.inc((int)bufZone[i], (size_t)bufClass[i], bufArea[i]);
 			}
 		}
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
@@ -814,16 +819,15 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 	printf("Zone ID\tZone stats\tBest estimate\tBest class\tError\n");
 	while (row != outTable.data.end())
 	{
-		float targetSum = row->first;
-		//cout << "target sum = " << targetSum << endl;
+		int targetSum = row->first;
 		float rowSum = (float)0;
 		float resultingSum = (float)0;
-		float absDiff = targetSum;
+		float absDiff = (float)targetSum;
 		unitResultT rowResult;
 		rowResult.bestClass = -1;
 		rowResult.bestEstimate = rowSum;
 		rowResult.bestClassMultiplier = 1;
-		if (compare_eq(targetSum, (float)0, EPSILON))
+		if (targetSum == 0)
 		{
 			rowResult.error = (float)0;
 			rowResult.bestEstimate = (float)0;
@@ -836,17 +840,17 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 				float nextRowSum = rowSum + row->second[cl-1];
 				rowResult.bestEstimate = rowSum;
 				rowResult.bestClass = cl;
-				if (nextRowSum > targetSum)
+				if (nextRowSum > (float)targetSum)
 				{
-					rowResult.bestClassMultiplier = (targetSum - rowSum) / row->second[cl-1];
+					rowResult.bestClassMultiplier = ((float)targetSum - rowSum) / row->second[cl-1];
 					break;
 				}
 				rowSum = nextRowSum;
 			}
 			rowResult.error = (float)0;
 		}
-		printf("%d\t%f\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.bestClassMultiplier);
-		calibratedResults.insert(make_pair<float, unitResultT>(row->first, rowResult));
+		printf("%d\t%d\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.bestClassMultiplier);
+		calibratedResults.insert(make_pair<int, unitResultT>(row->first, rowResult));
 		currentCountry++;
 		row++;
 	}

@@ -97,7 +97,7 @@ public:
 		PASS_INPUT,
 		PASS_TEMPORARY
 	};
-	typedef map<float, statisticsStructT> zonalStatisticsTableT;
+	typedef map<int, statisticsStructT> zonalStatisticsTableT;
 private:
 	struct unitResultT
 	{
@@ -106,7 +106,7 @@ private:
 		float bestClassMultiplier;
 		float error;
 	};
-	typedef map <float, unitResultT> summaryTableT;
+	typedef map <int, unitResultT> summaryTableT;
 
 	string rasterPath;
 	int horResolution;
@@ -127,7 +127,7 @@ private:
 	void copyFile(const string & source, const string & destination) const;
 	void deleteFile(const string & fileName) const;
 	void copyProperties(raster & destination) const;
-	void incMap(zonalStatisticsTableT &mp, float key, float val);
+	void incMap(zonalStatisticsTableT &mp, int key, float val);
 public:
 	raster();
 	raster(const string & rasterName, rasterTypeT rType);
