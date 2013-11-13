@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cp $(TargetPath) &quot;C:\Program Files\Cropland Tools\Probability Layer\$(ProjectName).exe&quot;"
+				CommandLine="cp &quot;$(TargetPath)&quot; &quot;$(SolutionDir)..\Cropland Tools\Probability Layer&quot;"
 			/>
 		</Configuration>
 	</Configurations>

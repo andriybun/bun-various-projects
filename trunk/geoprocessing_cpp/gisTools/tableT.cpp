@@ -23,13 +23,13 @@ void tableT::setNumCols(size_t n)
 	sized = true;
 }
 
-void tableT::insert(const float key, const vector<float> & val)
+void tableT::insert(const int key, const vector<float> & val)
 {
 	ASSERT_INT(val.size() == numCols, OTHER_ERROR);
-	data.insert(make_pair<float, vector<float>>(key, val));
+	data.insert(make_pair<int, vector<float>>(key, val));
 }
 
-void tableT::inc(const float key, const vector<float> & val)
+void tableT::inc(const int key, const vector<float> & val)
 {
 	ASSERT_INT(val.size() == numCols, OTHER_ERROR);
 	vector<float> tmp;
@@ -39,10 +39,10 @@ void tableT::inc(const float key, const vector<float> & val)
 		tmp[idx] += val[idx];
 	}
 	data.erase(key);
-	data.insert(make_pair<float, vector<float>>(key, tmp));
+	data.insert(make_pair<int, vector<float>>(key, tmp));
 }
 
-void tableT::inc(const float key, const size_t idx, const float val)
+void tableT::inc(const int key, const size_t idx, const float val)
 {
 	ASSERT_INT(idx < numCols + 1, OTHER_ERROR);
 	vector<float> tmp = data[key];
@@ -52,7 +52,7 @@ void tableT::inc(const float key, const size_t idx, const float val)
 	}
 	tmp[idx-1] += val;
 	data.erase(key);
-	data.insert(make_pair<float, vector<float>>(key, tmp));
+	data.insert(make_pair<int, vector<float>>(key, tmp));
 }
 
 tableT::dataT::iterator tableT::find(const vector<float> & val)
@@ -60,7 +60,7 @@ tableT::dataT::iterator tableT::find(const vector<float> & val)
 	dataT::iterator it = data.begin();
 	while (it != data.end())
 	{
-		if (it->second == val) return it;
+		if (std::equal(val.begin(), val.end(), it->second.begin())) return it;
 		it++;
 	}
 	return it;

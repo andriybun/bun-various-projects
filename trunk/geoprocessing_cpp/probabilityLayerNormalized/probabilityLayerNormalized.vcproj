@@ -162,7 +162,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cp $(TargetPath) &quot;C:\Program Files\Cropland Tools\Probability Layer\probabilityLayerNormalized.exe&quot;"
+				CommandLine="cp &quot;$(TargetPath)&quot; &quot;$(SolutionDir)..\Cropland Tools\ProbabilityLayer&quot;"
 			/>
 		</Configuration>
 	</Configurations>

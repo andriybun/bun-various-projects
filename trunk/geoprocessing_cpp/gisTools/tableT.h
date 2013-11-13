@@ -17,7 +17,7 @@ class raster;
 class tableT
 {
 public:
-	typedef map< float, vector<float> > dataT;
+	typedef map< int, vector<float> > dataT;
 	dataT data;
 private:
 	bool sized;
@@ -27,9 +27,9 @@ public:
 	tableT(size_t sz);
 	~tableT();
 	void setNumCols(size_t n);
-	void insert(const float key, const vector<float> & val);
-	void inc(const float key, const vector<float> & val);
-	void inc(const float key, const size_t idx, const float val);
+	void insert(const int key, const vector<float> & val);
+	void inc(const int key, const vector<float> & val);
+	void inc(const int key, const size_t idx, const float val);
 	// TODO: optimize
 	dataT::iterator find(const vector<float> & val);
 	bool exists(const vector<float> & val);

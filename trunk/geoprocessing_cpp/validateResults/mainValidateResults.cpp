@@ -30,6 +30,7 @@ int main(int argc, char * argv[])
 	raster areaRaster(argv[5], raster::INPUT);
 	raster nationalStatistics(argv[6], raster::INPUT);
 
+	raster outTotalCroplandRaster(runParams.resultDir + "total_out_cropland", raster::OUTPUT);
 	raster outAbsDiffRaster(runParams.resultDir + "error_abs", raster::OUTPUT);
 	raster outRelDiffRaster(runParams.resultDir + "error_rel", raster::OUTPUT);
 
@@ -37,6 +38,7 @@ int main(int argc, char * argv[])
 		areaRaster,
 		rasterToValidate,
 		nationalStatistics,
+		outTotalCroplandRaster,
 		outAbsDiffRaster,
 		outRelDiffRaster,
 		runParams);

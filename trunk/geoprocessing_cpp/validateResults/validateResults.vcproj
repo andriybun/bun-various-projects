@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="validateResults"
 	ProjectGUID="{903B2BB1-BB15-90E2-794D-0D06C300B521}"
 	RootNamespace="validateResults"
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cp $(TargetPath) &quot;$(SolutionDir)..\Cropland Tools\Cropland Validator\$(TargetFileName)&quot;"
+				CommandLine="cp &quot;$(TargetPath)&quot; &quot;$(SolutionDir)..\Cropland Tools\Cropland Validator&quot;"
 			/>
 		</Configuration>
 	</Configurations>
