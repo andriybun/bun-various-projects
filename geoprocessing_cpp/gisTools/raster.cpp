@@ -577,7 +577,7 @@ void raster::zonalStatistics(const raster & inZoneRaster,
 					outBuf[i] = tmp.sumVal;
 					break;
 				case MEAN:
-					outBuf[i] = tmp.sumVal / tmp.count;
+					outBuf[i] = tmp.sumVal / (float)tmp.count;
 					break;
 				case MAX:
 					outBuf[i] = tmp.maxVal;
