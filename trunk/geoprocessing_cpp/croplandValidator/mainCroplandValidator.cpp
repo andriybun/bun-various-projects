@@ -8,7 +8,7 @@
 
 float preprocessCellAreas(float area, float stat)
 {
-	return (area / (float)10) * (stat / (float)100);
+	return area * stat / (float)1000;
 }
 
 float postprocessResults(float calibratedResult, float stat)
