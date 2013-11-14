@@ -465,8 +465,6 @@ void validateCropland(
 
 	ifstream inCroplandRawFile;
 	inCroplandRawFile.open(inCroplandRawRaster.getFltPath().c_str(), ios::out | ios::binary);
-	//ifstream inCroplandFile;
-	//inCroplandFile.open(inCroplandFltPath.c_str(), ios::out | ios::binary);
 	ifstream inZoneFile;
 	inZoneFile.open(inZoneFltPath.c_str(), ios::out | ios::binary);
 	ifstream inClassFile;
@@ -478,7 +476,6 @@ void validateCropland(
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
 
 	float * inBufCroplandRaw = new float[bufSize];
-	//float * inBufCropland = new float[bufSize];
 	float * inBufZone = new float[bufSize];
 	float * inBufClass = new float[bufSize];
 	float * outBufCropland = new float[bufSize];
@@ -490,7 +487,6 @@ void validateCropland(
 		bufSize = min(bufSize, numCells - numCellsProcessed);
 		numCellsProcessed += bufSize;
 		inCroplandRawFile.read(reinterpret_cast<char*>(inBufCroplandRaw), sizeof(float) * bufSize);
-		//inCroplandFile.read(reinterpret_cast<char*>(inBufCropland), sizeof(float) * bufSize);
 		inZoneFile.read(reinterpret_cast<char*>(inBufZone), sizeof(float) * bufSize);
 		inClassFile.read(reinterpret_cast<char*>(inBufClass), sizeof(float) * bufSize);
 		for (int i = 0; i < bufSize; i++)
@@ -531,13 +527,11 @@ void validateCropland(
 	}
 
 	inCroplandRawFile.close();
-	//inCroplandFile.close();
 	inZoneFile.close();
 	inClassFile.close();
 	outCroplandFile.close();
 
 	delete [] inBufCroplandRaw;
-	//delete [] inBufCropland;
 	delete [] inBufZone;
 	delete [] inBufClass;
 	delete [] outBufCropland;
