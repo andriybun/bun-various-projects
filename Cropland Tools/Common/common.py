@@ -69,14 +69,17 @@ def CreateMaskLayer(inRaster, condition, outMask, gp = None):
     gp.Clip_management(tmpRaster, dataExtent, outMask)
     gp.Delete_management(tmpRaster)
 
-def ConClip(inConditionalRaster, inValueRaster, condition, outRaster, gp = None):
+def ConClip(inConditionalRaster, inValueRasterList, condition, outRasterList, gp = None):
     if gp is None:
         gp = arcgisscripting.create ()
         gp.OverWriteOutput = 1
     mask = GetTmpDir() + "tempcc.img"
     gp.AddMessage("Condition: " + condition)
     CreateMaskLayer(inConditionalRaster, condition, mask, gp)
-    gp.Con_sa(mask, inValueRaster, outRaster, "#", "value = 1")
+    for i in range(len(inValueRasterList)):
+        inValueRaster = inValueRasterList[i]
+        outRaster     = outRasterList[i]
+        gp.Con_sa(mask, inValueRaster, outRaster, "#", "value = 1")
     gp.Delete_management(mask)
 
 def ZonalStatistics(inZoneRaster, inValueRaster, outRaster, statisticsType, gp = None):
