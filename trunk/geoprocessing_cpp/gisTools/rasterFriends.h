@@ -29,14 +29,14 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &, void *),
 							   const vector<raster *> & inRastersVector,
 							   vector<raster *> & outRastersVector,
-							   void * params = NULL);
+							   void * runParams = NULL);
 
 // Cropland algorithms:
 void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 									raster & inCountriesRaster,
 									raster & inClassRaster,
 									raster & outClassRaster,
-									const runParamsT & params,
+									const runParamsT & runParams,
 									agreementTableT & agTable
 									);
 void validateCropland(raster & inCroplandRawRaster,
@@ -45,18 +45,21 @@ void validateCropland(raster & inCroplandRawRaster,
 					  raster & inClassRaster,
 					  raster & outCroplandRaster,
 					  raster & outMinClassRaster,
-					  raster & errorRaster);
+					  raster & errorRaster,
+					  const runParamsT & runParams);
 void validateCropland(raster & inCroplandRawRaster,
 					  raster & inCroplandRaster,
 					  raster & inZoneRaster,
 					  raster & inClassRaster,
 					  raster & outCroplandRaster,
-					  raster & outMinClassRaster);
+					  raster & outMinClassRaster,
+					  const runParamsT & runParams);
 void validateCropland(raster & inCroplandRawRaster,
 					  raster & inCroplandRaster,
 					  raster & inZoneRaster,
 					  raster & inClassRaster,
-					  raster & outCroplandRaster);
+					  raster & outCroplandRaster,
+					  const runParamsT & runParams);
 void calibrateCropland(raster & inCroplandRawRaster,
 					   raster & inCroplandRaster,
 					   raster & inClassRaster,
@@ -65,7 +68,7 @@ void calibrateCropland(raster & inCroplandRawRaster,
 					   raster & resultLevelUp,
 					   raster & resultLevel,
 					   raster & outCalibratedRasterLevel,
-					   const runParamsT & params);
+					   const runParamsT & runParams);
 void calibrateCropland(raster & inCroplandRawRaster,
 					   raster & inCroplandRaster,
 					   raster & inClassRaster,
@@ -75,7 +78,7 @@ void calibrateCropland(raster & inCroplandRawRaster,
 					   raster & resultLevel,
 					   raster & outCalibratedRasterLevel,
 					   raster & outMinClassRaster,
-					   const runParamsT & params);
+					   const runParamsT & runParams);
 void validateResult(raster & areaRaster,
 					raster & computedResultRaster,
 					raster & statisticsRaster,

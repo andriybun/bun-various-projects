@@ -80,13 +80,15 @@ int main(int argc, char * argv[])
 		tmpCellAreaStat,
 		statisticsRasterLevel0,
 		probabilityRaster,
-		outCroplandRasterLevel0);
+		outCroplandRasterLevel0,
+		runParams);
 	validateCropland(
 		statRaster,
 		tmpCellAreaStat,
 		statisticsRasterLevel1,
 		probabilityRaster,
-		outCroplandRasterLevel1);
+		outCroplandRasterLevel1,
+		runParams);
 	calibrateCropland(
 		statRaster,
 		tmpCellAreaStat,
@@ -102,7 +104,8 @@ int main(int argc, char * argv[])
 		tmpCellAreaStat,
 		statisticsRasterLevel2,
 		probabilityRaster,
-		outCroplandRasterLevel2);
+		outCroplandRasterLevel2,
+		runParams);
 	calibrateCropland(
 		statRaster,
 		tmpCellAreaStat,

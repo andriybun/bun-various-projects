@@ -65,7 +65,7 @@ public:
 		raster & resultLevelUp,
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
-		const runParamsT & params);
+		const runParamsT & runParams);
 };
 
 #endif

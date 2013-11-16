@@ -8,9 +8,12 @@ raster::raster()
 	rasterType = EMPTY;
 }
 
-raster::raster(const string & rasterName, rasterTypeT rType)
+raster::raster(const string & rasterFullPath, rasterTypeT rType)
 {
-	rasterPath = rasterName;
+	rasterPath = rasterFullPath;
+	char fileName[200];
+	_splitpath(rasterPath.c_str(), NULL, NULL, fileName, NULL);
+	rasterName = fileName;
 	isDescribed = false;
 	initializedFromImg = false;
 	rasterType = rType;
@@ -20,7 +23,7 @@ raster::raster(const string & rasterName, rasterTypeT rType)
 		if (!readRasterProperties())
 		{
 			ifstream f;
-			string imgFileName = rasterName + ".img";
+			string imgFileName = rasterFullPath + ".img";
 			f.open(imgFileName.c_str(), ios::in);
 			if (f.is_open())
 			{
@@ -66,6 +69,7 @@ raster::raster(const raster & g)
 {
 	initializedFromImg = false;
 	rasterType = COPY;
+	rasterName = g.rasterName;
 	rasterPath = g.rasterPath;
 	g.copyProperties(*this);
 }
@@ -77,6 +81,7 @@ raster & raster::operator = (const raster & g)
 	if (this != &g)
 	{
 		rasterPath = g.rasterPath;
+		rasterName = g.rasterName;
 		switch (g.rasterType)
 		{
 		case EMPTY:
@@ -732,7 +737,8 @@ string raster::getFltPath()
 
 void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 									raster & inClassRaster,
-									summaryTableT & calibratedResults)
+									summaryTableT & calibratedResults,
+									const runParamsT & runParams)
 {
 	printf("Executing zonal sum by class (as table)\n");
 
@@ -816,7 +822,11 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 
 	tableT::dataT::iterator row = outTable.data.begin();
 	size_t currentCountry = 0;
-	printf("Zone ID\tZone stats\tBest estimate\tBest class\tError\n");
+
+	string csvTablePath = runParams.resultDir + (*this).rasterName + "_classes_per_zone";
+	FILE * csvTableFile;
+	csvTableFile = fopen(csvTablePath.c_str(), "w");
+	fprintf(csvTableFile, "Zone ID,Zone stats,Best estimate,Best class,Error\n");
 	while (row != outTable.data.end())
 	{
 		int targetSum = row->first;
@@ -849,11 +859,12 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 			}
 			rowResult.error = (float)0;
 		}
-		printf("%d\t%d\t%f\t%d\t\t%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.bestClassMultiplier);
+		fprintf(csvTableFile, "%d,%d,%f,%d,%f\n", currentCountry, targetSum, rowResult.bestEstimate, rowResult.bestClass, rowResult.bestClassMultiplier);
 		calibratedResults.insert(make_pair<int, unitResultT>(row->first, rowResult));
 		currentCountry++;
 		row++;
 	}
+	fclose(csvTableFile);
 }
 
 float xplus(float val1, float val2)

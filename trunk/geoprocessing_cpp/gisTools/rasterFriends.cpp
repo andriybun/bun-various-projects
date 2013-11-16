@@ -215,7 +215,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &, void *),
 							   const vector<raster *> & inRastersVector,
 							   vector<raster *> & outRastersVector,
-							   void * params)
+							   void * runParams)
 {
 	printf("Executing multiple raster arithmetics\n");
 	size_t numRasters = inRastersVector.size();
@@ -304,7 +304,7 @@ void multipleRasterArithmetics(void (*func)(const vector<float> &, const vector<
 			}
 			vector<float> result;
 			result.resize(numOutRasters);
-			func(passArg, noDataValuesVector, noDataValuesOutVector, result, params);
+			func(passArg, noDataValuesVector, noDataValuesOutVector, result, runParams);
 			for (size_t idx = 0; idx < numOutRasters; idx++)
 			{
 				outBufVector[idx][i] = result[idx];
