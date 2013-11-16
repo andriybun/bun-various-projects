@@ -108,6 +108,7 @@ private:
 	};
 	typedef map <int, unitResultT> summaryTableT;
 
+	string rasterName;
 	string rasterPath;
 	int horResolution;
 	int verResolution;
@@ -141,7 +142,9 @@ public:
 	void removeFloatFromDisc();
 	void rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster);
 	void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
-	void zonalStatisticsAsTable(const raster & inZoneRaster, zonalStatisticsTableT & zonalStatisticsTable, statisticsTypeT statisticsType = SUM);
+	void zonalStatisticsAsTable(const raster & inZoneRaster,
+		zonalStatisticsTableT & zonalStatisticsTable,
+		statisticsTypeT statisticsType = SUM);
 	void zonalStatistics(const raster & inZoneRaster, raster & outRaster, statisticsTypeT statisticsType = SUM);
 	void combineAsTable(const vector<raster *> & inRastersVector, tableT & outTable);
 	statisticsStructT describe();
@@ -149,7 +152,8 @@ public:
 	// Some cropland specific methods
 	void zonalSumByClassAsTable(const raster & inZoneRaster,
 		raster & inClassRaster,
-		summaryTableT & calibratedResults);
+		summaryTableT & calibratedResults,
+		const runParamsT & runParams);
 
 	// Conversion
 	void convertRasterToFloat();
@@ -171,19 +175,19 @@ public:
 		void (*func)(const vector<float> &, const vector<float> &, const vector<float> &, vector<float> &, void *),
 		const vector<raster *> & inRastersVector,
 		vector<raster *> & outRastersVector,
-		void * params);
+		void * runParams);
 	friend void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 		raster & inCountriesRaster,
 		raster & inClassRaster,
 		raster & outClassRaster,
-		const runParamsT & params,
+		const runParamsT & runParams,
 		agreementTableT & agTable
 		);
 	friend void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 		raster & inCountriesRaster,
 		raster & inClassRaster,
 		raster & outClassRaster,
-		const runParamsT & params,
+		const runParamsT & runParams,
 		map<int, priorityDataT * > & priorityDataMap
 		);
 	friend void validateCropland(
@@ -191,14 +195,8 @@ public:
 		raster & inCroplandRaster,
 		raster & inZoneRaster,
 		raster & inClassRaster,
-		raster & outCroplandRaster);
-	friend void validateCropland(
-		raster & inCroplandRawRaster,
-		raster & inCroplandRaster,
-		raster & inZoneRaster,
-		raster & inClassRaster,
 		raster & outCroplandRaster,
-		raster & outMinClassRaster);
+		const runParamsT & runParams);
 	friend void validateCropland(
 		raster & inCroplandRawRaster,
 		raster & inCroplandRaster,
@@ -206,7 +204,16 @@ public:
 		raster & inClassRaster,
 		raster & outCroplandRaster,
 		raster & outMinClassRaster,
-		raster & errorRaster);
+		const runParamsT & runParams);
+	friend void validateCropland(
+		raster & inCroplandRawRaster,
+		raster & inCroplandRaster,
+		raster & inZoneRaster,
+		raster & inClassRaster,
+		raster & outCroplandRaster,
+		raster & outMinClassRaster,
+		raster & errorRaster,
+		const runParamsT & runParams);
 	friend void calibrateCropland(
 		raster & inCroplandRawRaster,
 		raster & inCroplandRaster,
@@ -216,7 +223,7 @@ public:
 		raster & resultLevelUp,
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
-		const runParamsT & params);
+		const runParamsT & runParams);
 	friend void calibrateCropland(
 		raster & inCroplandRawRaster,
 		raster & inCroplandRaster,
@@ -227,7 +234,7 @@ public:
 		raster & resultLevel,
 		raster & outCalibratedRasterLevel,
 		raster & outMinClassRaster,
-		const runParamsT & params);
+		const runParamsT & runParams);
 	friend void validateResult(raster & cellAreaStatRaster,
 		raster & statisticsRaster,
 		raster & outAbsDiffRaster,

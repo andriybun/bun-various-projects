@@ -113,7 +113,7 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 									raster & inCountriesRaster,
 									raster & inClassRaster,
 									raster & outClassRaster,
-									const runParamsT & params,
+									const runParamsT & runParams,
 									map<int, priorityDataT * > & priorityDataMap
 									)
 {
