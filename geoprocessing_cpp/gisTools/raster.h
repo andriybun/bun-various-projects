@@ -121,6 +121,7 @@ private:
 	bool initializedFromImg;
 	rasterTypeT rasterType;
 
+	void rasterInitPrivate(const string & rasterName, rasterTypeT rType);
 	bool readRasterProperties();
 	bool validateExtent(const raster & other) const;
 	void saveHdr();
@@ -132,9 +133,12 @@ private:
 public:
 	raster();
 	raster(const string & rasterName, rasterTypeT rType);
+	void rasterInit(const string & rasterName, rasterTypeT rType);
 	raster(const raster & g);
 	raster & operator = (const raster & g);
 	~raster();
+
+	bool isEmpty();
 
 	// Generic geoprocessing methods:
 	raster copy(const string & destinationName);

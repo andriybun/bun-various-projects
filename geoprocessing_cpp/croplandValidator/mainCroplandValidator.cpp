@@ -6,6 +6,8 @@
 #include "raster.h"
 #include "timer.h"
 
+const int MAX_LEVELS = 3;
+
 float preprocessCellAreas(float area, float stat)
 {
 	return area * stat / (float)1000;
@@ -43,90 +45,90 @@ int main(int argc, char * argv[])
 	runParams.tmpDir = string(argv[3]) + "\\";
 
 	raster areaRaster(argv[4], raster::INPUT);
-	raster statisticsRasterLevel0(argv[5], raster::INPUT);
-	raster statisticsRasterLevel1(argv[6], raster::INPUT);
-	raster statisticsRasterLevel2(argv[7], raster::INPUT);
 	raster probabilityRaster(argv[8], raster::INPUT);
 	raster statRaster(argv[9], raster::INPUT);
 	raster output(argv[10], raster::OUTPUT);
 
-	// Results for levels:
-	raster outCroplandRasterLevel0(runParams.resultDir + "validated_cropland_level0", raster::OUTPUT);
-	raster outCroplandRasterLevel1(runParams.resultDir + "validated_cropland_level1", raster::OUTPUT);
-	raster outCroplandRasterLevel2(runParams.resultDir + "validated_cropland_level2", raster::OUTPUT);
+	// Product of cell area and cropland percentage
+	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", raster::TEMPORARY);
+	areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
 
-	// Difference between results and reported statistics:
-	raster outErrorRasterLevel0(runParams.tmpDir + "validated_cropland_error_level0", raster::TEMPORARY);
-	raster outErrorRasterLevel1(runParams.tmpDir + "validated_cropland_error_level1", raster::TEMPORARY);
-	raster outErrorRasterLevel2(runParams.tmpDir + "validated_cropland_error_level2", raster::TEMPORARY);
+	string levelIdxChar("012");
 
-	// Calibrated results:
-	raster outCalibratedRasterLevel1(runParams.resultDir + "calibrated_cropland_level1", raster::OUTPUT);
-	raster outCalibratedRasterLevel2(runParams.resultDir + "calibrated_cropland_level2", raster::OUTPUT);
+	// Create vectors of inputs and results
+	raster statisticsRasterLevelVector[MAX_LEVELS];
+	raster outCroplandRasterLevelVector[MAX_LEVELS];
+	raster outCalibratedRasterLevelVector[MAX_LEVELS];
+
+	// Process levels
+	int levelIdx = 0;
+	for (; levelIdx < MAX_LEVELS; levelIdx++)
+	{
+		statisticsRasterLevelVector[levelIdx].rasterInit(argv[5+levelIdx], raster::INPUT);
+
+		if (statisticsRasterLevelVector[levelIdx].isEmpty())
+		{
+			ASSERT_INT(levelIdx != 0, INCORRECT_INPUT_PARAMS);
+			printf("Processing levels: loop stopped at level %d\n", levelIdx);
+			break;
+		}
+
+		outCroplandRasterLevelVector[levelIdx].rasterInit(runParams.resultDir + "validated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
+		outCalibratedRasterLevelVector[levelIdx].rasterInit(runParams.resultDir + "calibrated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
+
+		// Validate cropland
+		validateCropland(
+			statRaster,
+			tmpCellAreaStat,
+			statisticsRasterLevelVector[levelIdx],
+			probabilityRaster,
+			outCroplandRasterLevelVector[levelIdx],
+			runParams);
+
+		if (levelIdx == 0)
+		{
+			outCalibratedRasterLevelVector[levelIdx] = outCroplandRasterLevelVector[levelIdx];
+		}
+		else
+		{
+			// Run calibration method
+			calibrateCropland(
+				statRaster,
+				tmpCellAreaStat,
+				probabilityRaster,
+				statisticsRasterLevelVector[0],
+				statisticsRasterLevelVector[levelIdx],
+				outCalibratedRasterLevelVector[levelIdx-1],
+				outCroplandRasterLevelVector[levelIdx],
+				outCalibratedRasterLevelVector[levelIdx],
+				runParams);
+		}
+	}
 
 	// Error analysis:
 	raster outTotalCroplandRaster(runParams.resultDir + "total_out_cropland", raster::OUTPUT);
 	raster outAbsDiffRaster(runParams.resultDir + "error_abs", raster::OUTPUT);
 	raster outRelDiffRaster(runParams.resultDir + "error_rel", raster::OUTPUT);
-	raster outMinClassRaster(runParams.resultDir + "min_class", raster::TEMPORARY);
 
-	// Temporary:
-	// Product of cell area and cropland percentage
-	raster tmpCellAreaStat(runParams.tmpDir + "tmp_cell_area_stat", raster::TEMPORARY);
+	// Copy latest result to output raster
+	if (levelIdx == 1)
+	{
+		outCroplandRasterLevelVector[0].copy(output);
+	}
+	else if (levelIdx == 2 || levelIdx == 3)
+	{
+		outCalibratedRasterLevelVector[levelIdx-1].copy(output);
+	}
 
-	areaRaster.rasterArithmetics(&preprocessCellAreas, statRaster, tmpCellAreaStat);
-	validateCropland(
-		statRaster,
-		tmpCellAreaStat,
-		statisticsRasterLevel0,
-		probabilityRaster,
-		outCroplandRasterLevel0,
-		runParams);
-	validateCropland(
-		statRaster,
-		tmpCellAreaStat,
-		statisticsRasterLevel1,
-		probabilityRaster,
-		outCroplandRasterLevel1,
-		runParams);
-	calibrateCropland(
-		statRaster,
-		tmpCellAreaStat,
-		probabilityRaster,
-		statisticsRasterLevel0,
-		statisticsRasterLevel1,
-		outCroplandRasterLevel0,
-		outCroplandRasterLevel1,
-		outCalibratedRasterLevel1,
-		runParams);
-	validateCropland(
-		statRaster,
-		tmpCellAreaStat,
-		statisticsRasterLevel2,
-		probabilityRaster,
-		outCroplandRasterLevel2,
-		runParams);
-	calibrateCropland(
-		statRaster,
-		tmpCellAreaStat,
-		probabilityRaster,
-		statisticsRasterLevel0,
-		statisticsRasterLevel2,
-		outCalibratedRasterLevel1,
-		outCroplandRasterLevel2,
-		outCalibratedRasterLevel2,
-		outMinClassRaster,
-		runParams);
+	// Validation of result
 	validateResult(
 		areaRaster,
-		outCalibratedRasterLevel2,
-		statisticsRasterLevel0,
+		output,
+		statisticsRasterLevelVector[0],
 		outTotalCroplandRaster,
 		outAbsDiffRaster,
 		outRelDiffRaster,
 		runParams);
-
-	outCalibratedRasterLevel2.copy(output);
 
 	printf("End: ");
 	outputLocalTime();

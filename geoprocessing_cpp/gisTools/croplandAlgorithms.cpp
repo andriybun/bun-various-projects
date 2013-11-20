@@ -228,8 +228,6 @@ void validateCropland(
 	inClassFile.open(inClassFltPath.c_str(), ios::out | ios::binary);
 	ofstream outCroplandFile;
 	outCroplandFile.open(outCroplandFltPath.c_str(), ios::out | ios::binary);
-	ofstream outMinClassFile;
-	outMinClassFile.open(outMinClassFltPath.c_str(), ios::out | ios::binary);
 
 	int numCells = inCroplandRawRaster.horResolution * inCroplandRawRaster.verResolution;
 	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
@@ -238,7 +236,6 @@ void validateCropland(
 	float * inBufZone = new float[bufSize];
 	float * inBufClass = new float[bufSize];
 	float * outBufCropland = new float[bufSize];
-	float * outBufMinClass = new float[bufSize];
 
 	printf("Writing results to files\n");
 	int numCellsProcessed = 0;
@@ -256,7 +253,6 @@ void validateCropland(
 				&& (inBufClass[i] != inClassRaster.noDataValue))
 			{
 				raster::unitResultT unitResult = calibratedResults[(int)inBufZone[i]];
-				outBufMinClass[i] = (float)unitResult.bestClass;
 				if (unitResult.bestClass < inBufClass[i])
 				{
 					outBufCropland[i] = inBufCroplandRaw[i];
@@ -278,22 +274,12 @@ void validateCropland(
 					if (unitResultIter != calibratedResults.end())
 					{
 						raster::unitResultT unitResult = unitResultIter->second;
-						outBufMinClass[i] = (float)unitResultIter->second.bestClass;
 					}
-					else
-					{
-						outBufMinClass[i] = outMinClassRaster.noDataValue;
-					}
-				}
-				else
-				{
-					outBufMinClass[i] = outMinClassRaster.noDataValue;
 				}
 				outBufCropland[i] = outCroplandRaster.noDataValue;
 			}
 		}
 		outCroplandFile.write(reinterpret_cast<char *>(outBufCropland), sizeof(float) * bufSize);
-		outMinClassFile.write(reinterpret_cast<char *>(outBufMinClass), sizeof(float) * bufSize);
 		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
 	}
 
@@ -301,13 +287,11 @@ void validateCropland(
 	inZoneFile.close();
 	inClassFile.close();
 	outCroplandFile.close();
-	outMinClassFile.close();
 
 	delete [] inBufCroplandRaw;
 	delete [] inBufZone;
 	delete [] inBufClass;
 	delete [] outBufCropland;
-	delete [] outBufMinClass;
 }
 
 void validateCropland(
@@ -383,7 +367,7 @@ void validateCropland(
 				{
 					outBufCropland[i] = inBufCroplandRaw[i];
 				}
-				else if (unitResult.bestClass == inBufCroplandRaw[i])
+				else if (unitResult.bestClass == inBufClass[i])
 				{
 					outBufCropland[i] = inBufCroplandRaw[i] * unitResult.bestClassMultiplier;
 				}
@@ -491,7 +475,7 @@ void validateCropland(
 				{
 					outBufCropland[i] = inBufCroplandRaw[i];
 				}
-				else if (unitResult.bestClass == inBufCroplandRaw[i])
+				else if (unitResult.bestClass == inBufClass[i])
 				{
 					outBufCropland[i] = inBufCroplandRaw[i] * unitResult.bestClassMultiplier;
 				}
