@@ -10,6 +10,24 @@ raster::raster()
 
 raster::raster(const string & rasterFullPath, rasterTypeT rType)
 {
+	rasterInitPrivate(rasterFullPath, rType);
+}
+
+void raster::rasterInit(const string & rasterFullPath, rasterTypeT rType)
+{
+	// This method can be only called if current raster is EMPTY
+	ASSERT_INT(rasterType == EMPTY, ATTEMPT_TO_REINITIALIZE_RASTER)
+	rasterInitPrivate(rasterFullPath, rType);
+}
+
+void raster::rasterInitPrivate(const string & rasterFullPath, rasterTypeT rType)
+{
+	if (!strcmp(rasterFullPath.c_str(), "#"))
+	{
+		printf("# - empty raster\n");
+		rasterType = EMPTY;
+		return;
+	}
 	rasterPath = rasterFullPath;
 	char fileName[200];
 	_splitpath(rasterPath.c_str(), NULL, NULL, fileName, NULL);
@@ -116,6 +134,11 @@ raster::~raster()
 	{
 		removeFloatFromDisc();
 	}
+}
+
+bool raster::isEmpty()
+{
+	return (rasterType == EMPTY);
 }
 
 bool raster::readRasterProperties()
@@ -823,10 +846,10 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 	tableT::dataT::iterator row = outTable.data.begin();
 	size_t currentCountry = 0;
 
-	string csvTablePath = runParams.resultDir + (*this).rasterName + "_classes_per_zone";
+	string csvTablePath = runParams.resultDir + inZoneRaster.rasterName + "_classes_per_zone.csv";
 	FILE * csvTableFile;
 	csvTableFile = fopen(csvTablePath.c_str(), "w");
-	fprintf(csvTableFile, "Zone ID,Zone stats,Best estimate,Best class,Error\n");
+	fprintf(csvTableFile, "Zone ID,Zone stats,Best estimate,Best class,Best class multiplier\n");
 	while (row != outTable.data.end())
 	{
 		int targetSum = row->first;
