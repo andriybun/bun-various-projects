@@ -30,7 +30,7 @@ if __name__ == "__main__":
     
     statList = []
     outputList = []
-    if statLayer == "#":
+    if statLayer.getPath() == "#":
         # no raster specified, running for all types of statistics
         statTypes = ["min", "minavg", "avg", "maxavg", "max"]
         numStatistics = len(statTypes)
@@ -50,8 +50,10 @@ if __name__ == "__main__":
     allRasterList = [areaGrid, statisticsLevel0, statisticsLevel1, \
                      statisticsLevel2, probabilityGrid, statLayer]
     gp = arcgisscripting.create()
+    if (statisticsLevel1.getPath() == "#" and statisticsLevel2.getPath() != "#"):
+        raise Exception("Incorrect level 1 statistics can't be empty if level 2 is provided")
     if not IsSameExtent(gp, allRasterList):
-        raise Exception('Error! Rasters don\'t have same extent')
+        raise Exception("Error! Rasters don\'t have same extent")
     
     # Results
     resultDir        = output.getDirPath()
