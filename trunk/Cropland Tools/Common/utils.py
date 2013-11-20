@@ -22,6 +22,8 @@ def IsSameExtent(gp, rasterList):
     firstRaterExtent = GetRasterExtent(gp, rasterList[0])    
     numProperties = len(firstRaterExtent)
     for raster in rasterList[1:]:
+        if raster.getPath() == "#":
+            continue
         for i in range(numProperties):
             currentRasterExtent = GetRasterExtent(gp, raster)
             if (abs(firstRaterExtent[i] - currentRasterExtent[i]) > EPSILON):
@@ -42,13 +44,22 @@ class RasterData:
         self.ext = path.splitext(rasterPath)[1][1:]
     
     def getFullPath(self):
-        return self.getPath() + "." + self.ext
+        if self.getName() == "#":
+            return "#"
+        else:
+            return self.getPath() + "." + self.ext
         
     def getPath(self):
-        return self.getDirPath() + "\\" + self.getName()
+        if self.getName() == "#":
+            return "#"
+        else:
+            return self.getDirPath() + "\\" + self.getName()
         
     def getDirPath(self):
-        return self.dirName
+        if self.getName() == "#":
+            return "#"
+        else:
+            return self.dirName
         
     def getName(self):
         return self.name
