@@ -59,6 +59,9 @@ int main(int argc, char * argv[])
 	raster statisticsRasterLevelVector[MAX_LEVELS];
 	raster outCroplandRasterLevelVector[MAX_LEVELS];
 	raster outCalibratedRasterLevelVector[MAX_LEVELS];
+	
+	// Debugging
+	raster debugMinClassVector[MAX_LEVELS];
 
 	// Process levels
 	int levelIdx = 0;
@@ -75,6 +78,7 @@ int main(int argc, char * argv[])
 
 		outCroplandRasterLevelVector[levelIdx].rasterInit(runParams.resultDir + "validated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
 		outCalibratedRasterLevelVector[levelIdx].rasterInit(runParams.resultDir + "calibrated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
+		debugMinClassVector[levelIdx].rasterInit(runParams.resultDir + "debug_min_class_level" + levelIdxChar[levelIdx], raster::OUTPUT);
 
 		// Validate cropland
 		validateCropland(
@@ -83,6 +87,7 @@ int main(int argc, char * argv[])
 			statisticsRasterLevelVector[levelIdx],
 			probabilityRaster,
 			outCroplandRasterLevelVector[levelIdx],
+			debugMinClassVector[levelIdx],
 			runParams);
 
 		if (levelIdx == 0)
@@ -101,11 +106,13 @@ int main(int argc, char * argv[])
 				outCalibratedRasterLevelVector[levelIdx-1],
 				outCroplandRasterLevelVector[levelIdx],
 				outCalibratedRasterLevelVector[levelIdx],
+				debugMinClassVector[levelIdx],
 				runParams);
 		}
 	}
 
 	// Error analysis:
+	raster outAdjustedResultRaster(runParams.resultDir + "adjusted_output", raster::OUTPUT);
 	raster outTotalCroplandRaster(runParams.resultDir + "total_out_cropland", raster::OUTPUT);
 	raster outAbsDiffRaster(runParams.resultDir + "error_abs", raster::OUTPUT);
 	raster outRelDiffRaster(runParams.resultDir + "error_rel", raster::OUTPUT);
@@ -128,6 +135,7 @@ int main(int argc, char * argv[])
 		outTotalCroplandRaster,
 		outAbsDiffRaster,
 		outRelDiffRaster,
+		outAdjustedResultRaster,
 		runParams);
 
 	printf("End: ");
