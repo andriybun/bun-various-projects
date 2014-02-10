@@ -39,14 +39,14 @@ void adjustCroplandProbabilityLayer(raster & inAreaRaster,
 									const runParamsT & runParams,
 									agreementTableT & agTable
 									);
-void validateCropland(raster & inCroplandRawRaster,
-					  raster & inCroplandRaster,
-					  raster & inZoneRaster,
-					  raster & inClassRaster,
-					  raster & outCroplandRaster,
-					  raster & outMinClassRaster,
-					  raster & errorRaster,
-					  const runParamsT & runParams);
+//void validateCropland(raster & inCroplandRawRaster,
+//					  raster & inCroplandRaster,
+//					  raster & inZoneRaster,
+//					  raster & inClassRaster,
+//					  raster & outCroplandRaster,
+//					  raster & outMinClassRaster,
+//					  raster & errorRaster,
+//					  const runParamsT & runParams);
 void validateCropland(raster & inCroplandRawRaster,
 					  raster & inCroplandRaster,
 					  raster & inZoneRaster,
@@ -85,6 +85,7 @@ void validateResult(raster & areaRaster,
 					raster & outTotalCroplandRaster,
 					raster & outAbsDiffRaster,
 					raster & outRelDiffRaster,
+					raster & outAdjustedResultRaster,
 					const runParamsT & runParams);
 
 #endif

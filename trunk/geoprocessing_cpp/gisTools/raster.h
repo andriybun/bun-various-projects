@@ -209,15 +209,15 @@ public:
 		raster & outCroplandRaster,
 		raster & outMinClassRaster,
 		const runParamsT & runParams);
-	friend void validateCropland(
-		raster & inCroplandRawRaster,
-		raster & inCroplandRaster,
-		raster & inZoneRaster,
-		raster & inClassRaster,
-		raster & outCroplandRaster,
-		raster & outMinClassRaster,
-		raster & errorRaster,
-		const runParamsT & runParams);
+	//friend void validateCropland(
+	//	raster & inCroplandRawRaster,
+	//	raster & inCroplandRaster,
+	//	raster & inZoneRaster,
+	//	raster & inClassRaster,
+	//	raster & outCroplandRaster,
+	//	raster & outMinClassRaster,
+	//	raster & errorRaster,
+	//	const runParamsT & runParams);
 	friend void calibrateCropland(
 		raster & inCroplandRawRaster,
 		raster & inCroplandRaster,
