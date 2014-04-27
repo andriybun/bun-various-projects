@@ -92,6 +92,7 @@ public:
 		INPUT,
 		OUTPUT,
 		TEMPORARY,
+		DEBUG,
 		COPY,
 		EMPTY,
 		PASS_INPUT,
@@ -110,6 +111,7 @@ private:
 
 	string rasterName;
 	string rasterPath;
+	string rasterDir;
 	int horResolution;
 	int verResolution;
 	double xMin;
@@ -121,6 +123,7 @@ private:
 	bool initializedFromImg;
 	rasterTypeT rasterType;
 
+	void checkAndCreateFolder(const string & dirName);
 	void rasterInitPrivate(const string & rasterName, rasterTypeT rType);
 	bool readRasterProperties();
 	bool validateExtent(const raster & other) const;
@@ -139,6 +142,7 @@ public:
 	~raster();
 
 	bool isEmpty();
+	string getName();
 
 	// Generic geoprocessing methods:
 	raster copy(const string & destinationName);

@@ -549,9 +549,9 @@ void getCalibratedZones(const vector<float> & valVector,
 	else
 	{
 		// get cells of cropland from results of current level
-		result[0] = ((sumLevel >= sumLevelUp) && (resultLevel != noDataValuesVector[0])) ? resultLevel : noDataValuesOutVector[0];
+		result[0] = ((sumLevel > sumLevelUp) && (resultLevel != noDataValuesVector[0])) ? resultLevel : noDataValuesOutVector[0];
 		// get mask of cells for which calibration is needed
-		result[1] = (sumLevel < sumLevelUp) ? 1 : noDataValuesOutVector[1];
+		result[1] = (sumLevel <= sumLevelUp) ? 1 : noDataValuesOutVector[1];
 	}
 }
 
@@ -762,7 +762,7 @@ void validateResult(raster & areaRaster,
 {
 	raster tmpComputedAreasRaster(runParams.tmpDir + "tmp_computed_areas", raster::TEMPORARY);
 	raster tmpRatioRaster(runParams.tmpDir + "tmp_ratio", raster::TEMPORARY);
-	raster debugNotEnoughRaster(runParams.resultDir + "debug_not_enough", raster::OUTPUT);
+	raster debugNotEnoughRaster(runParams.debugDir + computedResultRaster.getName() + "debug_not_enough", raster::OUTPUT);
 
 	// Do some arithmetic transformations of input rasters
 	areaRaster.rasterArithmetics(&preprocessCellAreasInt, computedResultRaster, tmpComputedAreasRaster);
