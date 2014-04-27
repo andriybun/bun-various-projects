@@ -29,8 +29,11 @@ void raster::rasterInitPrivate(const string & rasterFullPath, rasterTypeT rType)
 		return;
 	}
 	rasterPath = rasterFullPath;
+	char diskName[10];
+	char dirName[2000];
 	char fileName[200];
-	_splitpath(rasterPath.c_str(), NULL, NULL, fileName, NULL);
+	_splitpath(rasterPath.c_str(), diskName, dirName, fileName, NULL);
+	rasterDir = string(diskName) + string(dirName);
 	rasterName = fileName;
 	isDescribed = false;
 	initializedFromImg = false;
@@ -65,14 +68,22 @@ void raster::rasterInitPrivate(const string & rasterFullPath, rasterTypeT rType)
 		case OUTPUT:
 			// Nothing is needed to be created at this stage
 			printf("\tInitialized output raster\n");
+			checkAndCreateFolder(rasterDir);
+			break;
+		case DEBUG:
+			// Nothing is needed to be created at this stage
+			printf("\tInitialized debug raster\n");
+			checkAndCreateFolder(rasterDir);
 			break;
 		case TEMPORARY:
 			// Nothing is needed to be created at this stage
 			printf("\tInitialized temporary raster\n");
+			checkAndCreateFolder(rasterDir);
 			break;
 		case PASS_TEMPORARY:
 			// Nothing is needed to be created at this stage
 			printf("\tInitialized temporary raster\n");
+			checkAndCreateFolder(rasterDir);
 			break;
 		case COPY:
 			// Copy can not be created using constructor
@@ -80,6 +91,16 @@ void raster::rasterInitPrivate(const string & rasterFullPath, rasterTypeT rType)
 			break;
 		};
 	}
+}
+
+void raster::checkAndCreateFolder(const string &dirName)
+{
+	BOOL directoryExists = CreateDirectoryA(dirName.c_str(), NULL);
+	if (!directoryExists)
+	{
+		directoryExists = (GetLastError() == ERROR_ALREADY_EXISTS);
+	}
+	ASSERT_INT(directoryExists, COULD_NOT_CREATE_DIRECTORY);
 }
 
 // Copy constructor
@@ -123,14 +144,15 @@ raster & raster::operator = (const raster & g)
 // Destructor
 raster::~raster()
 {
-	if (rasterType == OUTPUT)
+	if ((rasterType == OUTPUT) || (rasterType == DEBUG))
 	{
 		convertFloatToRaster();
 	}
 	if ((initializedFromImg && (rasterType != PASS_INPUT) && (rasterType != PASS_TEMPORARY)) 
 		|| (rasterType == TEMPORARY)
 		|| (rasterType == INPUT)
-		|| (rasterType == OUTPUT))
+		|| (rasterType == OUTPUT)
+		|| (rasterType == DEBUG))
 	{
 		removeFloatFromDisc();
 	}
@@ -139,6 +161,11 @@ raster::~raster()
 bool raster::isEmpty()
 {
 	return (rasterType == EMPTY);
+}
+
+string raster::getName()
+{
+	return rasterName;
 }
 
 bool raster::readRasterProperties()
@@ -846,7 +873,7 @@ void raster::zonalSumByClassAsTable(const raster & inZoneRaster,
 	tableT::dataT::iterator row = outTable.data.begin();
 	size_t currentCountry = 0;
 
-	string csvTablePath = runParams.resultDir + inZoneRaster.rasterName + "_classes_per_zone.csv";
+	string csvTablePath = runParams.debugDir + inZoneRaster.rasterName + "_classes_per_zone.csv";
 	FILE * csvTableFile;
 	csvTableFile = fopen(csvTablePath.c_str(), "w");
 	fprintf(csvTableFile, "Zone ID,Zone stats,Best estimate,Best class,Best class multiplier\n");

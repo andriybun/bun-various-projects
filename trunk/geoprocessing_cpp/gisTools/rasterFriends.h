@@ -18,6 +18,7 @@ struct runParamsT
 	string workingDir;
 	string tmpDir;
 	string resultDir;
+	string debugDir;
 };
 
 void multipleRasterArithmetics(float (*func)(const vector<float> & ), 

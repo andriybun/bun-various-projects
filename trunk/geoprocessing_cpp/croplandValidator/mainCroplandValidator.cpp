@@ -43,6 +43,7 @@ int main(int argc, char * argv[])
 	runParams.workingDir = string(argv[1]) + "\\";
 	runParams.resultDir = string(argv[2]) + "\\";
 	runParams.tmpDir = string(argv[3]) + "\\";
+	runParams.debugDir = runParams.resultDir + "debug\\";
 
 	raster areaRaster(argv[4], raster::INPUT);
 	raster probabilityRaster(argv[8], raster::INPUT);
@@ -76,9 +77,9 @@ int main(int argc, char * argv[])
 			break;
 		}
 
-		outCroplandRasterLevelVector[levelIdx].rasterInit(runParams.resultDir + "validated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
-		outCalibratedRasterLevelVector[levelIdx].rasterInit(runParams.resultDir + "calibrated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
-		debugMinClassVector[levelIdx].rasterInit(runParams.resultDir + "debug_min_class_level" + levelIdxChar[levelIdx], raster::OUTPUT);
+		outCroplandRasterLevelVector[levelIdx].rasterInit(runParams.debugDir + "validated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
+		outCalibratedRasterLevelVector[levelIdx].rasterInit(runParams.debugDir + "calibrated_cropland_level" + levelIdxChar[levelIdx], raster::OUTPUT);
+		debugMinClassVector[levelIdx].rasterInit(runParams.debugDir + "min_class_level" + levelIdxChar[levelIdx], raster::DEBUG);
 
 		// Validate cropland
 		validateCropland(
