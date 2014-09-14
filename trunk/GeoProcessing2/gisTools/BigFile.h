@@ -8,6 +8,15 @@
 
 //const int MAX_READ_BUFFER_ELEMENTS	= 40 * 1024 * 1024;
 
+class raster;
+
+struct rasterBufT
+{
+	float* buf;
+	float noDataValue;
+	int nEl;
+};
+
 class BigFile
 {
 protected:
