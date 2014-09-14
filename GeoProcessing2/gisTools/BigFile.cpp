@@ -48,7 +48,10 @@ int BigFileIn::read(rasterBufT &rBuf)
 	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
 	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
 	this->file.read(reinterpret_cast<char*>(buf), sizeof(float) * bufSize);
-	return (this->numCells - this->numCellsProcessed - bufSize);
+	rBuf.buf = buf;
+	rBuf.nEl = bufSize;
+	rBuf.noDataValue = this->noDataValue;
+	return bufSize;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,7 +85,10 @@ int BigFileOut::write(rasterBufT &rBuf)
 	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
 	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
 	this->file.write(reinterpret_cast<char *>(buf), sizeof(float) * bufSize);
-	return (this->numCells - this->numCellsProcessed - bufSize);
+	rBuf.buf = buf;
+	rBuf.nEl = bufSize;
+	rBuf.noDataValue = this->noDataValue;
+	return bufSize;
 }
 
 /*

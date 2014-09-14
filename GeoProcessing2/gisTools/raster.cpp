@@ -282,44 +282,32 @@ raster::statisticsStructT raster::describe()
 	result.meanVal = 0;
 	result.sumVal = 0;
 
-	std::string fltPath = this->rasterPath + ".flt";
-	std::ifstream thisFile;
-	thisFile.open(fltPath.c_str(), std::ios::out | std::ios::binary);
-	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
-
-	int numCells = this->extent.getNumCells();
-	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
-	float * buf = new float[bufSize];
-
-	int numCellsProcessed = 0;
+	BigFileIn thisFile(*this);
+	rasterBufT rBuf;	
+	
 	bool minMaxInitialized = false;
-	while(numCellsProcessed < numCells)
+
+	while (thisFile.read(rBuf))
 	{
-		bufSize = min(bufSize, numCells - numCellsProcessed);
-		thisFile.read(reinterpret_cast<char*>(buf), sizeof(float) * bufSize);
-		for (int i = 0; i < bufSize; i++)
+		for (int i = 0; i < rBuf.nEl; i++)
 		{
-			if (buf[i] != this->noDataValue)
+			if (rBuf.buf[i] != rBuf.noDataValue)
 			{
 				if (!minMaxInitialized)
 				{
-					result.maxVal = buf[i];
-					result.minVal = buf[i];
+					result.maxVal = rBuf.buf[i];
+					result.minVal = rBuf.buf[i];
 					minMaxInitialized = true;
 				}
 				result.count++;
-				result.sumVal += buf[i];
-				result.maxVal = xmax(buf[i], result.maxVal);
-				result.minVal = xmin(buf[i], result.minVal);
+				result.sumVal += rBuf.buf[i];
+				result.maxVal = xmax(rBuf.buf[i], result.maxVal);
+				result.minVal = xmin(rBuf.buf[i], result.minVal);
 			}
 		}
-		numCellsProcessed += bufSize;
 	}
 
 	result.meanVal = result.sumVal / result.count;
-
-	delete [] buf;
-	thisFile.close();
 
 	this->isDescribed = true;
 	this->description = result;

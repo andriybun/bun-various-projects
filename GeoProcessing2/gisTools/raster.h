@@ -15,6 +15,7 @@
 #include <windows.h>
 
 #include "assertInt.h"
+#include "BigFile.h"
 #include "errorCodes.h"
 #include "tableT.h"
 #include "extentT.h"
@@ -41,12 +42,6 @@ float xtimes(float val1, float val2);
 float xdivide(float val1, float val2);
 
 class BigFile;
-
-struct rasterBufT
-{
-	float* buf;
-	float noDataValue;
-};
 
 class raster
 {
