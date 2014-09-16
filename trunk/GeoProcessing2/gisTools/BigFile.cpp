@@ -4,6 +4,10 @@
 // Base
 //////////////////////////////////////////////////////////////////////////
 
+BigFile::~BigFile()
+{
+}
+
 template<class fStreamT>
 void BigFile::openBase(const raster &r, fStreamT* file, std::ios_base::openmode mode)
 {
