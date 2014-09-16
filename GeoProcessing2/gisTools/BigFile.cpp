@@ -13,8 +13,21 @@ void BigFile::openBase(const raster &r, fStreamT* file, std::ios_base::openmode 
 	this->isOpen = true;
 	this->numCells = r.extent.getNumCells();
 	numCellsProcessed = 0;
-	this->buf = new float[MAX_READ_BUFFER_ELEMENTS];
+	//this->buf = new float[MAX_READ_BUFFER_ELEMENTS];
+	this->buf.allocate(MAX_READ_BUFFER_ELEMENTS);
 	this->noDataValue = r.noDataValue;
+}
+
+void BigFile::printProgress()
+{
+	if (this->isOpen)
+	{
+		printf("%5.2f%% processed\n", (float)100 * this->numCellsProcessed / this->numCells);
+	}
+	else
+	{
+		printf("File not open yet\n");
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,7 +48,7 @@ BigFileIn::BigFileIn(const raster &readRaster)
 BigFileIn::~BigFileIn(void)
 {
 	this->file.close();
-	delete [] buf;
+	//delete [] buf;
 }
 
 void BigFileIn::open(const raster &readRaster)
@@ -47,8 +60,8 @@ int BigFileIn::read(rasterBufT &rBuf)
 {
 	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
 	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
-	this->file.read(reinterpret_cast<char*>(buf), sizeof(float) * bufSize);
-	rBuf.buf = buf;
+	this->file.read(reinterpret_cast<char*>(this->buf.ptr()), sizeof(float) * bufSize);
+	rBuf.buf = this->buf;
 	rBuf.nEl = bufSize;
 	rBuf.noDataValue = this->noDataValue;
 	return bufSize;
@@ -72,7 +85,7 @@ BigFileOut::BigFileOut(const raster &writeRaster)
 BigFileOut::~BigFileOut(void)
 {
 	this->file.close();
-	delete [] buf;
+	//delete [] buf;
 }
 
 void BigFileOut::open(const raster &writeRaster)
@@ -84,54 +97,9 @@ int BigFileOut::write(rasterBufT &rBuf)
 {
 	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
 	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
-	this->file.write(reinterpret_cast<char *>(buf), sizeof(float) * bufSize);
-	rBuf.buf = buf;
+	this->file.write(reinterpret_cast<char *>(this->buf.ptr()), sizeof(float) * bufSize);
+	rBuf.buf = this->buf;
 	rBuf.nEl = bufSize;
 	rBuf.noDataValue = this->noDataValue;
 	return bufSize;
 }
-
-/*
-{
-	std::string fltPath = this->rasterPath + ".flt";
-	
-	std::ifstream thisFile;
-	thisFile.open(fltPath.c_str(), std::ios::out | std::ios::binary);
-	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
-
-	int numCells = this->extent.getNumCells();
-	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
-	float * buf = new float[bufSize];
-
-	int numCellsProcessed = 0;
-	bool minMaxInitialized = false;
-	while(numCellsProcessed < numCells)
-	{
-		bufSize = min(bufSize, numCells - numCellsProcessed);
-		thisFile.read(reinterpret_cast<char*>(buf), sizeof(float) * bufSize);
-		for (int i = 0; i < bufSize; i++)
-		{
-			if (buf[i] != this->noDataValue)
-			{
-				if (!minMaxInitialized)
-				{
-					result.maxVal = buf[i];
-					result.minVal = buf[i];
-					minMaxInitialized = true;
-				}
-				result.count++;
-				result.sumVal += buf[i];
-				result.maxVal = xmax(buf[i], result.maxVal);
-				result.minVal = xmin(buf[i], result.minVal);
-			}
-		}
-		numCellsProcessed += bufSize;
-	}
-
-	result.meanVal = result.sumVal / result.count;
-
-	delete [] buf;
-	thisFile.close();
-
-}
-*/
