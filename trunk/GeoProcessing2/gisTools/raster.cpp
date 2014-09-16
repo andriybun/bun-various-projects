@@ -115,6 +115,7 @@ raster::~raster()
 {
 	if (rasterType == OUTPUT)
 	{
+		this->saveHdr();
 		this->convertFloatToRaster();
 	}
 	if ((this->initializedFromImg && ((this->rasterType == INPUT) || (this->rasterType == OUTPUT)))
@@ -216,7 +217,7 @@ bool raster::fileExists(const std::string & fileName)
 	return false;
 }
 
-void raster::copyFile(const std::string & source, const std::string & destination) const
+void raster::copyFile(const std::string & source, const std::string & destination)
 {
 #if defined(_WIN32) || defined(_WIN64) || defined(OS_WINDOWS)
 	system((std::string("copy \"") + source + "\" \"" + destination + "\"").c_str());
@@ -242,29 +243,6 @@ void raster::copyProperties(raster & destination) const
 	destination.isDescribed = this->isDescribed;
 	destination.description = this->description;
 }
-
-//void raster::incMap(zonalStatisticsTableT &mp, int key, float val)
-//{
-//	statisticsStructT tmp = mp[key];
-//	if (tmp.count == 0)
-//	{
-//		tmp.sumVal = val;
-//		tmp.maxVal = val;
-//		tmp.minVal = val;
-//		tmp.count = 1;
-//		tmp.countNonZero = 1;
-//	}
-//	else
-//	{
-//		tmp.sumVal += val;
-//		tmp.maxVal = xmax(tmp.maxVal, val);
-//		tmp.minVal = xmin(tmp.minVal, val);
-//		tmp.count++;
-//		tmp.countNonZero += (val > 0) ? 1 : 0;
-//	}
-//	mp.erase(key);
-//	mp.insert(make_pair<int, statisticsStructT>(key, tmp));
-//}
 
 raster::statisticsStructT raster::describe()
 {
@@ -338,115 +316,6 @@ void raster::removeFloatFromDisc()
 	deleteFile((this->rasterPath + ".hdr").c_str());
 	deleteFile((this->rasterPath + ".flt").c_str());
 }
-
-//void raster::rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster)
-//{
-//	printf("Executing raster arithmetics\n");
-//	std::string thisHdrPath = this->rasterPath + ".hdr";
-//	std::string thisFltPath = this->rasterPath + ".flt";
-//	std::string outHdrPath = outRaster.rasterPath + ".hdr";
-//	std::string outFltPath = outRaster.rasterPath + ".flt";
-//
-//	copyFile(thisHdrPath, outHdrPath);
-//	copyProperties(outRaster);
-//
-//	ifstream thisFile;
-//	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
-//	ofstream outFile;
-//	outFile.open(outFltPath.c_str(), ios::out | ios::binary);
-//
-//	int numCells = (*this).horResolution * (*this).verResolution;
-//	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
-//
-//	float * buf = new float[bufSize];
-//
-//	int numCellsProcessed = 0;
-//	while(numCellsProcessed < numCells)
-//	{
-//		bufSize = min(bufSize, numCells - numCellsProcessed);
-//		numCellsProcessed += bufSize;
-//		thisFile.read(reinterpret_cast<char*>(buf), sizeof(float) * bufSize);
-//		for (int i = 0; i < bufSize; i++)
-//		{
-//			if (buf[i] != (*this).noDataValue)
-//			{
-//				buf[i] = func(buf[i], num);
-//			}
-//			else
-//			{
-//				buf[i] = (*this).noDataValue;
-//			}
-//		}
-//		outFile.write(reinterpret_cast<char *>(buf), sizeof(float) * bufSize);
-//		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
-//	}
-//
-//	thisFile.close();
-//	outFile.close();
-//
-//    delete [] buf;
-//}
-//
-//void raster::rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster)
-//{
-//	printf("Executing raster arithmetics\n");
-//	validateExtent(inRaster);
-//
-//	string thisHdrPath = (*this).rasterPath + ".hdr";
-//	string thisFltPath = (*this).rasterPath + ".flt";
-//	string inHdrPath = inRaster.rasterPath + ".hdr";
-//	string inFltPath = inRaster.rasterPath + ".flt";
-//	string outHdrPath = outRaster.rasterPath + ".hdr";
-//	string outFltPath = outRaster.rasterPath + ".flt";
-//
-//	copyFile(thisHdrPath, outHdrPath);
-//	copyProperties(outRaster);
-//
-//	ifstream thisFile;
-//	thisFile.open(thisFltPath.c_str(), ios::in | ios::binary);
-//	ASSERT_INT(thisFile.is_open(), FILE_NOT_OPEN);
-//	ifstream inFile;
-//	inFile.open(inFltPath.c_str(), ios::out | ios::binary);
-//	ASSERT_INT(inFile.is_open(), FILE_NOT_OPEN);
-//	ofstream outFile;
-//	outFile.open(outFltPath.c_str(), ios::out | ios::binary);
-//	ASSERT_INT(outFile.is_open(), FILE_NOT_OPEN);
-//
-//	int numCells = (*this).horResolution * (*this).verResolution;
-//	int bufSize = xmin(numCells, MAX_READ_BUFFER_ELEMENTS);
-//
-//	float * buf = new float[bufSize];
-//	float * buf2 = new float[bufSize];
-//
-//	int numCellsProcessed = 0;
-//	while(numCellsProcessed < numCells)
-//	{
-//		bufSize = min(bufSize, numCells - numCellsProcessed);
-//		numCellsProcessed += bufSize;
-//		thisFile.read(reinterpret_cast<char*>(buf), sizeof(float) * bufSize);
-//		inFile.read(reinterpret_cast<char*>(buf2), sizeof(float) * bufSize);
-//		for (int i = 0; i < bufSize; i++)
-//		{
-//			if ((buf[i] != (*this).noDataValue) && (buf2[i] != inRaster.noDataValue))
-//			{
-//				buf[i] = func(buf[i], buf2[i]);
-//			}
-//			else
-//			{
-//				buf[i] = (*this).noDataValue;
-//			}
-//		}
-//		outFile.write(reinterpret_cast<char *>(buf), sizeof(float) * bufSize);
-//		printf("%5.2f%% processed\n", (float)100 * numCellsProcessed / numCells);
-//	}
-//
-//	thisFile.close();
-//	inFile.close();
-//	outFile.close();
-//
-//	delete [] buf;
-//	delete [] buf2;
-//}
 
 // Conversion methods:
 void raster::convertRasterToFloat()

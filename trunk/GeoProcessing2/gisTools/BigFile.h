@@ -1,10 +1,13 @@
 #pragma once
 
+#include <cstdio>
 #include <fstream>
 #include <string>
+//#include <boost/shared_ptr.hpp>
 
 #include "assertInt.h"
 #include "raster.h"
+#include "SmartArray.h"
 
 //const int MAX_READ_BUFFER_ELEMENTS	= 40 * 1024 * 1024;
 
@@ -12,7 +15,8 @@ class raster;
 
 struct rasterBufT
 {
-	float* buf;
+	SmartArray<float> buf;
+	//float* buf;
 	float noDataValue;
 	int nEl;
 };
@@ -24,7 +28,8 @@ protected:
 	int numCells;
 	int numCellsProcessed;
 	float noDataValue;
-	float* buf;
+	SmartArray<float> buf;
+	//float* buf;
 
 	template<class fStreamT>
 	void openBase(const raster &r, fStreamT* file, std::ios_base::openmode mode);
@@ -32,6 +37,7 @@ public:
 	BigFile(void) {};
 	virtual ~BigFile(void) = 0;
 	virtual void open(const raster &r) = 0;
+	virtual void printProgress();
 };
 
 class BigFileIn : public BigFile

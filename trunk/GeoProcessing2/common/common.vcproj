@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="gisTools"
-	ProjectGUID="{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}"
-	RootNamespace="gisTools"
+	Name="common"
+	ProjectGUID="{DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8}"
+	RootNamespace="common"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)\vendors;$(SolutionDir)\common;$(BOOST_ROOT)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				AdditionalIncludeDirectories="$(BOOST_ROOT)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -77,7 +77,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(ProjectDir)convertFloatToRaster.py&quot; &quot;$(OutDir)\convertFloatToRaster.py&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -107,8 +106,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="$(SolutionDir)\vendors;$(SolutionDir)\common;$(BOOST_ROOT)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				AdditionalIncludeDirectories="$(BOOST_ROOT)"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -142,7 +141,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(ProjectDir)convertFloatToRaster.py&quot; &quot;$(OutDir)\convertFloatToRaster.py&quot;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -155,19 +153,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\BigFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\raster.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SpatialAnalyst.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\tableT.cpp"
+				RelativePath=".\SmartArray.cpp"
 				>
 			</File>
 		</Filter>
@@ -177,31 +163,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\assertInt.h"
+				RelativePath=".\SmartArray.h"
 				>
 			</File>
 			<File
-				RelativePath=".\BigFile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\errorCodes.h"
-				>
-			</File>
-			<File
-				RelativePath=".\extentT.h"
-				>
-			</File>
-			<File
-				RelativePath=".\raster.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SpatialAnalyst.h"
-				>
-			</File>
-			<File
-				RelativePath=".\tableT.h"
+				RelativePath="..\gisTools\staticArrays.h"
 				>
 			</File>
 		</Filter>

@@ -42,6 +42,7 @@ float xtimes(float val1, float val2);
 float xdivide(float val1, float val2);
 
 class BigFile;
+class SpatialAnalyst;
 
 class raster
 {
@@ -104,9 +105,10 @@ private:
 	bool validateExtent(const extentT &otherExtent) const;
 	void saveHdr();
 	bool fileExists(const std::string & fileName);
-	void copyFile(const std::string & source, const std::string & destination) const;
 	void deleteFile(const std::string & fileName) const;
 	void copyProperties(raster & destination) const;
+
+	static void copyFile(const std::string & source, const std::string & destination);
 public:
 	raster();
 	raster(const std::string & rasterName, rasterTypeT rType);
@@ -135,4 +137,5 @@ public:
 	std::string getFltPath() const;
 
 	friend class BigFile;
+	friend class SpatialAnalyst;
 };
