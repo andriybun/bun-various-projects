@@ -37,7 +37,7 @@ public:
 	BigFile(void) {};
 	virtual ~BigFile(void) = 0;
 	virtual void open(const raster &r) = 0;
-	virtual void printProgress();
+	void printProgress();
 };
 
 class BigFileIn : public BigFile
