@@ -20,14 +20,22 @@ float processRasters(float val1, float val2)
 	return (val1 + 2) * val2;
 }
 
-float processMultipleRasters(const vector<float> & vec)
+void processMultipleRasters(const vector<float> & vec,
+							const vector<float> & noDataInVec,
+							const vector<float> & noDataOutVec,
+							vector<float> & outVec)
 {
-	float sum = 0;
 	for (size_t idx = 0; idx < vec.size(); idx++)
 	{
-		sum += vec[idx];
+		if (vec[idx] != noDataInVec[idx])
+		{
+			outVec[0] += vec[idx];
+		}
+		else
+		{
+			outVec[0] = noDataOutVec[0];
+		}
 	}
-	return sum;
 }
 
 namespace po = boost::program_options;
@@ -91,6 +99,14 @@ int main(int argc, char* argv[])
 		inRaster1, 
 		inRaster2, 
 		outRaster);
+
+	vector<raster> inRasterVec, outRasterVec;
+	inRasterVec.push_back(inRaster1);
+	inRasterVec.push_back(inRaster2);
+	raster outRaster2(outRasterPath + "_multi", raster::OUTPUT);
+	outRasterVec.push_back(outRaster2);
+	SpatialAnalyst::multipleRasterArithmetics(&processMultipleRasters, inRasterVec, outRasterVec);
+
 
 	printf(__TIME__ "\n");
 	return 0;
