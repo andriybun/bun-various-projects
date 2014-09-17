@@ -30,7 +30,7 @@ void raster::rasterInitPrivate(const std::string & rasterFullPath, rasterTypeT r
 	}
 	this->rasterPath = rasterFullPath;
 	char fileName[200];
-	_splitpath(this->rasterPath.c_str(), NULL, NULL, fileName, NULL);
+	_splitpath_s(this->rasterPath.c_str(), NULL, 0, NULL, 0, fileName, 200, NULL, 0);
 	this->rasterName = fileName;
 	this->isDescribed = false;
 	this->initializedFromImg = false;
