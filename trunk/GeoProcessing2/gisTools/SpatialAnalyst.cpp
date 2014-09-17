@@ -18,12 +18,8 @@ void SpatialAnalyst::rasterArithmetics(float (*func)(float, float),
 									   raster & outRaster)
 {
 	printf("Executing raster arithmetics\n");
-	std::string inHdrPath = inRaster.getHdrPath();
-	std::string inFltPath = inRaster.getFltPath();
-	std::string outHdrPath = outRaster.getHdrPath();
-	std::string outFltPath = outRaster.getFltPath();
 
-	raster::copyFile(inHdrPath, outHdrPath);
+	raster::copyFile(inRaster.getHdrPath(), outRaster.getHdrPath());
 	inRaster.copyProperties(outRaster);
 	rasterBufT inBuf, outBuf;
 
@@ -58,14 +54,8 @@ void SpatialAnalyst::rasterArithmetics(float (*func)(float, float),
 	inRaster1.validateExtent(inRaster2.extent);
 
 	printf("Executing raster arithmetics\n");
-	std::string inHdrPath1 = inRaster1.getHdrPath();
-	std::string inFltPath1 = inRaster1.getFltPath();
-	std::string inHdrPath2 = inRaster2.getHdrPath();
-	std::string inFltPath2 = inRaster2.getFltPath();
-	std::string outHdrPath = outRaster.getHdrPath();
-	std::string outFltPath = outRaster.getFltPath();
 
-	raster::copyFile(inHdrPath1, outHdrPath);
+	raster::copyFile(inRaster1.getHdrPath(), outRaster.getHdrPath());
 	inRaster1.copyProperties(outRaster);
 	rasterBufT inBuf1, inBuf2, outBuf;
 
@@ -92,4 +82,90 @@ void SpatialAnalyst::rasterArithmetics(float (*func)(float, float),
 		outFile.write(outBuf);
 		inFile1.printProgress();
 	}
+}
+
+void SpatialAnalyst::multipleRasterArithmetics(void (*func)(
+															const std::vector<float> &, 
+															const std::vector<float> &, 
+															const std::vector<float> &, 
+															std::vector<float> & ),
+											   const std::vector<raster> & inRastersVector,
+											   std::vector<raster> & outRastersVector)
+{
+	size_t numInRasters = inRastersVector.size();
+	size_t numOutRasters = outRastersVector.size();
+
+	std::vector<BigFileIn*> inFileVector;
+	std::vector<BigFileOut*> outFileVector;
+
+	// Read buffers
+	std::vector<rasterBufT> inBufVector, outBufVector;
+	inBufVector.resize(numInRasters);
+	outBufVector.resize(numOutRasters);
+
+	// Validate extent for all input rasters
+	_foreach(raster r, inRastersVector)
+	{
+		r.validateExtent(inRastersVector[0].extent);
+		inFileVector.push_back(new BigFileIn(r));
+	}
+
+	printf("Executing multiple raster arithmetics\n");
+
+	// Copy header files for all output rasters
+	size_t idx = 0;
+	_foreach(raster r, outRastersVector)
+	{
+		raster::copyFile(inRastersVector[0].getHdrPath(), r.getHdrPath());
+		outFileVector.push_back(new BigFileOut(r));
+		inRastersVector[0].copyProperties(r);
+		outBufVector[idx++].noDataValue = r.noDataValue;
+	}
+
+	// Main loop
+	while (inFileVector[0]->read(inBufVector[0]))
+	{
+		for (size_t rasterIdx = 1; rasterIdx < numInRasters; rasterIdx++)
+		{
+			inFileVector[rasterIdx]->read(inBufVector[rasterIdx]);
+		}
+		std::vector<float> noDataValuesVector, noDataOutValuesVector;
+		for (size_t rasterIdx = 0; rasterIdx < numInRasters; rasterIdx++)
+		{
+			noDataValuesVector.push_back(inBufVector[rasterIdx].noDataValue);
+		}
+		for (size_t rasterIdx = 0; rasterIdx < numOutRasters; rasterIdx++)
+		{
+			noDataOutValuesVector.push_back(outBufVector[rasterIdx].noDataValue);
+			outBufVector[rasterIdx].nEl = inBufVector[0].nEl;
+		}
+		for (int i = 0; i < inBufVector[0].nEl; i++)
+		{
+			std::vector<float> passArg, result;
+			result.resize(numOutRasters);
+			for (size_t rasterIdx = 0; rasterIdx < numInRasters; rasterIdx++)
+			{
+				passArg.push_back(inBufVector[rasterIdx].buf[i]);
+			}
+
+			// Call function
+			func(passArg, noDataValuesVector, noDataOutValuesVector, result);
+
+			// Results to out buffer
+			for (size_t idx = 0; idx < numOutRasters; idx++)
+			{
+				outBufVector[idx].buf[i] = result[idx];
+			}	
+		}
+		// Write all out buffers to files
+		for (size_t idx = 0; idx < numOutRasters; idx++)
+		{
+			outFileVector[idx]->write(outBufVector[idx]);
+		}
+		inFileVector[0]->printProgress();
+	}
+
+	// Cleanup
+	_foreach(BigFileIn* f, inFileVector) delete f;
+	_foreach(BigFileOut* f, outFileVector) delete f;
 }

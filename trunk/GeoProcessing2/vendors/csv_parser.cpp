@@ -47,9 +47,9 @@ bool csv_parser::init(const char * input_file)
 
 	memset(input_filename, 0, filename_length + 1);
 
-	strcpy(input_filename, input_file);
+	strcpy_s(input_filename, filename_length + 1, input_file);
 
-	input_fp = fopen(input_file, "r");
+	fopen_s(&input_fp, input_file, "r");
 
 	if (input_fp == NULL)
 	{
