@@ -18,6 +18,7 @@ public:
 	};
 
 	void allocate(const size_t n);
+	void allocateOnce(const size_t n);
 	T& operator* ();
 	T* operator-> ();
 	T* ptr();

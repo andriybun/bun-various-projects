@@ -32,7 +32,7 @@ public:
 			const std::vector<float> &, 
 			std::vector<float> &
 		),
-		const std::vector<raster> & inRastersVector,
-		std::vector<raster> & outRastersVector);
+		const std::vector<raster*> & inRastersVector,
+		std::vector<raster*> & outRastersVector);
 
 };

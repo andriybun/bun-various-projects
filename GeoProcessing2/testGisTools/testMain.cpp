@@ -100,11 +100,11 @@ int main(int argc, char* argv[])
 		inRaster2, 
 		outRaster);
 
-	vector<raster> inRasterVec, outRasterVec;
-	inRasterVec.push_back(inRaster1);
-	inRasterVec.push_back(inRaster2);
+	vector<raster *> inRasterVec, outRasterVec;
+	inRasterVec.push_back(&inRaster1);
+	inRasterVec.push_back(&inRaster2);
 	raster outRaster2(outRasterPath + "_multi", raster::OUTPUT);
-	outRasterVec.push_back(outRaster2);
+	outRasterVec.push_back(&outRaster2);
 	SpatialAnalyst::multipleRasterArithmetics(&processMultipleRasters, inRasterVec, outRasterVec);
 
 

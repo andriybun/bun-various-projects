@@ -12,6 +12,16 @@ void SmartArray<T>::allocate(size_t n)
 }
 
 template<class T>
+void SmartArray<T>::allocateOnce(size_t n)
+{
+	if (!this->isAllocated)
+	{
+		this->isAllocated = true;
+		this->reset(new T[n]);	
+	}
+}
+
+template<class T>
 T& SmartArray<T>::operator* ()
 {
 	return *(this->get());

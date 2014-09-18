@@ -46,6 +46,7 @@ BigFileIn::BigFileIn(void)
 
 BigFileIn::BigFileIn(const raster &readRaster)
 {
+	this->isOpen = false;
 	this->open(readRaster);
 }
 
@@ -65,6 +66,7 @@ int BigFileIn::read(rasterBufT &rBuf)
 	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
 	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
 	this->file.read(reinterpret_cast<char*>(this->buf.ptr()), sizeof(float) * bufSize);
+	this->numCellsProcessed += bufSize;
 	rBuf.buf = this->buf;
 	rBuf.nEl = bufSize;
 	rBuf.noDataValue = this->noDataValue;
@@ -83,6 +85,7 @@ BigFileOut::BigFileOut(void)
 
 BigFileOut::BigFileOut(const raster &writeRaster)
 {
+	this->isOpen = false;
 	this->open(writeRaster);
 }
 
@@ -97,13 +100,13 @@ void BigFileOut::open(const raster &writeRaster)
 	this->openBase(writeRaster, &(this->file), std::ios::out);
 }
 
-int BigFileOut::write(rasterBufT &rBuf)
+void BigFileOut::write(rasterBufT &rBuf)
 {
-	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
-	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
-	this->file.write(reinterpret_cast<char *>(this->buf.ptr()), sizeof(float) * bufSize);
-	rBuf.buf = this->buf;
-	rBuf.nEl = bufSize;
-	rBuf.noDataValue = this->noDataValue;
-	return bufSize;
+	int bufSize = rBuf.nEl;
+	this->file.write(reinterpret_cast<char *>(rBuf.buf.ptr()), sizeof(float) * bufSize);
+	this->numCellsProcessed += bufSize;
+	//rBuf.buf = this->buf;
+	//rBuf.nEl = bufSize;
+	//rBuf.noDataValue = this->noDataValue;
+	//return bufSize;
 }
