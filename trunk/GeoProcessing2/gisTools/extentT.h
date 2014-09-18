@@ -66,22 +66,22 @@ public:
 			result = false;
 			printf("hor resolution: %d - %d\n", this->horResolution, other.horResolution);
 		}
-		if (this->verResolution == other.verResolution)
+		if (this->verResolution != other.verResolution)
 		{
 			result = false;
 			printf("ver resolution: %d - %d\n", this->verResolution, other.verResolution);
 		}
-		if (compare_eq(this->xMin, other.xMin, EPSILON))
+		if (!compare_eq(this->xMin, other.xMin, EPSILON))
 		{
 			result = false;
 			printf("x min:          %f - %f\n", this->xMin, other.xMin);
 		}
-		if (compare_eq(this->yMin, other.yMin, EPSILON))
+		if (!compare_eq(this->yMin, other.yMin, EPSILON))
 		{
 			result = false;
 			printf("y min:          %f - %f\n", this->yMin, other.yMin);
 		}
-		if (compare_eq(this->cellSize, other.cellSize, EPSILON))
+		if (!compare_eq(this->cellSize, other.cellSize, EPSILON))
 		{
 			result = false;
 			printf("cell size:      %f - %f\n", this->cellSize, other.cellSize);

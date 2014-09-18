@@ -11,8 +11,8 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
-
 #include <windows.h>
+#include <boost/shared_ptr.hpp>
 
 #include "assertInt.h"
 #include "BigFile.h"
@@ -95,7 +95,6 @@ private:
 	// Raster geometry
 	extentT extent;
 	float noDataValue;
-
 	// Runtime properties
 	bool isDescribed;
 	statisticsStructT description;
@@ -106,7 +105,7 @@ private:
 	void saveHdr();
 	bool fileExists(const std::string & fileName);
 	void deleteFile(const std::string & fileName) const;
-	void copyProperties(raster & destination) const;
+	void copyProperties(const raster & source);
 
 	static void copyFile(const std::string & source, const std::string & destination);
 public:

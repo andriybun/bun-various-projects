@@ -59,5 +59,5 @@ public:
 	BigFileOut(const raster &writeRaster);
 	~BigFileOut(void);
 	void open(const raster &writeRaster);
-	int write(rasterBufT &rBuf);
+	void write(rasterBufT &rBuf);
 };

@@ -85,7 +85,7 @@ raster::raster(const raster & g)
 	this->rasterType = COPY;
 	this->rasterName = g.rasterName;
 	this->rasterPath = g.rasterPath;
-	g.copyProperties(*this);
+	this->copyProperties(g);
 }
 
 // Assignment operator overloading
@@ -99,13 +99,13 @@ raster & raster::operator = (const raster & g)
 		switch (g.rasterType)
 		{
 		case EMPTY:
-			this->rasterType = g.rasterType;
+			this->rasterType = EMPTY;
 			break;
 		default:
 			this->rasterType = COPY;
 			break;
 		};
-		g.copyProperties(*this);
+		this->copyProperties(g);
 	}
 	return *this;
 }
@@ -113,10 +113,11 @@ raster & raster::operator = (const raster & g)
 // Destructor
 raster::~raster()
 {
-	if (rasterType == OUTPUT)
+	if (this->rasterType == OUTPUT)
 	{
 		this->saveHdr();
 		this->convertFloatToRaster();
+
 	}
 	if ((this->initializedFromImg && ((this->rasterType == INPUT) || (this->rasterType == OUTPUT)))
 		|| (this->rasterType == TEMPORARY))
@@ -236,12 +237,12 @@ void raster::deleteFile(const std::string & fileName) const
 #endif
 }
 
-void raster::copyProperties(raster & destination) const
+void raster::copyProperties(const raster & source)
 {
-	destination.extent = this->extent;
-	destination.noDataValue = this->noDataValue;
-	destination.isDescribed = this->isDescribed;
-	destination.description = this->description;
+	this->extent = source.extent;
+	this->noDataValue = source.noDataValue;
+	this->isDescribed = source.isDescribed;
+	this->description = source.description;
 }
 
 raster::statisticsStructT raster::describe()
@@ -308,7 +309,7 @@ void raster::copy(raster & destinationRaster)
 	std::string destinationName = destinationRaster.rasterPath;
 	this->copyFile(this->rasterPath + ".hdr", destinationName + ".hdr");
 	this->copyFile(this->rasterPath + ".flt", destinationName + ".flt");
-	this->copyProperties(destinationRaster);
+	destinationRaster.copyProperties(*this);
 }
 
 void raster::removeFloatFromDisc()
