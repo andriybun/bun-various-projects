@@ -88,8 +88,7 @@ void SpatialAnalyst::rasterArithmetics(float (*func)(float, float),
 	}
 }
 
-void SpatialAnalyst::multipleRasterArithmetics(void (*func)(
-															const std::vector<float> &, 
+void SpatialAnalyst::multipleRasterArithmetics(void (*func)(const std::vector<float> &, 
 															const std::vector<float> &, 
 															const std::vector<float> &, 
 															std::vector<float> & ),
@@ -108,7 +107,7 @@ void SpatialAnalyst::multipleRasterArithmetics(void (*func)(
 	outBufVector.resize(numOutRasters);
 
 	// Validate extent for all input rasters
-	_foreach(raster* r, inRastersVector)
+	foreach_(raster* r, inRastersVector)
 	{
 		r->validateExtent(inRastersVector[0]->extent);
 		inFileVector.push_back(new BigFileIn(*r));
@@ -118,7 +117,7 @@ void SpatialAnalyst::multipleRasterArithmetics(void (*func)(
 
 	// Copy header files for all output rasters
 	size_t idx = 0;
-	_foreach(raster* r, outRastersVector)
+	foreach_(raster* r, outRastersVector)
 	{
 		r->copyProperties(*inRastersVector[0]);
 		raster::copyFile(inRastersVector[0]->getHdrPath(), r->getHdrPath());
@@ -144,13 +143,16 @@ void SpatialAnalyst::multipleRasterArithmetics(void (*func)(
 			outBufVector[rasterIdx].nEl = inBufVector[0].nEl;
 			outBufVector[rasterIdx].buf.allocateOnce(outBufVector[rasterIdx].nEl);
 		}
+		std::vector<float> passArg, result;
+		passArg.resize(numInRasters);
+		result.resize(numOutRasters);
+
+		// Processing loop
 		for (int i = 0; i < inBufVector[0].nEl; i++)
 		{
-			std::vector<float> passArg, result;
-			result.resize(numOutRasters);
 			for (size_t rasterIdx = 0; rasterIdx < numInRasters; rasterIdx++)
 			{
-				passArg.push_back(inBufVector[rasterIdx].buf[i]);
+				passArg[rasterIdx] = inBufVector[rasterIdx].buf[i];
 			}
 
 			// Call function
@@ -171,6 +173,6 @@ void SpatialAnalyst::multipleRasterArithmetics(void (*func)(
 	}
 
 	// Cleanup
-	_foreach(BigFileIn* f, inFileVector) delete f;
-	_foreach(BigFileOut* f, outFileVector) delete f;
+	foreach_(BigFileIn* f, inFileVector) delete f;
+	foreach_(BigFileOut* f, outFileVector) delete f;
 }

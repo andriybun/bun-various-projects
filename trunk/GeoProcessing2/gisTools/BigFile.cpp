@@ -17,8 +17,6 @@ void BigFile::openBase(const raster &r, fStreamT* file, std::ios_base::openmode 
 	this->isOpen = true;
 	this->numCells = r.extent.getNumCells();
 	numCellsProcessed = 0;
-	//this->buf = new float[MAX_READ_BUFFER_ELEMENTS];
-	this->buf.allocate(MAX_READ_BUFFER_ELEMENTS);
 	this->noDataValue = r.noDataValue;
 }
 
@@ -53,7 +51,6 @@ BigFileIn::BigFileIn(const raster &readRaster)
 BigFileIn::~BigFileIn(void)
 {
 	this->file.close();
-	//delete [] buf;
 }
 
 void BigFileIn::open(const raster &readRaster)
@@ -65,10 +62,10 @@ int BigFileIn::read(rasterBufT &rBuf)
 {
 	int bufSize = xmin(this->numCells, MAX_READ_BUFFER_ELEMENTS);
 	bufSize = xmin(bufSize, this->numCells - this->numCellsProcessed);
-	this->file.read(reinterpret_cast<char*>(this->buf.ptr()), sizeof(float) * bufSize);
-	this->numCellsProcessed += bufSize;
-	rBuf.buf = this->buf;
+	rBuf.buf.allocateOnce(bufSize);
 	rBuf.nEl = bufSize;
+	this->file.read(reinterpret_cast<char*>(rBuf.buf.ptr()), sizeof(float) * bufSize);
+	this->numCellsProcessed += bufSize;
 	rBuf.noDataValue = this->noDataValue;
 	return bufSize;
 }
@@ -92,7 +89,6 @@ BigFileOut::BigFileOut(const raster &writeRaster)
 BigFileOut::~BigFileOut(void)
 {
 	this->file.close();
-	//delete [] buf;
 }
 
 void BigFileOut::open(const raster &writeRaster)
@@ -105,8 +101,4 @@ void BigFileOut::write(rasterBufT &rBuf)
 	int bufSize = rBuf.nEl;
 	this->file.write(reinterpret_cast<char *>(rBuf.buf.ptr()), sizeof(float) * bufSize);
 	this->numCellsProcessed += bufSize;
-	//rBuf.buf = this->buf;
-	//rBuf.nEl = bufSize;
-	//rBuf.noDataValue = this->noDataValue;
-	//return bufSize;
 }
