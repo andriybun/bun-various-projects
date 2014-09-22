@@ -7,7 +7,7 @@
 #include "errorCodes.h"
 #include "raster.h"
 
-#define _foreach	BOOST_FOREACH
+#define foreach_	BOOST_FOREACH
 
 class SpatialAnalyst
 {

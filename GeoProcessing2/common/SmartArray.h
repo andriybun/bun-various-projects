@@ -5,6 +5,7 @@
 template<class T>
 class SmartArray : public boost::shared_array<T>
 {
+	size_t n;
 	bool isAllocated;
 public:
 	//using boost::shared_array<T>::shared_array;
@@ -14,6 +15,7 @@ public:
 	}; 
 	SmartArray(const size_t n) : boost::shared_array<T>(new T[n])
 	{
+		this->n = n;
 		this->isAllocated = true;
 	};
 

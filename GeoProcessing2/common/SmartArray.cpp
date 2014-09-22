@@ -8,15 +8,17 @@ void SmartArray<T>::allocate(size_t n)
 		throw "SmartArray is already allocated";
 	}
 	this->isAllocated = true;
+	this->n = n;
 	this->reset(new T[n]);
 }
 
 template<class T>
 void SmartArray<T>::allocateOnce(size_t n)
 {
-	if (!this->isAllocated)
+	if ((!this->isAllocated) || (this->n < n))
 	{
 		this->isAllocated = true;
+		this->n = n;
 		this->reset(new T[n]);	
 	}
 }

@@ -16,7 +16,6 @@ class raster;
 struct rasterBufT
 {
 	SmartArray<float> buf;
-	//float* buf;
 	float noDataValue;
 	int nEl;
 };
@@ -28,8 +27,6 @@ protected:
 	int numCells;
 	int numCellsProcessed;
 	float noDataValue;
-	SmartArray<float> buf;
-	//float* buf;
 
 	template<class fStreamT>
 	void openBase(const raster &r, fStreamT* file, std::ios_base::openmode mode);
