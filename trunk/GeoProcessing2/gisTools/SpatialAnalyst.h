@@ -15,17 +15,27 @@ public:
 	SpatialAnalyst(void);
 	~SpatialAnalyst(void);
 
-	static void rasterArithmetics(float (*func)(float, float), 
+	enum statisticsTypeT
+	{
+		SUM,
+		MEAN,
+		MIN,
+		MAX,
+		COUNT,
+		COUNT_NON_ZERO
+	};
+
+	static void RasterArithmetics(float (*func)(float, float), 
 		const raster & inRaster, 
 		const float num, 
 		raster & outRaster);
 
-	static void rasterArithmetics(float (*func)(float, float), 
+	static void RasterArithmetics(float (*func)(float, float), 
 		const raster & inRaster1, 
 		const raster & inRaster2, 
 		raster & outRaster);
 
-	static void multipleRasterArithmetics(
+	static void MultipleRasterArithmetics(
 		void (*func)(
 			const std::vector<float> &, 
 			const std::vector<float> &, 
@@ -34,5 +44,21 @@ public:
 		),
 		const std::vector<raster*> & inRastersVector,
 		std::vector<raster*> & outRastersVector);
+
+	static void ZonalStatisticsAsTable(
+		const raster &zoneRaster,
+		const raster &valueRaster,
+		//<some_table_type> &outTable,
+		//statisticsTypeT statisticType,
+		bool ignoreNodata
+		);
+
+	static void ZonalStatistics(
+		const raster &zoneRaster,
+		const raster &valueRaster,
+		raster &outRaster,
+		statisticsTypeT statisticType,
+		bool ignoreNodata
+		);
 
 };

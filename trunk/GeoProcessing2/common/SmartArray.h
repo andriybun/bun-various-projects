@@ -3,21 +3,19 @@
 #include <boost\shared_array.hpp>
 
 template<class T>
-class SmartArray : public boost::shared_array<T>
+class SmartArray final
 {
 	size_t n;
+	typedef boost::shared_array<T> smartArrayT;
+	smartArrayT data;
+
 	bool isAllocated;
 public:
-	//using boost::shared_array<T>::shared_array;
-	SmartArray(void) : boost::shared_array<T>(new T)
-	{
-		this->isAllocated = false;
-	}; 
-	SmartArray(const size_t n) : boost::shared_array<T>(new T[n])
-	{
-		this->n = n;
-		this->isAllocated = true;
-	};
+	SmartArray(void);
+	SmartArray(const size_t n);
+	SmartArray(const SmartArray&) = default;
+	SmartArray& operator=(const SmartArray&) = default;
+	T& operator[] (const size_t i);
 
 	void allocate(const size_t n);
 	void allocateOnce(const size_t n);
@@ -25,24 +23,3 @@ public:
 	T* operator-> ();
 	T* ptr();
 };
-
-//class SmartArray
-//{
-//	bool isAllocated;
-//	size_t* refCount;
-//	T* data;
-//
-//	void deallocate();
-//public:
-//	SmartArray(void);
-//	SmartArray(const size_t n);
-//	SmartArray(const SmartArray& other);
-//	SmartArray& operator=(const SmartArray& rhs);
-//	virtual ~SmartArray(void);
-//
-//	void allocate(const size_t n);
-//	T& operator* ();
-//	T operator[] (size_t i);
-//	T* operator-> ();
-//	T* ptr();
-//};

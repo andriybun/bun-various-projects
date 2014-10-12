@@ -26,7 +26,7 @@ void tableT::setNumCols(size_t n)
 void tableT::insert(const int key, const std::vector<float> & val)
 {
 	ASSERT_INT(val.size() == numCols, OTHER_ERROR);
-	data.insert(std::make_pair<int, std::vector<float>>(key, val));
+	data.insert(std::pair<int, std::vector<float>>(key, val));
 }
 
 void tableT::inc(const int key, const std::vector<float> & val)
@@ -39,7 +39,7 @@ void tableT::inc(const int key, const std::vector<float> & val)
 		tmp[idx] += val[idx];
 	}
 	data.erase(key);
-	data.insert(std::make_pair<int, std::vector<float>>(key, tmp));
+	data.insert(std::pair<int, std::vector<float>>(key, tmp));
 }
 
 void tableT::inc(const int key, const size_t idx, const float val)
@@ -52,7 +52,7 @@ void tableT::inc(const int key, const size_t idx, const float val)
 	}
 	tmp[idx-1] += val;
 	data.erase(key);
-	data.insert(std::make_pair<int, std::vector<float>>(key, tmp));
+	data.insert(std::pair<int, std::vector<float>>(key, tmp));
 }
 
 tableT::dataT::iterator tableT::find(const std::vector<float> & val)
