@@ -9,10 +9,10 @@ SpatialAnalyst::~SpatialAnalyst(void)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Static methods
+// Spatial analyst tools
 //////////////////////////////////////////////////////////////////////////
 
-void SpatialAnalyst::rasterArithmetics(float (*func)(float, float), 
+void SpatialAnalyst::RasterArithmetics(float (*func)(float, float), 
 									   const raster & inRaster,
 									   const float num,
 									   raster & outRaster)
@@ -48,7 +48,7 @@ void SpatialAnalyst::rasterArithmetics(float (*func)(float, float),
 	}
 }
 
-void SpatialAnalyst::rasterArithmetics(float (*func)(float, float), 
+void SpatialAnalyst::RasterArithmetics(float (*func)(float, float), 
 									   const raster & inRaster1,
 									   const raster & inRaster2,
 									   raster & outRaster)
@@ -88,7 +88,7 @@ void SpatialAnalyst::rasterArithmetics(float (*func)(float, float),
 	}
 }
 
-void SpatialAnalyst::multipleRasterArithmetics(void (*func)(const std::vector<float> &, 
+void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<float> &, 
 															const std::vector<float> &, 
 															const std::vector<float> &, 
 															std::vector<float> & ),
@@ -175,4 +175,24 @@ void SpatialAnalyst::multipleRasterArithmetics(void (*func)(const std::vector<fl
 	// Cleanup
 	foreach_(BigFileIn* f, inFileVector) delete f;
 	foreach_(BigFileOut* f, outFileVector) delete f;
+}
+
+void SpatialAnalyst::ZonalStatisticsAsTable(const raster &zoneRaster,
+											const raster &valueRaster,
+											// <some_table_type> &outTable,
+											//statisticsTypeT statisticType,
+											bool ignoreNodata
+											)
+{
+	// Implement
+}
+
+void SpatialAnalyst::ZonalStatistics(const raster &zoneRaster,
+									 const raster &valueRaster,
+									 raster &outRaster,
+									 statisticsTypeT statisticType,
+									 bool ignoreNodata
+									 )
+{
+	// Implement
 }

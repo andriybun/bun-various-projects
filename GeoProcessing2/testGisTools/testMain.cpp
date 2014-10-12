@@ -5,6 +5,7 @@
 
 #include "raster.h"
 #include "SpatialAnalyst.h"
+#include "time_tools.h"
 
 using namespace std;
 
@@ -54,17 +55,25 @@ po::options_description DefineOptions()
 
 int main(int argc, char* argv[])
 {
-	printf(__TIME__ "\n");
+	cout << getTime() << endl;
 	bool deleteFloats = true;
 	runParamsT runParams;
 
 	//runParams.resultDir = "E:\\GIS\\cropland calibrated\\";
 	//runParams.tmpDir = "E:\\GIS\\cropland calibrated\\tmp\\";
 
-	po::options_description desc = DefineOptions();
-	po::variables_map vm;        
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-	po::notify(vm);
+	auto desc = DefineOptions();
+	po::variables_map vm;  
+	try
+	{
+		po::store(po::parse_command_line(argc, argv, desc), vm);
+		po::notify(vm);
+	}
+	catch (std::exception& e)
+	{
+		cout << "There was a problem with parsing command line parameters." << endl;
+		return INCORRECT_INPUT_PARAMS;
+	}
 
 	if (vm.count("help"))
 	{
@@ -94,7 +103,7 @@ int main(int argc, char* argv[])
 	raster inRaster2(inRasterPath2, raster::INPUT);
 	raster outRaster(outRasterPath, raster::OUTPUT);
 
-	SpatialAnalyst::rasterArithmetics(
+	SpatialAnalyst::RasterArithmetics(
 		&processRasters, 
 		inRaster1, 
 		inRaster2, 
@@ -105,9 +114,8 @@ int main(int argc, char* argv[])
 	inRasterVec.push_back(&inRaster2);
 	raster outRaster2(outRasterPath + "_multi", raster::OUTPUT);
 	outRasterVec.push_back(&outRaster2);
-	SpatialAnalyst::multipleRasterArithmetics(&processMultipleRasters, inRasterVec, outRasterVec);
+	SpatialAnalyst::MultipleRasterArithmetics(&processMultipleRasters, inRasterVec, outRasterVec);
 
-
-	printf(__TIME__ "\n");
+	cout << getTime() << endl;
 	return 0;
 }
