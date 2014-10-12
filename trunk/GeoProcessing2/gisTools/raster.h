@@ -40,6 +40,7 @@ float xplus(float val1, float val2);
 float xminus(float val1, float val2);
 float xtimes(float val1, float val2);
 float xdivide(float val1, float val2);
+bool xequals(float val1, float val2);
 
 class BigFile;
 class SpatialAnalyst;
@@ -122,9 +123,8 @@ public:
 	raster copy(const std::string & destinationName);
 	void copy(raster & destinationRaster); 
 	void removeFloatFromDisc();
-	//void rasterArithmetics(float (*func)(float, float), const float num, raster & outRaster);
-	//void rasterArithmetics(float (*func)(float, float), const raster & inRaster, raster & outRaster);
-	
+
+	// Collect raster's statistics
 	statisticsStructT describe();
 
 	// Conversion
@@ -134,6 +134,10 @@ public:
 	// Paths to raster files
 	std::string getHdrPath() const;
 	std::string getFltPath() const;
+
+	// Some algorithms
+	bool equals(const raster &other) const;
+	float getCellValue(float x, float y) const;
 
 	friend class BigFile;
 	friend class SpatialAnalyst;

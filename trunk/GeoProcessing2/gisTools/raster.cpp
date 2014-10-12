@@ -334,6 +334,42 @@ void raster::convertFloatToRaster()
 	ASSERT_INT(!system(conversionCommand.c_str()), FLOAT_TO_RASTER_CONVERSION_ERROR);
 }
 
+// Geoprocessing algorithms
+bool raster::equals(const raster &other) const
+{
+	printf("Checking if rasters are equal\n");
+	if (this->extent != other.extent) return false;
+
+	rasterBufT thisBuf, otherBuf;
+
+	BigFileIn inFile1(*this);
+	BigFileIn inFile2(other);
+
+	while (inFile1.read(thisBuf))
+	{
+		inFile2.read(otherBuf);
+		for (int i = 0; i < thisBuf.nEl; i++)
+		{
+			if ((thisBuf.buf[i] != thisBuf.noDataValue) && (otherBuf.buf[i] != otherBuf.noDataValue))
+			{
+				if (!xequals(thisBuf.buf[i], otherBuf.buf[i])) return false;
+			}
+			else if ((thisBuf.buf[i] != thisBuf.noDataValue) || (otherBuf.buf[i] != otherBuf.noDataValue))
+			{
+				return false;
+			}
+		}
+		inFile1.printProgress();
+	}
+	return true;
+}
+
+float raster::getCellValue(float x, float y) const
+{
+	BigFileIn inFile(*this);
+	return inFile.read(this->extent.getPos(x, y));
+}
+
 std::string raster::getHdrPath() const
 {
 	return this->rasterPath + ".hdr";
@@ -362,4 +398,9 @@ float xtimes(float val1, float val2)
 float xdivide(float val1, float val2)
 {
 	return val1 / val2;
+}
+
+bool xequals(float val1, float val2)
+{
+	return val1 == val2;
 }

@@ -70,6 +70,16 @@ int BigFileIn::read(rasterBufT &rBuf)
 	return bufSize;
 }
 
+float BigFileIn::read(int pos)
+{
+	float result;
+	auto iniPos = this->file.tellg();
+	this->file.seekg(pos * sizeof(float));
+	this->file.read(reinterpret_cast<char*>(&result), sizeof(float));
+	this->file.seekg(iniPos);
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Output file
 //////////////////////////////////////////////////////////////////////////
