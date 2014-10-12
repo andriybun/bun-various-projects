@@ -36,6 +36,7 @@ void processMultipleRasters(const vector<float> & vec,
 		else
 		{
 			outVec[0] = noDataOutVec[0];
+			return;
 		}
 	}
 }
@@ -111,6 +112,7 @@ int main(int argc, char* argv[])
 		inRaster2, 
 		outRaster);
 
+	// TODO: fix this:
 	vector<raster *> inRasterVec, outRasterVec;
 	inRasterVec.push_back(&inRaster1);
 	inRasterVec.push_back(&inRaster2);
