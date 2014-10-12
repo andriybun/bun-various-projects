@@ -26,7 +26,8 @@ void processMultipleRasters(const vector<float> & vec,
 							const vector<float> & noDataOutVec,
 							vector<float> & outVec)
 {
-	for (size_t idx = 0; idx < vec.size(); idx++)
+	size_t nEl = vec.size();
+	for (size_t idx = 0; idx < nEl; idx++)
 	{
 		if (vec[idx] != noDataInVec[idx])
 		{
@@ -72,6 +73,7 @@ int main(int argc, char* argv[])
 	catch (std::exception& e)
 	{
 		cout << "There was a problem with parsing command line parameters." << endl;
+		e.what();
 		return INCORRECT_INPUT_PARAMS;
 	}
 

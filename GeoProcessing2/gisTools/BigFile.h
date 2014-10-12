@@ -46,6 +46,7 @@ public:
 	~BigFileIn(void);
 	void open(const raster &readRaster);
 	int read(rasterBufT &rBuf);
+	float read(int pos);
 };
 
 class BigFileOut : public BigFile

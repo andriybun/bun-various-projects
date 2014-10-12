@@ -109,4 +109,29 @@ public:
 		ASSERT_INT(this->isInitialized, OTHER_ERROR);
 		return this->horResolution * this->verResolution;
 	}
+
+	int getXIdx(float x) const
+	{
+		int xIdx = (int)floor((x - this->xMin) / this->cellSize);
+		if ((xIdx < 0) || (xIdx > this->horResolution))
+		{
+			throw "X coordinate out of range";
+		}
+		return xIdx;
+	}
+
+	int getYIdx(float y) const
+	{
+		int yIdx = (int)floor((this->yMin - y) / this->cellSize);
+		if ((yIdx < 0) || (yIdx > this->verResolution))
+		{
+			throw "Y coordinate out of range";
+		}
+		return yIdx;
+	}
+
+	int getPos(float x, float y) const
+	{
+		return getYIdx(y) * this->horResolution + getXIdx(x);
+	}
 };
