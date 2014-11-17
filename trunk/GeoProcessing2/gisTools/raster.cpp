@@ -352,7 +352,7 @@ bool raster::equals(const raster &other) const
 		{
 			if ((thisBuf.buf[i] != thisBuf.noDataValue) && (otherBuf.buf[i] != otherBuf.noDataValue))
 			{
-				if (!xequals(thisBuf.buf[i], otherBuf.buf[i])) return false;
+				if (thisBuf.buf[i] != otherBuf.buf[i]) return false;
 			}
 			else if ((thisBuf.buf[i] != thisBuf.noDataValue) || (otherBuf.buf[i] != otherBuf.noDataValue))
 			{
@@ -398,9 +398,4 @@ float xtimes(float val1, float val2)
 float xdivide(float val1, float val2)
 {
 	return val1 / val2;
-}
-
-bool xequals(float val1, float val2)
-{
-	return val1 == val2;
 }

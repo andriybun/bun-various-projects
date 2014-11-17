@@ -1,13 +1,12 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
-#include <boost/foreach.hpp>
+#include <cfloat>
 
 #include "errorCodes.h"
 #include "raster.h"
-
-#define foreach_	BOOST_FOREACH
 
 class SpatialAnalyst
 {
@@ -15,6 +14,7 @@ public:
 	SpatialAnalyst(void);
 	~SpatialAnalyst(void);
 
+	// Types definition
 	enum statisticsTypeT
 	{
 		SUM,
@@ -24,7 +24,26 @@ public:
 		COUNT,
 		COUNT_NON_ZERO
 	};
+	struct statisticsStructT
+	{
+		float sumVal;
+		float minVal;
+		float maxVal;
+		float meanVal;
+		int count;
+		int countNonZero;
+		statisticsStructT()
+			: count(0)
+			, countNonZero(0)
+			, sumVal(0)
+			, minVal(FLT_MAX)
+			, maxVal(FLT_MIN) 
+		{};
+	};
+	typedef std::pair<int, statisticsStructT> zonalStatisticsRecordT;
+	typedef std::map<int, statisticsStructT> zonalStatisticsTableT;
 
+	// Spatial analyst methods
 	static void RasterArithmetics(float (*func)(float, float), 
 		const raster & inRaster, 
 		const float num, 
@@ -46,19 +65,17 @@ public:
 		std::vector<raster*> & outRastersVector);
 
 	static void ZonalStatisticsAsTable(
-		const raster &zoneRaster,
-		const raster &valueRaster,
-		//<some_table_type> &outTable,
-		//statisticsTypeT statisticType,
-		bool ignoreNodata
+		const raster &zoneRaster
+		, const raster &valueRaster
+		, zonalStatisticsTableT &statTable
+		//, statisticsTypeT statType
 		);
 
 	static void ZonalStatistics(
 		const raster &zoneRaster,
 		const raster &valueRaster,
 		raster &outRaster,
-		statisticsTypeT statisticType,
-		bool ignoreNodata
+		statisticsTypeT statisticType
 		);
 
 };
