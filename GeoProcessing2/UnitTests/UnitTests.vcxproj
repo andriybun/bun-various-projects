@@ -14,6 +14,10 @@
     <ProjectGuid>{8C16E5FC-C73F-4583-820C-C6102C64C704}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>UnitTests</RootNamespace>
+    <SccProjectName>SAK</SccProjectName>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

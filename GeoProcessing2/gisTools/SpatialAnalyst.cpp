@@ -107,7 +107,7 @@ void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<fl
 	outBufVector.resize(numOutRasters);
 
 	// Validate extent for all input rasters
-	foreach_(raster* r, inRastersVector)
+	for(raster* r: inRastersVector)
 	{
 		r->validateExtent(inRastersVector[0]->extent);
 		inFileVector.push_back(new BigFileIn(*r));
@@ -117,7 +117,7 @@ void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<fl
 
 	// Copy header files for all output rasters
 	size_t idx = 0;
-	foreach_(raster* r, outRastersVector)
+	for(raster* r: outRastersVector)
 	{
 		r->copyProperties(*inRastersVector[0]);
 		raster::copyFile(inRastersVector[0]->getHdrPath(), r->getHdrPath());
@@ -173,26 +173,118 @@ void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<fl
 	}
 
 	// Cleanup
-	foreach_(BigFileIn* f, inFileVector) delete f;
-	foreach_(BigFileOut* f, outFileVector) delete f;
+	for(BigFileIn* f: inFileVector) delete f;
+	for(BigFileOut* f: outFileVector) delete f;
 }
 
-void SpatialAnalyst::ZonalStatisticsAsTable(const raster &zoneRaster,
-											const raster &valueRaster,
-											// <some_table_type> &outTable,
-											//statisticsTypeT statisticType,
-											bool ignoreNodata
+void SpatialAnalyst::ZonalStatisticsAsTable(const raster &zoneRaster
+											, const raster &valueRaster
+											, SpatialAnalyst::zonalStatisticsTableT &statTable
+											//, SpatialAnalyst::statisticsTypeT statType
 											)
 {
-	// Implement
+	zoneRaster.validateExtent(valueRaster.extent);
+
+	printf("Executing zonal statistics as table\n");
+
+	rasterBufT zoneBuf, valueBuf;
+
+	BigFileIn zoneFile(zoneRaster);
+	BigFileIn valueFile(valueRaster);
+
+	while (zoneFile.read(zoneBuf))
+	{
+		valueFile.read(valueBuf);
+		for (int i = 0; i < zoneBuf.nEl; i++)
+		{
+			if ((zoneBuf.buf[i] != zoneBuf.noDataValue) && (valueBuf.buf[i] != valueBuf.noDataValue))
+			{
+				auto it = statTable.find((int)zoneBuf.buf[i]);
+				if (it == statTable.end())
+				{
+					auto insPair = statTable.insert(
+						zonalStatisticsRecordT((int)zoneBuf.buf[i], statisticsStructT()));
+					it = insPair.first;
+				}
+				auto zoneData = &it->second;
+				zoneData->count++;
+				zoneData->countNonZero += (int)(valueBuf.buf[i] == 0);
+				zoneData->maxVal = xmax(zoneData->maxVal, valueBuf.buf[i]);
+				zoneData->minVal = xmin(zoneData->minVal, valueBuf.buf[i]);
+				zoneData->sumVal += valueBuf.buf[i];
+			}
+		}
+		zoneFile.printProgress();
+	}
+
+	for (auto it = statTable.begin(); it != statTable.end(); ++it)
+	{
+		it->second.meanVal = it->second.sumVal / it->second.count;
+	}
 }
 
 void SpatialAnalyst::ZonalStatistics(const raster &zoneRaster,
 									 const raster &valueRaster,
 									 raster &outRaster,
-									 statisticsTypeT statisticType,
-									 bool ignoreNodata
+									 statisticsTypeT statisticType
 									 )
 {
-	// Implement
+	zoneRaster.validateExtent(valueRaster.extent);
+
+	printf("Executing zonal statistics\n");
+
+	zonalStatisticsTableT statTable;
+	ZonalStatisticsAsTable(zoneRaster, valueRaster, statTable);
+
+	raster::copyFile(zoneRaster.getHdrPath(), outRaster.getHdrPath());
+	outRaster.copyProperties(zoneRaster);
+
+	rasterBufT zoneBuf, valueBuf, outBuf;
+
+	BigFileIn zoneFile(zoneRaster);
+	BigFileIn valueFile(valueRaster);
+	BigFileOut outFile(outRaster);
+
+	while (zoneFile.read(zoneBuf))
+	{
+		valueFile.read(valueBuf);
+
+		rasterBufT outBuf;
+		outBuf.buf.allocate(zoneBuf.nEl);
+		outBuf.nEl = zoneBuf.nEl;
+		outBuf.noDataValue = zoneBuf.noDataValue;
+
+		for (int i = 0; i < zoneBuf.nEl; i++)
+		{
+			if ((zoneBuf.buf[i] != zoneBuf.noDataValue) && (valueBuf.buf[i] != valueBuf.noDataValue))
+			{
+				switch (statisticType)
+				{
+				case SUM:
+					outBuf.buf[i] = statTable[(int)zoneBuf.buf[i]].sumVal;
+					break;
+				case MEAN:
+					outBuf.buf[i] = statTable[(int)zoneBuf.buf[i]].meanVal;
+					break;
+				case MIN:
+					outBuf.buf[i] = statTable[(int)zoneBuf.buf[i]].minVal;
+					break;
+				case MAX:
+					outBuf.buf[i] = statTable[(int)zoneBuf.buf[i]].maxVal;
+					break;
+				case COUNT:
+					outBuf.buf[i] = (float)statTable[(int)zoneBuf.buf[i]].count;
+					break;
+				case COUNT_NON_ZERO:
+					outBuf.buf[i] = (float)statTable[(int)zoneBuf.buf[i]].countNonZero;
+				}
+			}
+			else
+			{
+				outBuf.buf[i] = outBuf.noDataValue;
+			}
+		}
+		outFile.write(outBuf);
+		zoneFile.printProgress();
+	}
 }

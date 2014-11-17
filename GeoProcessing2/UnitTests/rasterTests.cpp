@@ -85,5 +85,37 @@ namespace UnitTests
 			Assert::AreEqual((float)16, rasOut.getCellValue(3, 1));
 			Assert::AreEqual((float)17, rasOut.getCellValue(4, 1));
 		}
+
+		TEST_METHOD(TestZonalStatisticsAsTable)
+		{
+			string home("D:\\Workspace\\IIASA\\GeoProcessing2\\_testData\\");
+			raster rasZones(home + "zones", raster::INPUT);
+			raster rasValues(home + "increment", raster::INPUT);
+
+			SpatialAnalyst::zonalStatisticsTableT statTable;
+			SpatialAnalyst::ZonalStatisticsAsTable(rasZones, 
+				rasValues, 
+				statTable);
+
+			Assert::AreEqual((float)10, statTable[1].sumVal);
+			Assert::AreEqual((float)6.5, statTable[2].meanVal);
+			Assert::AreEqual((float)12, statTable[3].maxVal);
+			Assert::AreEqual(4, statTable[4].count);
+		}
+
+		TEST_METHOD(TestZonalStatistics)
+		{
+			string home("D:\\Workspace\\IIASA\\GeoProcessing2\\_testData\\");
+			raster rasZones(home + "zones", raster::INPUT);
+			raster rasValues(home + "increment", raster::INPUT);
+			raster rasOut(home + "x_zonal_stat", raster::TEMPORARY);
+			
+			SpatialAnalyst::ZonalStatistics(rasZones, rasValues, rasOut, SpatialAnalyst::SUM);
+
+			Assert::AreEqual((float)10, rasOut.getCellValue(1, 4));
+			Assert::AreEqual((float)26, rasOut.getCellValue(1, 3));
+			Assert::AreEqual((float)42, rasOut.getCellValue(1, 2));
+			Assert::AreEqual((float)58, rasOut.getCellValue(1, 1));
+		}
 	};
 }

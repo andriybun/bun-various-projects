@@ -40,7 +40,6 @@ float xplus(float val1, float val2);
 float xminus(float val1, float val2);
 float xtimes(float val1, float val2);
 float xdivide(float val1, float val2);
-bool xequals(float val1, float val2);
 
 class BigFile;
 class SpatialAnalyst;

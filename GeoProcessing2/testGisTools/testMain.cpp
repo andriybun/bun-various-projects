@@ -106,19 +106,21 @@ int main(int argc, char* argv[])
 	raster inRaster2(inRasterPath2, raster::INPUT);
 	raster outRaster(outRasterPath, raster::OUTPUT);
 
-	SpatialAnalyst::RasterArithmetics(
-		&processRasters, 
-		inRaster1, 
-		inRaster2, 
-		outRaster);
+	//SpatialAnalyst::RasterArithmetics(
+	//	&processRasters, 
+	//	inRaster1, 
+	//	inRaster2, 
+	//	outRaster);
 
-	// TODO: fix this:
-	vector<raster *> inRasterVec, outRasterVec;
-	inRasterVec.push_back(&inRaster1);
-	inRasterVec.push_back(&inRaster2);
-	raster outRaster2(outRasterPath + "_multi", raster::OUTPUT);
-	outRasterVec.push_back(&outRaster2);
-	SpatialAnalyst::MultipleRasterArithmetics(&processMultipleRasters, inRasterVec, outRasterVec);
+	//// TODO: fix this:
+	//vector<raster *> inRasterVec, outRasterVec;
+	//inRasterVec.push_back(&inRaster1);
+	//inRasterVec.push_back(&inRaster2);
+	//raster outRaster2(outRasterPath + "_multi", raster::OUTPUT);
+	//outRasterVec.push_back(&outRaster2);
+	//SpatialAnalyst::MultipleRasterArithmetics(&processMultipleRasters, inRasterVec, outRasterVec);
+
+	SpatialAnalyst::ZonalStatistics(inRaster1, inRaster2, outRaster, SpatialAnalyst::SUM);
 
 	cout << getTime() << endl;
 	return 0;
