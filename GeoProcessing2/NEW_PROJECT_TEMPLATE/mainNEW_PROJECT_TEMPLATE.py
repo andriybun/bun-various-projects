@@ -1,6 +1,6 @@
 """
   This is a template for Python script which is called from ArcMap tool.
-  Put NEW_PROJECT_TEMPLATE.exe file to the same folder and point to this script while 
+  Put xDeleteMe.exe file to the same folder and point to this script while 
   creating tool in ArcMap.
 """
 
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
     os.chdir(workingDir)
 
-    runFileName = "NEW_PROJECT_TEMPLATE.exe"
+    runFileName = "xDeleteMe.exe"
 
     
     """

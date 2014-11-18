@@ -5,27 +5,21 @@ import hashlib
 
 def generateProjectFiles(templateFileName, generatedFileName, oldStr, newStr):
     templateFile = open(templateFileName, 'r')
-    generatedFile = open(generatedFileName, 'w')
-    
     tfLines = templateFile.readlines()
+    templateFile.close()
+    generatedFile = open(generatedFileName, 'w')
     for line in tfLines:
         generatedFile.write(line.replace(oldStr, newStr))
-    
-    templateFile.close()
     generatedFile.close()
     
-def addProjectToSolution(NEW_PROJECT_NAME):
+def addProjectToSolution(NEW_PROJECT_NAME, guid):
     solutionFileOrig = open("GeoProcessing2.sln", 'r')
     solText = solutionFileOrig.readlines()
     solutionFileOrig.close()
-
+    
     shutil.move("GeoProcessing2.sln", "GeoProcessing2.sln.bak")
     solutionFile = open("GeoProcessing2.sln", 'w')
     
-    guid = hashlib.md5(NEW_PROJECT_NAME.encode('utf-8')).hexdigest()
-    guid = "%s-%s-%s-%s-%s" % (guid[0:8], guid[8:12], guid[12:16], guid[16:20], guid[20:])
-    guid = guid.upper()
-
     textToAdd = [\
         "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"%s\", \"%s\\%s.vcxproj\", \"{%s}\"\n" \
         % (NEW_PROJECT_NAME, NEW_PROJECT_NAME, NEW_PROJECT_NAME, guid), \
@@ -69,8 +63,13 @@ def addProjectToSolution(NEW_PROJECT_NAME):
 
     
 if __name__ == "__main__":
+    PYTHON_VER = sys.version_info.major
     NEW_PROJECT_NAME = sys.argv[1]
     
+    guid = hashlib.md5(NEW_PROJECT_NAME.encode('utf-8')).hexdigest()
+    guid = "%s-%s-%s-%s-%s" % (guid[0:8], guid[8:12], guid[12:16], guid[16:20], guid[20:])
+    guid = guid.upper()
+	
     # Create directory for new project
     if not os.path.exists(NEW_PROJECT_NAME):
         os.mkdir(NEW_PROJECT_NAME)
@@ -81,7 +80,7 @@ if __name__ == "__main__":
     fileList = [ \
         "mainNEW_PROJECT_TEMPLATE.cpp" , \
         "mainNEW_PROJECT_TEMPLATE.py", \
-        "NEW_PROJECT_TEMPLATE.vcproj"]
+        "NEW_PROJECT_TEMPLATE.vcxproj"]
     
     # Generate 
     for fileName in fileList:
@@ -97,8 +96,10 @@ if __name__ == "__main__":
         
         # Generate files
         generateProjectFiles(templateFileName, generatedFileName, "NEW_PROJECT_TEMPLATE", NEW_PROJECT_NAME);
+        shutil.copyfile(generatedFileName, templateFileName)
+        generateProjectFiles(generatedFileName, generatedFileName, "PROJECT_GUID", guid);
     
     # Add project to solution
-    addProjectToSolution(NEW_PROJECT_NAME)
+    addProjectToSolution(NEW_PROJECT_NAME, guid)
     
     print("Project files generated successfully")
