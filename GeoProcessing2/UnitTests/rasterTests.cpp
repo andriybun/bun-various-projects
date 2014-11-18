@@ -36,7 +36,7 @@ namespace UnitTests
 		
 	public:
 		
-		TEST_METHOD(TestGetCellArea)
+		TEST_METHOD(TestGetCellValue)
 		{
 			string home("D:\\Workspace\\IIASA\\GeoProcessing2\\_testData\\");
 			raster inRaster(home + "increment", raster::INPUT);
