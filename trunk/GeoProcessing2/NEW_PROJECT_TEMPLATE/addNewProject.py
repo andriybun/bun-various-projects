@@ -96,7 +96,6 @@ if __name__ == "__main__":
         
         # Generate files
         generateProjectFiles(templateFileName, generatedFileName, "NEW_PROJECT_TEMPLATE", NEW_PROJECT_NAME);
-        shutil.copyfile(generatedFileName, templateFileName)
         generateProjectFiles(generatedFileName, generatedFileName, "PROJECT_GUID", guid);
     
     # Add project to solution

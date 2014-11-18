@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{PROJECT_GUID}</ProjectGuid>
-    <RootNamespace>xDeleteMe</RootNamespace>
+    <RootNamespace>NEW_PROJECT_TEMPLATE</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <SccProjectName>SAK</SccProjectName>
     <SccAuxPath>SAK</SccAuxPath>
@@ -99,7 +99,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="mainxDeleteMe.cpp" />
+    <ClCompile Include="mainNEW_PROJECT_TEMPLATE.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\gisTools\gisTools.vcxproj">
