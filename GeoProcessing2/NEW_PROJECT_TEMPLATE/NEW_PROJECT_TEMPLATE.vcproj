@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9,00"
 	Name="NEW_PROJECT_TEMPLATE"
-	ProjectGUID="{95049340-1C6B-40B6-AF42-46B1DC5140AF}"
+	ProjectGUID="{6FBB2AFD-8B29-4ECC-A545-0BAE1C2CB353}"
 	RootNamespace="NEW_PROJECT_TEMPLATE"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)gisTools"
+				AdditionalIncludeDirectories="$(SolutionDir)gisTools;$(SolutionDir)vendors;$(SolutionDir)common;$(BOOST_ROOT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,11 +61,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="gisTools.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName); $(PYTHON_LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(BOOST_ROOT)\stage\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
+				Profile="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -116,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="$(SolutionDir)gisTools"
+				AdditionalIncludeDirectories="$(SolutionDir)gisTools;$(SolutionDir)vendors;$(SolutionDir)common;$(BOOST_ROOT)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -135,8 +137,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="gisTools.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName); $(PYTHON_LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(BOOST_ROOT)\stage\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -163,7 +166,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>

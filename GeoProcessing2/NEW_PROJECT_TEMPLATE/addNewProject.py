@@ -21,22 +21,23 @@ def generateProjectFiles(templateFileName, generatedFileName, oldStr, newStr):
     generatedFile.close()
     
 def addProjectToSolution(NEW_PROJECT_NAME):
-    solutionFileOrig = open("geoprocessing.sln", 'r')
+    solutionFileOrig = open("GeoProcessing2.sln", 'r')
     solText = solutionFileOrig.readlines()
     solutionFileOrig.close()
     
-    shutil.move("geoprocessing.sln", "geoprocessing.sln.bak")
-    solutionFile = open("geoprocessing.sln", 'w')
+    shutil.move("GeoProcessing2.sln", "GeoProcessing2.sln.bak")
+    solutionFile = open("GeoProcessing2.sln", 'w')
     
     guid = hashlib.md5(NEW_PROJECT_NAME).hexdigest()
     guid = "%s-%s-%s-%s-%s" % (guid[0:8], guid[8:12], guid[12:16], guid[16:20], guid[20:])
     guid = guid.upper()
 
     textToAdd = [\
-        "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"%s\", \"%s\\%s.vcproj\", \"{%s}\"\n" \
+        "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"%s\", \"%s\\%s.vcxproj\", \"{%s}\"\n" \
         % (NEW_PROJECT_NAME, NEW_PROJECT_NAME, NEW_PROJECT_NAME, guid), \
         "\tProjectSection(ProjectDependencies) = postProject\n", \
         "\t\t{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7} = {E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}\n", \
+        "\t\t{DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8} = {DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8}\n", \
         "\tEndProjectSection\n", \
         "EndProject\n"]
     

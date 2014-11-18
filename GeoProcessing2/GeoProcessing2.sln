@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gisTools", "gisTools\gisTools.vcxproj", "{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testGisTools", "testGisTools\testGisTools.vcxproj", "{6FBB2AFD-8B29-4ECC-A545-0BAE1C2CB353}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7} = {E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}
+		{DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8} = {DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vendors", "vendors\vendors.vcxproj", "{B6582166-CF21-4ABE-9A64-674C1411018F}"
 EndProject
@@ -19,27 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\Unit
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://andriybun.visualstudio.com/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = common\\common.vcxproj
-		SccProjectName1 = common
-		SccLocalPath1 = common
-		SccProjectUniqueName2 = gisTools\\gisTools.vcxproj
-		SccProjectName2 = gisTools
-		SccLocalPath2 = gisTools
-		SccProjectUniqueName3 = testGisTools\\testGisTools.vcxproj
-		SccProjectName3 = testGisTools
-		SccLocalPath3 = testGisTools
-		SccProjectUniqueName4 = UnitTests\\UnitTests.vcxproj
-		SccProjectName4 = UnitTests
-		SccLocalPath4 = UnitTests
-		SccProjectUniqueName5 = vendors\\vendors.vcxproj
-		SccProjectName5 = vendors
-		SccLocalPath5 = vendors
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
@@ -68,8 +51,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
