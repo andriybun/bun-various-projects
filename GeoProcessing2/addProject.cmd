@@ -1,1 +1,1 @@
-NEW_PROJECT_TEMPLATE/addNewProject.py probabilityLayerMultiPriority
+NEW_PROJECT_TEMPLATE\\addNewProject.py %1

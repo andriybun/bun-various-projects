@@ -1,9 +1,3 @@
-#NEW_PROJECT_NAME = "deleteTestProject"
-
-
-
-###############################################################################
-
 import sys
 import os
 import shutil
@@ -24,11 +18,11 @@ def addProjectToSolution(NEW_PROJECT_NAME):
     solutionFileOrig = open("GeoProcessing2.sln", 'r')
     solText = solutionFileOrig.readlines()
     solutionFileOrig.close()
-    
+
     shutil.move("GeoProcessing2.sln", "GeoProcessing2.sln.bak")
     solutionFile = open("GeoProcessing2.sln", 'w')
     
-    guid = hashlib.md5(NEW_PROJECT_NAME).hexdigest()
+    guid = hashlib.md5(NEW_PROJECT_NAME.encode('utf-8')).hexdigest()
     guid = "%s-%s-%s-%s-%s" % (guid[0:8], guid[8:12], guid[12:16], guid[16:20], guid[20:])
     guid = guid.upper()
 
@@ -107,4 +101,4 @@ if __name__ == "__main__":
     # Add project to solution
     addProjectToSolution(NEW_PROJECT_NAME)
     
-    print "Project files generated successfully!"
+    print("Project files generated successfully")
