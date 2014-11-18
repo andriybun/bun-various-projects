@@ -17,7 +17,7 @@ if __name__ == "__main__":
     workingDir = os.path.dirname(sys.argv[0])
     os.chdir(workingDir)
 
-    runFileName = "xDeleteMe.exe"
+    runFileName = "NEW_PROJECT_TEMPLATE.exe"
 
     
     """
