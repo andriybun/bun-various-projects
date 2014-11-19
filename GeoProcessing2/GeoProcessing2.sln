@@ -16,6 +16,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcxproj", "{DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD9D3F2D-F982-4074-B0BC-C106829407E3}"
+	ProjectSection(SolutionItems) = preProject
+		readme.txt = readme.txt
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{8C16E5FC-C73F-4583-820C-C6102C64C704}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -23,6 +26,36 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\Unit
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://andriybun.visualstudio.com/defaultcollection
+		SccProjectUniqueName0 = gisTools\\gisTools.vcxproj
+		SccProjectName0 = gisTools
+		SccAuxPath0 = https://andriybun.visualstudio.com/defaultcollection
+		SccLocalPath0 = gisTools
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName1 = common\\common.vcxproj
+		SccProjectName1 = common
+		SccAuxPath1 = https://andriybun.visualstudio.com/defaultcollection
+		SccLocalPath1 = common
+		SccProvider1 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName2 = testGisTools\\testGisTools.vcxproj
+		SccProjectName2 = testGisTools
+		SccAuxPath2 = https://andriybun.visualstudio.com/defaultcollection
+		SccLocalPath2 = testGisTools
+		SccProvider2 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName3 = vendors\\vendors.vcxproj
+		SccProjectName3 = vendors
+		SccAuxPath3 = https://andriybun.visualstudio.com/defaultcollection
+		SccLocalPath3 = vendors
+		SccProvider3 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName4 = UnitTests\\UnitTests.vcxproj
+		SccProjectName4 = UnitTests
+		SccAuxPath4 = https://andriybun.visualstudio.com/defaultcollection
+		SccLocalPath4 = UnitTests
+		SccProvider4 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
