@@ -107,7 +107,7 @@ if __name__ == "__main__":
     Now parsing names of parameters passed as command line arguments from 2nd to the end
     """
     nArgs = len(sys.argv) - 1
-    EXECUTE_COMMAND_FORMAT = '\'' + r'"%s" "%s" "%s" "%s"'
+    EXECUTE_COMMAND_FORMAT = '\'' + r'"%s" --workingDir "%s" --resultDir "%s" --tmpDir "%s"'
     EXECUTE_COMMAND_PARAMS = ""
     OPTIONS_DESCRIPTION = ""
     PARSE_PARAMS_DECLARATION = ""
