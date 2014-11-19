@@ -77,13 +77,14 @@ if __name__ == "__main__":
         raise Exception("Specified directory already exists.")
 
     # List of files to process
-    fileList = [ \
+    fileListRaw = [ \
         "mainNEW_PROJECT_TEMPLATE.cpp" , \
         "mainNEW_PROJECT_TEMPLATE.py", \
         "NEW_PROJECT_TEMPLATE.vcxproj"]
-    
+    fileList = []
+
     # Generate 
-    for fileName in fileList:
+    for fileName in fileListRaw:
         # Path to template file
         templateFileName = "NEW_PROJECT_TEMPLATE\\%s" % (fileName)
         
@@ -97,8 +98,42 @@ if __name__ == "__main__":
         # Generate files
         generateProjectFiles(templateFileName, generatedFileName, "NEW_PROJECT_TEMPLATE", NEW_PROJECT_NAME);
         generateProjectFiles(generatedFileName, generatedFileName, "PROJECT_GUID", guid);
+
+        fileList.append(generatedFileName)
     
     # Add project to solution
     addProjectToSolution(NEW_PROJECT_NAME, guid)
-    
+
+    """
+    Now parsing names of parameters passed as command line arguments from 2nd to the end
+    """
+    nArgs = len(sys.argv) - 1
+    EXECUTE_COMMAND_FORMAT = '\'' + r'"%s" "%s" "%s" "%s"'
+    EXECUTE_COMMAND_PARAMS = ""
+    OPTIONS_DESCRIPTION = ""
+    PARSE_PARAMS_DECLARATION = ""
+    PARSE_PARAMS = ""
+    i = 0
+    for parName in sys.argv[2:]:
+        i += 1
+        EXECUTE_COMMAND_FORMAT += r' "%s" --' + parName
+        EXECUTE_COMMAND_PARAMS += ', \\\n\t\tsys.argv[%d]' % (i)
+        OPTIONS_DESCRIPTION += "\t\t(\"%s\", po::value<#TYPE_OF_PARAMETER_%d>(), \"ADD DESCRIPTION\")\n" % (parName, i)
+        PARSE_PARAMS_DECLARATION += "\t#TYPE_OF_PARAMETER_%d #NAME_OF_PARAMETER_%d;\n" % (i, i)
+        PARSE_PARAMS += \
+            	"\tif (vm.count(\"%s\"))\n" % (parName) + \
+	            "\t{\n" + \
+		        "\t\t#NAME_OF_PARAMETER_%d = vm[\"%s\"].as<#TYPE_OF_PARAMETER_%d>();\n" % (i, parName, i) + \
+		        "\t\tnParams++;\n" + \
+	            "\t}\n"
+
+
+    EXECUTE_COMMAND_FORMAT += '\''
+    generateProjectFiles(fileList[1], fileList[1], "EXECUTE_COMMAND_FORMAT", EXECUTE_COMMAND_FORMAT)
+    generateProjectFiles(fileList[1], fileList[1], "EXECUTE_COMMAND_PARAMS", EXECUTE_COMMAND_PARAMS)
+    generateProjectFiles(fileList[0], fileList[0], "#OPTIONS_DESCRIPTION", OPTIONS_DESCRIPTION)
+    generateProjectFiles(fileList[0], fileList[0], "#PARSE_PARAMS_DECLARATION", PARSE_PARAMS_DECLARATION)
+    generateProjectFiles(fileList[0], fileList[0], "#PARSE_PARAMS", PARSE_PARAMS)
+    generateProjectFiles(fileList[0], fileList[0], "#NUM_PARAMS", str(i))
+
     print("Project files generated successfully")
