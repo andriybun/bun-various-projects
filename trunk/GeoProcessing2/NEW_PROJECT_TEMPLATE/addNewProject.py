@@ -63,7 +63,6 @@ def addProjectToSolution(NEW_PROJECT_NAME, guid):
 
     
 if __name__ == "__main__":
-    PYTHON_VER = sys.version_info.major
     NEW_PROJECT_NAME = sys.argv[1]
     
     guid = hashlib.md5(NEW_PROJECT_NAME.encode('utf-8')).hexdigest()
