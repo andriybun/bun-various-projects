@@ -1,1 +1,1 @@
-NEW_PROJECT_TEMPLATE\\addNewProject.py %1
+NEW_PROJECT_TEMPLATE\\addNewProject.py %*

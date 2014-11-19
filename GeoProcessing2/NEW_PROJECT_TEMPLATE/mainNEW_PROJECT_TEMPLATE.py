@@ -36,11 +36,11 @@ if __name__ == "__main__":
       It is necessary to pass to C++ program paths to working directory, directory 
       for results and putting temporary files which will be deleted after executing script.
     """
-    executeCommand = '"%s" "%s" "%s" "%s"' % ( \
+    executeCommand = EXECUTE_COMMAND_FORMAT % ( \
         runFileName, \
         workingDir, \
         resultDir, \
-        tmpDir
+        tmpDir EXECUTE_COMMAND_PARAMS
         )
     """
       Here include other parameters you want to pass to program executable.
