@@ -29,14 +29,14 @@ def addProjectToSolution(NEW_PROJECT_NAME, guid):
         "\tEndProjectSection\n", \
         "EndProject\n"]
     
-    idx = 0
+    idx = 1
     line = solText[idx]
     
     while (line != "Global\n"):
         solutionFile.write(line)
-        idx += 1
         line = solText[idx]
-        
+        idx += 1
+
     solutionFile.writelines(textToAdd)
     
     while (line != "\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n"):
@@ -48,7 +48,7 @@ def addProjectToSolution(NEW_PROJECT_NAME, guid):
         solutionFile.write(line)
         line = solText[idx]
         idx += 1
-    
+
     solutionFile.write("\t\t{%s}.Debug|Win32.ActiveCfg = Debug|Win32\n" % (guid))
     solutionFile.write("\t\t{%s}.Debug|Win32.Build.0 = Debug|Win32\n" % (guid))
     solutionFile.write("\t\t{%s}.Release|Win32.ActiveCfg = Release|Win32\n" % (guid))
@@ -58,7 +58,7 @@ def addProjectToSolution(NEW_PROJECT_NAME, guid):
         solutionFile.write(line)
         line = solText[idx]
         idx += 1
-
+    solutionFile.write(line)
     solutionFile.close()
 
     
