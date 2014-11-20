@@ -25,12 +25,12 @@ if __name__ == "__main__":
       temporary directory if necessary. Computer name is used to avoid network conflicts
       if two or more computers are running scripts in the same directory on network drive.
     """    
-#    resultDir        = os.path.dirname(output)
-#    tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
-#    deleteTmpDir = False
-#    if not os.path.exists(tmpDir):
-#        os.mkdir(tmpDir)
-#        deleteTmpDir = True
+   resultDir        = os.path.dirname(output)
+   tmpDir           = resultDir + "\\tmp_" + os.getenv('COMPUTERNAME')
+   deleteTmpDir = False
+   if not os.path.exists(tmpDir):
+       os.mkdir(tmpDir)
+       deleteTmpDir = True
 
     """
       It is necessary to pass to C++ program paths to working directory, directory 
@@ -50,8 +50,8 @@ if __name__ == "__main__":
     print("Command line:\n%s\n-----------------------------------------------------------------------" % executeCommand)
     callResult = subprocess.call(executeCommand)
 
-#    if deleteTmpDir:
-#        shutil.rmtree(tmpDir)
+   if deleteTmpDir:
+       shutil.rmtree(tmpDir)
     
     if not(callResult == 0):
         raise Exception('Error! Function returned error code %d!' % callResult)
