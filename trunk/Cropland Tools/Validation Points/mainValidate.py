@@ -78,7 +78,6 @@ def printScores(resultFile, croplandLayerList, rasterAgreement, rasterZonesStats
     csvfile.close()        
         
 if __name__ == "__main__":
-#    interface = arcgisscripting.create()
     interface = interfaceT()
     interface.AddMessage("Running validation points check.")
     workingDir = os.path.dirname(sys.argv[5])
@@ -159,8 +158,6 @@ if __name__ == "__main__":
     
     gp.AddMessage('while loop')
     while row:
-        
-        gp.AddMessage('row idx = %d' % (idx))
         # Read joined table
         # Read country index
         zoneId = row.GetValue(countriesFieldName)
@@ -169,16 +166,13 @@ if __name__ == "__main__":
         landClass = []
         landPerc = []
         for col in range(3):
-            
-            gp.AddMessage('\tcol = %d' % (col))
             landClass.append(row.GetValue(fields[col * 2]))
             landPerc.append(row.GetValue(fields[col * 2 + 1]))
-        gp.AddMessage('\tdone col loop')
         # Now lookup for cropland and its percentage per cell
         if CROPLAND_CLASS_IDX in landClass:
             crPerc = landPerc[landClass.index(CROPLAND_CLASS_IDX)]
         else:
-            crPerc = 0
+            crPerc = -999
         # Fill in agreement tables
         for rasterIdx in range(numRasters):
             newFieldName = newFieldNamePattern % (rasterIdx + 1)
@@ -187,18 +181,16 @@ if __name__ == "__main__":
 
         row = rows.next()
         idx += 1
-        gp.AddMessage('row done')
+        #gp.AddMessage('row done')
     
     gp.AddMessage('done while loop')
     # Process collected data and calculate scores for countries
     rasterZonesStats = getScores(inRastersList, rasterAgreement)
     # Print results to file
     printScores(output, inRastersList, rasterAgreement, rasterZonesStats)
-    
+
     if deleteTmpDir:
         shutil.rmtree(tmpDir)
-    
-    raise Exception('REDO!')
     
     """
     "m:\Andriy\new_run\1_Cropland_Validation_Inputs\countries.img" "m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_regional_120307_ABmin.img;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_modis.img;m:\Andriy\new_run\1_Cropland_Validation_Inputs\prod_avg_geocover.img" "M:\Andriy\new_run\Results_Global\120826_test\validation_points.csv" "M:\Andriy\new_run\Results_Global\120826_test\result_optimized.csv"
