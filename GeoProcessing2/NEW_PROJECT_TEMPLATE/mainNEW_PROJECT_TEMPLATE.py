@@ -46,7 +46,8 @@ if __name__ == "__main__":
       Here include other parameters you want to pass to program executable.
       Note! Don't forget to modify format string as well!
     """
-        
+
+    print("Command line:\n%s\n-----------------------------------------------------------------------" % executeCommand)
     callResult = subprocess.call(executeCommand)
 
 #    if deleteTmpDir:
