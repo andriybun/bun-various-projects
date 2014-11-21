@@ -117,7 +117,7 @@ if __name__ == "__main__":
     i = 0
     for parName in sys.argv[2:]:
         i += 1
-        EXECUTE_COMMAND_FORMAT += r' "%s" --' + parName
+        EXECUTE_COMMAND_FORMAT += r' --' + parName + r' "%s"'
         EXECUTE_COMMAND_PARAMS += ', \\\n\t\tsys.argv[%d]' % (i)
         OPTIONS_DESCRIPTION += "\t\t(\"%s\", po::value<#TYPE_OF_PARAMETER_%d>(), \"ADD DESCRIPTION\")\n" % (parName, i)
         PARSE_PARAMS_DECLARATION += "\t#TYPE_OF_PARAMETER_%d #NAME_OF_PARAMETER_%d;\n" % (i, i)
