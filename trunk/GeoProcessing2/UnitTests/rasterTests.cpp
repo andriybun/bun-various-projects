@@ -64,26 +64,26 @@ namespace UnitTests
 		TEST_METHOD(TestMultipleRasterArithmetics)
 		{
 			string home("D:\\Workspace\\IIASA\\GeoProcessing2\\_testData\\");
-			raster rasIncrement(home + "increment", raster::INPUT);
-			raster rasOnes(home + "ones", raster::INPUT);
-			raster rasOut(home + "x_unit_test_result", raster::TEMPORARY);
+			std::shared_ptr<raster> rasIncrement(new raster(home + "increment", raster::INPUT));
+			std::shared_ptr<raster> rasOnes(new raster(home + "ones", raster::INPUT));
+			std::shared_ptr<raster> rasOut(new raster(home + "x_unit_test_result", raster::TEMPORARY));
 
-			vector<raster *> inRasterVec, outRasterVec;
-			inRasterVec.push_back(&rasIncrement);
-			inRasterVec.push_back(&rasOnes);
-			outRasterVec.push_back(&rasOut);
+			vector<std::shared_ptr<raster>> inRasterVec, outRasterVec;
+			inRasterVec.push_back(rasIncrement);
+			inRasterVec.push_back(rasOnes);
+			outRasterVec.push_back(rasOut);
 
 			SpatialAnalyst::MultipleRasterArithmetics(&processMultipleRasters, 
 				inRasterVec, outRasterVec);
 
-			Assert::AreEqual((float)2, rasOut.getCellValue(1, 4));
-			Assert::AreEqual((float)3, rasOut.getCellValue(2, 4));
-			Assert::AreEqual((float)4, rasOut.getCellValue(3, 4));
-			Assert::AreEqual((float)5, rasOut.getCellValue(4, 4));
-			Assert::AreEqual((float)14, rasOut.getCellValue(1, 1));
-			Assert::AreEqual((float)15, rasOut.getCellValue(2, 1));
-			Assert::AreEqual((float)16, rasOut.getCellValue(3, 1));
-			Assert::AreEqual((float)17, rasOut.getCellValue(4, 1));
+			Assert::AreEqual((float)2, rasOut->getCellValue(1, 4));
+			Assert::AreEqual((float)3, rasOut->getCellValue(2, 4));
+			Assert::AreEqual((float)4, rasOut->getCellValue(3, 4));
+			Assert::AreEqual((float)5, rasOut->getCellValue(4, 4));
+			Assert::AreEqual((float)14, rasOut->getCellValue(1, 1));
+			Assert::AreEqual((float)15, rasOut->getCellValue(2, 1));
+			Assert::AreEqual((float)16, rasOut->getCellValue(3, 1));
+			Assert::AreEqual((float)17, rasOut->getCellValue(4, 1));
 		}
 
 		TEST_METHOD(TestZonalStatisticsAsTable)
