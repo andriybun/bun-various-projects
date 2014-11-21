@@ -123,7 +123,7 @@ raster::~raster()
 		this->convertFloatToRaster();
 
 	}
-	if ((this->initializedFromImg && ((this->rasterType == INPUT) || (this->rasterType == OUTPUT)))
+	if ((this->initializedFromImg && (this->rasterType == INPUT)) || (this->rasterType == OUTPUT)
 		|| (this->rasterType == TEMPORARY))
 	{
 		this->removeFloatFromDisc();
