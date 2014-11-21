@@ -87,11 +87,13 @@
   <ItemGroup>
     <ClCompile Include="SmartArray.cpp" />
     <ClCompile Include="time_tools.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SmartArray.h" />
     <ClInclude Include="..\gisTools\staticArrays.h" />
     <ClInclude Include="time_tools.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
