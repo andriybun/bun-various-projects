@@ -68,8 +68,8 @@
       <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(ProjectDir)convertFloatToRaster.py" "$(OutDir)convertFloatToRaster.py"</Command>
-	  <Command>copy "$(ProjectDir)convertRasterToFloat.py" "$(OutDir)convertRasterToFloat.py"</Command>
+      <Command>copy "$(ProjectDir)convertRasterToFloat.py" "$(OutDir)convertRasterToFloat.py"
+                    copy "$(ProjectDir)convertFloatToRaster.py" "$(OutDir)convertFloatToRaster.py"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -88,8 +88,8 @@
       <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(ProjectDir)convertFloatToRaster.py" "$(OutDir)convertFloatToRaster.py"</Command>
-      <Command>copy "$(ProjectDir)convertRasterToFloat.py" "$(OutDir)convertRasterToFloat.py"</Command>
+      <Command>copy "$(ProjectDir)convertRasterToFloat.py" "$(OutDir)convertRasterToFloat.py"
+                    copy "$(ProjectDir)convertFloatToRaster.py" "$(OutDir)convertFloatToRaster.py"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
