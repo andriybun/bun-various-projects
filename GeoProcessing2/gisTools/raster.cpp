@@ -27,7 +27,12 @@ void raster::rasterInitPrivate(const std::string & rasterFullPath, rasterTypeT r
 		this->rasterType = EMPTY;
 		return;
 	}
-	this->rasterPath = rasterFullPath;
+	std::string rasterPathTrunk = rasterFullPath;
+	if (!rasterPathTrunk.substr(rasterPathTrunk.length() - 4, 4).compare(".img"))
+	{
+		rasterPathTrunk = rasterPathTrunk.substr(0, rasterPathTrunk.length() - 4);
+	}
+	this->rasterPath = rasterPathTrunk;
 	char fileName[200];
 	_splitpath_s(this->rasterPath.c_str(), NULL, 0, NULL, 0, fileName, 200, NULL, 0);
 	this->rasterName = fileName;
@@ -40,7 +45,7 @@ void raster::rasterInitPrivate(const std::string & rasterFullPath, rasterTypeT r
 		if (!this->readRasterProperties())
 		{
 			std::ifstream f;
-			std::string imgFileName = rasterFullPath + ".img";
+			std::string imgFileName = rasterPathTrunk + ".img";
 			f.open(imgFileName.c_str(), std::ios::in);
 			if (f.is_open())
 			{
