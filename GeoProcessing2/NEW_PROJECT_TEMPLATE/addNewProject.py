@@ -81,6 +81,7 @@ if __name__ == "__main__":
         "mainNEW_PROJECT_TEMPLATE.py", \
         "NEW_PROJECT_TEMPLATE.vcxproj"]
     fileList = []
+    filePathList = []
 
     # Generate 
     for fileName in fileListRaw:
@@ -92,12 +93,13 @@ if __name__ == "__main__":
         generatedFileName = fileName.replace("NEW_PROJECT_TEMPLATE", new_project_name_cap)
         generatedFileName = generatedFileName[0].lower() + generatedFileName[1:]
         # Full path to generated file
-        generatedFileName = "%s\\%s" % (NEW_PROJECT_NAME, generatedFileName)
+        generatedFilePath = "%s\\%s" % (NEW_PROJECT_NAME, generatedFileName)
         
         # Generate files
-        generateProjectFiles(templateFileName, generatedFileName, "NEW_PROJECT_TEMPLATE", NEW_PROJECT_NAME);
-        generateProjectFiles(generatedFileName, generatedFileName, "PROJECT_GUID", guid);
+        generateProjectFiles(templateFileName, generatedFilePath, "NEW_PROJECT_TEMPLATE", NEW_PROJECT_NAME);
+        generateProjectFiles(generatedFilePath, generatedFilePath, "PROJECT_GUID", guid);
 
+        filePathList.append(generatedFilePath)
         fileList.append(generatedFileName)
     
     # Add project to solution
@@ -128,11 +130,13 @@ if __name__ == "__main__":
 
 
     EXECUTE_COMMAND_FORMAT += '\''
-    generateProjectFiles(fileList[1], fileList[1], "EXECUTE_COMMAND_FORMAT", EXECUTE_COMMAND_FORMAT)
-    generateProjectFiles(fileList[1], fileList[1], "EXECUTE_COMMAND_PARAMS", EXECUTE_COMMAND_PARAMS)
-    generateProjectFiles(fileList[0], fileList[0], "#OPTIONS_DESCRIPTION", OPTIONS_DESCRIPTION)
-    generateProjectFiles(fileList[0], fileList[0], "#PARSE_PARAMS_DECLARATION", PARSE_PARAMS_DECLARATION)
-    generateProjectFiles(fileList[0], fileList[0], "#PARSE_PARAMS", PARSE_PARAMS)
-    generateProjectFiles(fileList[0], fileList[0], "#NUM_PARAMS", str(i))
+    generateProjectFiles(filePathList[1], filePathList[1], "EXECUTE_COMMAND_FORMAT", EXECUTE_COMMAND_FORMAT)
+    generateProjectFiles(filePathList[1], filePathList[1], "EXECUTE_COMMAND_PARAMS", EXECUTE_COMMAND_PARAMS)
+    generateProjectFiles(filePathList[0], filePathList[0], "#OPTIONS_DESCRIPTION", OPTIONS_DESCRIPTION)
+    generateProjectFiles(filePathList[0], filePathList[0], "#PARSE_PARAMS_DECLARATION", PARSE_PARAMS_DECLARATION)
+    generateProjectFiles(filePathList[0], filePathList[0], "#PARSE_PARAMS", PARSE_PARAMS)
+    generateProjectFiles(filePathList[0], filePathList[0], "#NUM_PARAMS", str(i))
+    generateProjectFiles(filePathList[2], filePathList[2], "#PYTHON_FILE_NAME", fileList[1])
+
 
     print("Project files generated successfully")

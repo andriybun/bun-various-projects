@@ -75,6 +75,9 @@
       <Profile>false</Profile>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)#PYTHON_FILE_NAME $(OutDir)#PYTHON_FILE_NAME</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -97,6 +100,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)#PYTHON_FILE_NAME $(OutDir)#PYTHON_FILE_NAME</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mainNEW_PROJECT_TEMPLATE.cpp" />

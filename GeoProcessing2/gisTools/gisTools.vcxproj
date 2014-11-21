@@ -89,6 +89,7 @@
     </Lib>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)convertFloatToRaster.py" "$(OutDir)convertFloatToRaster.py"</Command>
+      <Command>copy "$(ProjectDir)convertRasterToFloat.py" "$(OutDir)convertRasterToFloat.py"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
