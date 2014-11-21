@@ -375,6 +375,11 @@ float raster::getCellValue(float x, float y) const
 	return inFile.read(this->extent.getPos(x, y));
 }
 
+std::string raster::getName() const
+{
+	return this->rasterName;
+}
+
 std::string raster::getHdrPath() const
 {
 	return this->rasterPath + ".hdr";
