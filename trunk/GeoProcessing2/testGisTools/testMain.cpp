@@ -6,6 +6,7 @@
 #include "raster.h"
 #include "SpatialAnalyst.h"
 #include "time_tools.h"
+#include "utils.h"
 
 using namespace std;
 

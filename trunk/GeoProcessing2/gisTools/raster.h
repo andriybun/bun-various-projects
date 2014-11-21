@@ -131,6 +131,7 @@ public:
 	void convertFloatToRaster();
 
 	// Paths to raster files
+	std::string getName() const;
 	std::string getHdrPath() const;
 	std::string getFltPath() const;
 

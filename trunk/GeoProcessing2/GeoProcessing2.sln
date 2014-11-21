@@ -1,4 +1,4 @@
-﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
@@ -23,6 +23,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{8C16E5FC-C73F-4583-820C-C6102C64C704}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7} = {E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "countriesWithNonZero", "countriesWithNonZero\countriesWithNonZero.vcxproj", "{283ACA6C-A764-52B7-968C-F35711A8EA06}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E5DA2D38-E736-4619-8D0B-D4DE27F34BD7} = {E5DA2D38-E736-4619-8D0B-D4DE27F34BD7}
+		{DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8} = {DE3FABA0-FF0D-46D2-92F0-BC5F207FD5D8}
 	EndProjectSection
 EndProject
 Global
@@ -81,6 +87,10 @@ Global
 		{8C16E5FC-C73F-4583-820C-C6102C64C704}.Debug|Win32.Build.0 = Debug|Win32
 		{8C16E5FC-C73F-4583-820C-C6102C64C704}.Release|Win32.ActiveCfg = Release|Win32
 		{8C16E5FC-C73F-4583-820C-C6102C64C704}.Release|Win32.Build.0 = Release|Win32
+		{283ACA6C-A764-52B7-968C-F35711A8EA06}.Debug|Win32.ActiveCfg = Debug|Win32
+		{283ACA6C-A764-52B7-968C-F35711A8EA06}.Debug|Win32.Build.0 = Debug|Win32
+		{283ACA6C-A764-52B7-968C-F35711A8EA06}.Release|Win32.ActiveCfg = Release|Win32
+		{283ACA6C-A764-52B7-968C-F35711A8EA06}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
