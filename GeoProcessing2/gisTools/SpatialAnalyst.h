@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <cfloat>
@@ -61,8 +62,8 @@ public:
 			const std::vector<float> &, 
 			std::vector<float> &
 		),
-		const std::vector<raster*> & inRastersVector,
-		std::vector<raster*> & outRastersVector);
+		const std::vector<std::shared_ptr<raster>> & inRastersVector,
+		std::vector<std::shared_ptr<raster>> & outRastersVector);
 
 	static void ZonalStatisticsAsTable(
 		const raster &zoneRaster

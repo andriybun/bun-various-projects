@@ -92,8 +92,8 @@ void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<fl
 															const std::vector<float> &, 
 															const std::vector<float> &, 
 															std::vector<float> & ),
-											   const std::vector<raster*> & inRastersVector,
-											   std::vector<raster*> & outRastersVector)
+															const std::vector<std::shared_ptr<raster>> & inRastersVector,
+															std::vector<std::shared_ptr<raster>> & outRastersVector)
 {
 	size_t numInRasters = inRastersVector.size();
 	size_t numOutRasters = outRastersVector.size();
@@ -107,7 +107,7 @@ void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<fl
 	outBufVector.resize(numOutRasters);
 
 	// Validate extent for all input rasters
-	for(raster* r: inRastersVector)
+	for (auto r : inRastersVector)
 	{
 		r->validateExtent(inRastersVector[0]->extent);
 		inFileVector.push_back(new BigFileIn(*r));
@@ -117,7 +117,7 @@ void SpatialAnalyst::MultipleRasterArithmetics(void (*func)(const std::vector<fl
 
 	// Copy header files for all output rasters
 	size_t idx = 0;
-	for(raster* r: outRastersVector)
+	for(auto r: outRastersVector)
 	{
 		r->copyProperties(*inRastersVector[0]);
 		raster::copyFile(inRastersVector[0]->getHdrPath(), r->getHdrPath());
